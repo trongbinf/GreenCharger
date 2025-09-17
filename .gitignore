@@ -1,0 +1,21 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+# OS
+.DS_Store
+Thumbs.db
+# Logs
+*.log
+# Visual Studio Code
+.vscode/
+# Others
+.env
+node_modules/
+# Build
+GreenChargerAPI/bin/
+GreenChargerAPI/obj/

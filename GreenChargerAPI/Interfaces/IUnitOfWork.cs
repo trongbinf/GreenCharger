@@ -9,7 +9,13 @@ namespace GreenChargerAPI.Interfaces
         IGenericRepository<Order> Orders { get; }
         IGenericRepository<OrderDetail> OrderDetails { get; }
         IGenericRepository<Slider> Sliders { get; }
-         IGenericRepository<Cart> Carts { get; }
+        IGenericRepository<Cart> Carts { get; }
+        IGenericRepository<Address> Addresses { get; }
+        IGenericRepository<Review> Reviews { get; }
+        IGenericRepository<Wishlist> Wishlists { get; }
+        IGenericRepository<Coupon> Coupons { get; }
+        IGenericRepository<CouponUsage> CouponUsages { get; }
+        IGenericRepository<ReviewHelpful> ReviewHelpfuls { get; }
         Task<int> CompleteAsync();
     }
 }

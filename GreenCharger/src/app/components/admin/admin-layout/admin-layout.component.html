@@ -1,0 +1,77 @@
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Admin Panel</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a routerLink="/admin/dashboard" routerLinkActive="active">
+            <i class="icon-dashboard"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/users" routerLinkActive="active">
+            <i class="icon-users"></i>
+            <span>Quản lý người dùng</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/categories" routerLinkActive="active">
+            <i class="icon-category"></i>
+            <span>Quản lý danh mục</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/products" routerLinkActive="active">
+            <i class="icon-product"></i>
+            <span>Quản lý sản phẩm</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/orders" routerLinkActive="active">
+            <i class="icon-orders"></i>
+            <span>Quản lý đơn hàng</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/reviews" routerLinkActive="active">
+            <i class="icon-reviews"></i>
+            <span>Quản lý đánh giá</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/admin/coupons" routerLinkActive="active">
+            <i class="icon-coupons"></i>
+            <span>Quản lý mã giảm giá</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="header">
+      <div class="header-left">
+        <button class="sidebar-toggle" (click)="toggleSidebar()">
+          <i class="icon-menu"></i>
+        </button>
+        <h1>{{pageTitle}}</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <span>Admin</span>
+          <button class="logout-btn" (click)="logout()">
+            <i class="icon-logout"></i>
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

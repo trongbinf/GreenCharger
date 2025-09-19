@@ -1,0 +1,70 @@
+namespace GreenChargerAPI.Models.DTOs
+{
+    public class ProductDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal? Discount { get; set; }
+        public decimal FinalPrice => Discount.HasValue ? Price * (1 - Discount.Value / 100) : Price;
+        public int StockQuantity { get; set; }
+        public string? MainImageUrl { get; set; }
+        public List<string>? DetailImageUrls { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    public class ProductCreateDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal? Discount { get; set; }
+        public int StockQuantity { get; set; }
+        public string? MainImageUrl { get; set; }
+        public List<string>? DetailImageUrls { get; set; }
+        public int CategoryId { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
+
+    public class ProductUpdateDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal? Discount { get; set; }
+        public int StockQuantity { get; set; }
+        public string? MainImageUrl { get; set; }
+        public List<string>? DetailImageUrls { get; set; }
+        public int CategoryId { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    public class ProductSearchDto
+    {
+        public string? Keyword { get; set; }
+        public int? CategoryId { get; set; }
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
+        public bool? IsActive { get; set; }
+        public string SortBy { get; set; } = "Name"; // Name, Price, CreatedAt
+        public string SortOrder { get; set; } = "ASC"; // ASC, DESC
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class ProductListResponseDto
+    {
+        public List<ProductDto> Products { get; set; } = new();
+        public int TotalCount { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+    }
+}

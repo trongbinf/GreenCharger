@@ -1,0 +1,189 @@
+<div class="coupon-management">
+  <div class="header">
+    <h1>Quản lý Coupon</h1>
+    <button (click)="showCreateForm()" class="btn-primary">Thêm Coupon mới</button>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid" *ngIf="statistics">
+    <div class="stat-card">
+      <h3>Tổng Coupon</h3>
+      <p>{{ statistics.totalCoupons }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Đang hoạt động</h3>
+      <p>{{ statistics.activeCoupons }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Đã hết hạn</h3>
+      <p>{{ statistics.expiredCoupons }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Tổng sử dụng</h3>
+      <p>{{ statistics.totalUsages }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <input [(ngModel)]="searchTerm" placeholder="Tìm kiếm theo tên hoặc mã" class="search-input">
+    
+    <select [(ngModel)]="filterActive" class="filter-select">
+      <option [value]="undefined">Tất cả trạng thái</option>
+      <option [value]="true">Đang hoạt động</option>
+      <option [value]="false">Không hoạt động</option>
+    </select>
+
+    <select [(ngModel)]="filterPublic" class="filter-select">
+      <option [value]="undefined">Tất cả loại</option>
+      <option [value]="true">Công khai</option>
+      <option [value]="false">Riêng tư</option>
+    </select>
+
+    <button (click)="applyFilters()" class="btn-secondary">Lọc</button>
+    <button (click)="clearFilters()" class="btn-secondary">Xóa bộ lọc</button>
+  </div>
+
+  <!-- Coupon List -->
+  <div class="coupon-list" *ngIf="!loading; else loadingTemplate">
+    <div class="coupon-card" *ngFor="let coupon of coupons">
+      <div class="coupon-header">
+        <h3>{{ coupon.name }}</h3>
+        <div class="coupon-badges">
+          <span class="badge" [class.active]="coupon.isActive" [class.inactive]="!coupon.isActive">
+            {{ coupon.isActive ? 'Hoạt động' : 'Không hoạt động' }}
+          </span>
+          <span class="badge" [class.public]="coupon.isPublic" [class.private]="!coupon.isPublic">
+            {{ coupon.isPublic ? 'Công khai' : 'Riêng tư' }}
+          </span>
+          <span class="badge expired" *ngIf="coupon.isExpired">Hết hạn</span>
+          <span class="badge not-started" *ngIf="coupon.isNotStarted">Chưa bắt đầu</span>
+        </div>
+      </div>
+
+      <div class="coupon-details">
+        <p><strong>Mã:</strong> {{ coupon.code }}</p>
+        <p><strong>Loại:</strong> {{ getCouponTypeText(coupon.type) }}</p>
+        <p><strong>Giá trị:</strong> {{ getValueDisplay(coupon) }}</p>
+        <p><strong>Thời gian:</strong> {{ coupon.startDate | date:'dd/MM/yyyy' }} - {{ coupon.endDate | date:'dd/MM/yyyy' }}</p>
+        <p><strong>Sử dụng:</strong> {{ coupon.currentUsageCount }}/{{ coupon.maxUsageCount }}</p>
+        <p *ngIf="coupon.description"><strong>Mô tả:</strong> {{ coupon.description }}</p>
+        <p *ngIf="coupon.categoryName"><strong>Danh mục:</strong> {{ coupon.categoryName }}</p>
+        <p *ngIf="coupon.productName"><strong>Sản phẩm:</strong> {{ coupon.productName }}</p>
+      </div>
+
+      <div class="coupon-actions">
+        <button (click)="editCoupon(coupon)" class="btn-edit">Sửa</button>
+        <button (click)="deleteCoupon(coupon)" class="btn-delete">Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal" *ngIf="showForm" (click)="showForm = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingCoupon ? 'Sửa Coupon' : 'Thêm Coupon mới' }}</h2>
+        <button (click)="showForm = false" class="close-btn">&times;</button>
+      </div>
+
+      <form [formGroup]="couponForm" (ngSubmit)="saveCoupon()">
+        <div class="form-row" *ngIf="!editingCoupon">
+          <label>Mã Coupon *</label>
+          <input formControlName="code" type="text" required>
+        </div>
+
+        <div class="form-row">
+          <label>Tên Coupon *</label>
+          <input formControlName="name" type="text" required>
+        </div>
+
+        <div class="form-row">
+          <label>Mô tả</label>
+          <textarea formControlName="description" rows="3"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label>Loại giảm giá *</label>
+          <select formControlName="type" required>
+            <option [value]="CouponType.Percentage">Phần trăm</option>
+            <option [value]="CouponType.FixedAmount">Số tiền cố định</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Giá trị *</label>
+          <input formControlName="value" type="number" min="0" required>
+        </div>
+
+        <div class="form-row">
+          <label>Đơn hàng tối thiểu</label>
+          <input formControlName="minOrderAmount" type="number" min="0">
+        </div>
+
+        <div class="form-row">
+          <label>Giảm tối đa</label>
+          <input formControlName="maxDiscountAmount" type="number" min="0">
+        </div>
+
+        <div class="form-row">
+          <label>Ngày bắt đầu *</label>
+          <input formControlName="startDate" type="datetime-local" required>
+        </div>
+
+        <div class="form-row">
+          <label>Ngày kết thúc *</label>
+          <input formControlName="endDate" type="datetime-local" required>
+        </div>
+
+        <div class="form-row">
+          <label>Số lần sử dụng tối đa *</label>
+          <input formControlName="maxUsageCount" type="number" min="1" required>
+        </div>
+
+        <div class="form-row">
+          <label>Số lần/người dùng *</label>
+          <input formControlName="maxUsagePerUser" type="number" min="1" required>
+        </div>
+
+        <div class="form-row">
+          <label>Danh mục</label>
+          <select formControlName="categoryId">
+            <option [value]="null">Tất cả danh mục</option>
+            <option [value]="category.id" *ngFor="let category of categories">{{ category.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Sản phẩm</label>
+          <select formControlName="productId">
+            <option [value]="null">Tất cả sản phẩm</option>
+            <option [value]="product.id" *ngFor="let product of products">{{ product.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-checkboxes">
+          <label>
+            <input formControlName="isActive" type="checkbox">
+            Kích hoạt
+          </label>
+          <label>
+            <input formControlName="isPublic" type="checkbox">
+            Công khai
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="!couponForm.valid" class="btn-primary">
+            {{ editingCoupon ? 'Cập nhật' : 'Tạo mới' }}
+          </button>
+          <button type="button" (click)="showForm = false" class="btn-secondary">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <div class="loading">Đang tải...</div>
+  </ng-template>
+</div>

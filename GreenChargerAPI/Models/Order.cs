@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GreenChargerAPI.Models
 {
@@ -26,6 +27,21 @@ namespace GreenChargerAPI.Models
         
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        
+        // Foreign Keys for new models
+        public string? UserId { get; set; }
+        public int? AddressId { get; set; }
+        public int? CouponId { get; set; }
+        
+        // Navigation Properties
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser? User { get; set; }
+        
+        [ForeignKey("AddressId")]
+        public virtual Address? Address { get; set; }
+        
+        [ForeignKey("CouponId")]
+        public virtual Coupon? Coupon { get; set; }
         
         public required ICollection<OrderDetail> OrderDetails { get; set; }
     }

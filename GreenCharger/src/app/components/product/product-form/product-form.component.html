@@ -1,0 +1,167 @@
+<div class="product-form-container">
+  <div class="header">
+    <h2>{{ isEditMode ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới' }}</h2>
+    <button class="btn btn-secondary" (click)="onCancel()">
+      <i class="fas fa-arrow-left"></i> Quay lại
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading">
+    <p>{{ isEditMode ? 'Đang tải thông tin sản phẩm...' : 'Đang xử lý...' }}</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Form -->
+  <form *ngIf="!loading" [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="name">Tên sản phẩm *</label>
+        <input 
+          type="text" 
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="getFieldError('name')"
+          placeholder="Nhập tên sản phẩm">
+        <div *ngIf="getFieldError('name')" class="invalid-feedback">
+          {{ getFieldError('name') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">Danh mục *</label>
+        <select 
+          id="categoryId"
+          formControlName="categoryId"
+          class="form-control"
+          [class.is-invalid]="getFieldError('categoryId')">
+          <option value="">Chọn danh mục</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+        <div *ngIf="getFieldError('categoryId')" class="invalid-feedback">
+          {{ getFieldError('categoryId') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label for="description">Mô tả *</label>
+      <textarea 
+        id="description"
+        formControlName="description"
+        class="form-control"
+        [class.is-invalid]="getFieldError('description')"
+        rows="4"
+        placeholder="Nhập mô tả chi tiết về sản phẩm"></textarea>
+      <div *ngIf="getFieldError('description')" class="invalid-feedback">
+        {{ getFieldError('description') }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="price">Giá bán (VNĐ) *</label>
+        <input 
+          type="number" 
+          id="price"
+          formControlName="price"
+          class="form-control"
+          [class.is-invalid]="getFieldError('price')"
+          min="0"
+          step="1000"
+          placeholder="0">
+        <div *ngIf="getFieldError('price')" class="invalid-feedback">
+          {{ getFieldError('price') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="discount">Giảm giá (%)</label>
+        <input 
+          type="number" 
+          id="discount"
+          formControlName="discount"
+          class="form-control"
+          [class.is-invalid]="getFieldError('discount')"
+          min="0"
+          max="100"
+          placeholder="0">
+        <div *ngIf="getFieldError('discount')" class="invalid-feedback">
+          {{ getFieldError('discount') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="stockQuantity">Số lượng tồn kho *</label>
+        <input 
+          type="number" 
+          id="stockQuantity"
+          formControlName="stockQuantity"
+          class="form-control"
+          [class.is-invalid]="getFieldError('stockQuantity')"
+          min="0"
+          placeholder="0">
+        <div *ngIf="getFieldError('stockQuantity')" class="invalid-feedback">
+          {{ getFieldError('stockQuantity') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="mainImageUrl">URL ảnh chính</label>
+      <input 
+        type="url" 
+        id="mainImageUrl"
+        formControlName="mainImageUrl"
+        class="form-control"
+        placeholder="https://example.com/image.jpg">
+    </div>
+
+    <div class="form-group">
+      <label for="imageFiles">Hoặc tải ảnh lên</label>
+      <input 
+        type="file" 
+        id="imageFiles"
+        (change)="onFileSelect($event)"
+        class="form-control"
+        accept="image/*"
+        multiple>
+      <small class="form-text">Chọn ảnh để tải lên (hỗ trợ nhiều ảnh)</small>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          formControlName="isActive"
+          class="checkbox-input">
+        <span class="checkbox-custom"></span>
+        Kích hoạt sản phẩm
+      </label>
+      <small class="form-text">Sản phẩm sẽ hiển thị cho khách hàng khi được kích hoạt</small>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="onCancel()">
+        Hủy
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="productForm.invalid || loading">
+        <i class="fas fa-save"></i>
+        {{ isEditMode ? 'Cập nhật' : 'Tạo mới' }}
+      </button>
+    </div>
+  </form>
+</div>

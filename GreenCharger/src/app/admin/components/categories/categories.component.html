@@ -1,34 +1,127 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>Quản lý Danh mục</h2>
-    <button class="btn btn-primary">
+    <h2>Quản lý danh mục</h2>
+    <button class="btn btn-primary" (click)="onAddCategory()">
       <i class="anticon anticon-plus"></i>
-      Thêm Danh mục
+      Thêm danh mục mới
     </button>
   </div>
-  
-  <div class="table-container">
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <div class="search-input-container">
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="Tìm kiếm theo tên, mô tả..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()">
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <i class="anticon anticon-exclamation-circle"></i>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadCategories()">Thử lại</button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Tên</th>
+          <th>STT</th>
+          <th>Tên danh mục</th>
           <th>Mô tả</th>
-          <th>Trạng thái</th>
-          <th>Ngày tạo</th>
-          <th>Hành động</th>
+          <th>Số sản phẩm</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="6" class="text-center">
+        <tr *ngIf="paginatedCategories.length === 0">
+          <td colspan="5" class="text-center">
             <div class="empty-state">
               <i class="anticon anticon-inbox"></i>
               <p>Chưa có dữ liệu</p>
             </div>
           </td>
         </tr>
+        <tr *ngFor="let category of paginatedCategories; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td>{{ category.name }}</td>
+          <td>{{ category.description }}</td>
+          <td>
+            <span class="badge" [class.badge-primary]="category.productCount > 0" [class.badge-danger]="category.productCount === 0">
+              {{ category.productCount }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action btn-view" (click)="onViewCategory(category)" title="Xem chi tiết">
+                <i class="anticon anticon-eye"></i>
+              </button>
+              <button class="btn-action btn-edit" (click)="onEditCategory(category)" title="Sửa">
+                <i class="anticon anticon-edit"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="onDeleteCategory(category)" title="Xóa">
+                <i class="anticon anticon-delete"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && !error && totalPages > 1" class="pagination-container">
+    <div class="pagination-info">
+      <span>Tổng số {{ totalItems }} danh mục</span>
+    </div>
+    <div class="pagination-controls">
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === 1"
+        (click)="goToPage(currentPage - 1)">
+        <i class="anticon anticon-left"></i>
+      </button>
+      
+      <span class="page-number">{{ currentPage }}</span>
+      
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(currentPage + 1)">
+        <i class="anticon anticon-right"></i>
+      </button>
+      
+      <select 
+        class="items-per-page"
+        [value]="itemsPerPage"
+        (change)="changeItemsPerPage(+$any($event.target).value)">
+        <option value="5">5/trang</option>
+        <option value="10">10/trang</option>
+        <option value="20">20/trang</option>
+        <option value="50">50/trang</option>
+      </select>
+      
+      <div class="go-to-page">
+        <span>Đến Trang</span>
+        <input 
+          type="number" 
+          class="page-input"
+          [min]="1"
+          [max]="totalPages"
+          [value]="currentPage"
+          (change)="goToPage(+$any($event.target).value)">
+      </div>
+    </div>
   </div>
 </div>

@@ -1,60 +1,48 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
-
-interface MenuItem {
-  key: string;
-  title: string;
-  icon: string;
-  path: string;
-}
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './admin-layout.component.html',
-  styleUrls: ['./admin-layout.component.css']
+  styleUrl: './admin-layout.component.css'
 })
 export class AdminLayoutComponent implements OnInit {
   isCollapsed = false;
-  selectedMenuKey = 'dashboard';
-  currentTime = '30 ngày qua';
+  selectedMenuKey: string = 'dashboard';
+  currentTime: string = 'today';
 
-  menuItems: MenuItem[] = [
-    { key: 'dashboard', title: 'Tổng quan', icon: 'dashboard', path: '/admin/dashboard' },
-    { key: 'users', title: 'Người dùng', icon: 'user', path: '/admin/users' },
-    { key: 'categories', title: 'Danh mục', icon: 'appstore', path: '/admin/categories' },
-    { key: 'products', title: 'Sản phẩm', icon: 'inbox', path: '/admin/products' },
-    { key: 'orders', title: 'Đơn hàng', icon: 'shopping-cart', path: '/admin/orders' },
-    { key: 'slider', title: 'Slider', icon: 'picture', path: '/admin/slider' }
+  menuItems = [
+    { key: 'dashboard', icon: 'dashboard', text: 'Tổng quan', link: '/admin/dashboard' },
+    { key: 'users', icon: 'user', text: 'Người dùng', link: '/admin/users' },
+    { key: 'categories', icon: 'tags', text: 'Danh mục', link: '/admin/categories' },
+    { key: 'products', icon: 'inbox', text: 'Sản phẩm', link: '/admin/products' },
+    { key: 'orders', icon: 'shopping-cart', text: 'Đơn hàng', link: '/admin/orders' },
+    { key: 'slider', icon: 'picture', text: 'Slider', link: '/admin/slider' }
   ];
 
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    // Lắng nghe thay đổi route để cập nhật menu được chọn
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        const url = event.url;
-        const currentItem = this.menuItems.find(item => url.includes(item.path));
-        if (currentItem) {
-          this.selectedMenuKey = currentItem.key;
-        }
-      });
+  ngOnInit(): void {
+    this.updateSelectedMenuKey();
   }
 
-  onMenuClick(item: MenuItem) {
-    this.selectedMenuKey = item.key;
-    this.router.navigate([item.path]);
+  toggleCollapsed(): void {
+    this.isCollapsed = !this.isCollapsed;
   }
 
-  onTimeRangeChange(value: string) {
-    this.currentTime = value;
+  updateSelectedMenuKey(): void {
+    const path = window.location.pathname;
+    const activeItem = this.menuItems.find(item => path.includes(item.link));
+    if (activeItem) {
+      this.selectedMenuKey = activeItem.key;
+    }
+  }
+
+  onTimeRangeChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.currentTime = selectElement.value;
+    console.log('Selected time range:', this.currentTime);
   }
 }

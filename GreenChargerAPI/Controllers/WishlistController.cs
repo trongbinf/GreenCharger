@@ -6,6 +6,7 @@ using GreenChargerAPI.Interfaces;
 using GreenChargerAPI.Models;
 using GreenChargerAPI.Models.DTOs;
 using AutoMapper;
+using GreenChargerAPI.Models.DTOs;
 
 namespace GreenChargerAPI.Controllers
 {

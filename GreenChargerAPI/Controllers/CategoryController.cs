@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using GreenChargerAPI.Services;
 using AutoMapper;
 
+using GreenChargerAPI.Models.DTOs;
 namespace GreenChargerAPI.Controllers
 {
     [ApiController]

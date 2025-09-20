@@ -1,5 +1,6 @@
 using AutoMapper;
 using GreenChargerAPI.Models;
+using GreenChargerAPI.Models.DTOs;
 
 namespace GreenChargerAPI.MappingProfiles
 {
@@ -10,7 +11,7 @@ namespace GreenChargerAPI.MappingProfiles
             // Product <-> ProductDto
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
             CreateMap<ProductDto, Product>();
 
             // Category <-> CategoryDto
@@ -20,8 +21,7 @@ namespace GreenChargerAPI.MappingProfiles
 
             // ApplicationUser <-> UserDto
             CreateMap<ApplicationUser, UserDto>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => (src.FirstName + " " + src.LastName).Trim()))
-                .ForMember(dest => dest.IsLocked, opt => opt.MapFrom(src => src.LockoutEnd != null && src.LockoutEnd > DateTime.UtcNow));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => (src.FirstName + " " + src.LastName).Trim()));
             CreateMap<UserDto, ApplicationUser>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => GetFirstName(src.FullName)))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => GetLastName(src.FullName)));
@@ -40,4 +40,4 @@ namespace GreenChargerAPI.MappingProfiles
             return parts.Length > 1 ? parts[1] : string.Empty;
         }
     }
-} 
+}

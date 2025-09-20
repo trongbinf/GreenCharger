@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using GreenChargerAPI.Models.DTOs;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using GreenChargerAPI.Services;

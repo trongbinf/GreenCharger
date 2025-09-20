@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using GreenChargerAPI.Models.DTOs;
 using GreenChargerAPI.Services;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
@@ -157,10 +158,12 @@ namespace GreenChargerAPI.Controllers
             {
                 Id = user.Id,
                 Email = user.Email ?? "",
-                FullName = $"{user.FirstName} {user.LastName}",
-                Role = roles.FirstOrDefault() ?? "",
-                IsLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                
+                
                 EmailConfirmed = user.EmailConfirmed,
+                Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
@@ -255,9 +258,10 @@ namespace GreenChargerAPI.Controllers
             {
                 Id = u.Id,
                 Email = u.Email ?? "",
-                FullName = $"{u.FirstName} {u.LastName}",
-                Role = _userManager.GetRolesAsync(u).Result.FirstOrDefault() ?? "",
-                IsLocked = u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                
+                
                 EmailConfirmed = u.EmailConfirmed,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt
@@ -277,16 +281,19 @@ namespace GreenChargerAPI.Controllers
             }
 
             var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound();
 
             var dto = new UserDto
             {
                 Id = user.Id,
                 Email = user.Email ?? "",
-                FullName = $"{user.FirstName} {user.LastName}",
-                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "",
-                IsLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                
+                
                 EmailConfirmed = user.EmailConfirmed,
+                Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
@@ -298,15 +305,18 @@ namespace GreenChargerAPI.Controllers
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound();
             var dto = new UserDto
             {
                 Id = user.Id,
                 Email = user.Email ?? "",
-                FullName = $"{user.FirstName} {user.LastName}",
-                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "",
-                IsLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                
+                
                 EmailConfirmed = user.EmailConfirmed,
+                Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
@@ -325,6 +335,7 @@ namespace GreenChargerAPI.Controllers
                 }
 
                 var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound();
                 
                 Console.WriteLine($"Updating user {id}: {JsonSerializer.Serialize(dto)}");
@@ -365,6 +376,7 @@ namespace GreenChargerAPI.Controllers
         public async Task<IActionResult> LockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound();
             await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
             user.UpdatedAt = DateTime.UtcNow;
@@ -377,6 +389,7 @@ namespace GreenChargerAPI.Controllers
         public async Task<IActionResult> UnlockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound();
             await _userManager.SetLockoutEndDateAsync(user, null);
             user.UpdatedAt = DateTime.UtcNow;
@@ -416,6 +429,7 @@ namespace GreenChargerAPI.Controllers
                 }
                 
                 var user = await _userManager.FindByIdAsync(id);
+            var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound();
                 
                 // Validate that the role exists
@@ -479,6 +493,7 @@ namespace GreenChargerAPI.Controllers
                 }
 
                 var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound(new { message = "User not found" });
                 
                 // Update name if provided
@@ -527,6 +542,7 @@ namespace GreenChargerAPI.Controllers
             }
 
             var user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound(new { message = "User not found" });
             
             // Kiểm tra mật khẩu hiện tại

@@ -135,7 +135,7 @@
             <div class="rating-info">
               <div class="rating">
                 <i class="anticon anticon-star"></i>
-                {{ product.averageRating?.toFixed(1) || '0.0' }}
+                {{ product.averageRating ? product.averageRating.toFixed(1) : '0.0' }}
               </div>
               <div class="review-count">({{ product.reviewCount || 0 }})</div>
             </div>

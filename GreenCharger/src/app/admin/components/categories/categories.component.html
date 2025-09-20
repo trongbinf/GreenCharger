@@ -2,7 +2,7 @@
   <div class="page-header">
     <h2>Quản lý danh mục</h2>
     <button class="btn btn-primary" (click)="onAddCategory()">
-      <i class="anticon anticon-plus"></i>
+      <i class="fas fa-plus"></i>
       Thêm danh mục mới
     </button>
   </div>
@@ -11,7 +11,7 @@
   <div class="search-section">
     <div class="search-container">
       <div class="search-input-wrapper">
-        <i class="anticon anticon-search search-icon"></i>
+        <i class="fas fa-search search-icon"></i>
         <input 
           type="text" 
           class="search-input"
@@ -30,7 +30,7 @@
 
   <!-- Error State -->
   <div *ngIf="error && !loading" class="error-state">
-    <i class="anticon anticon-exclamation-circle"></i>
+    <i class="fas fa-exclamation-circle"></i>
     <p>{{ error }}</p>
     <button class="btn btn-primary" (click)="loadCategories()">Thử lại</button>
   </div>
@@ -51,7 +51,7 @@
         <tr *ngIf="paginatedCategories.length === 0">
           <td colspan="5" class="text-center">
             <div class="empty-state">
-              <i class="anticon anticon-inbox"></i>
+              <i class="fas fa-inbox"></i>
               <p>Chưa có dữ liệu</p>
             </div>
           </td>
@@ -99,7 +99,7 @@
         class="btn-pagination" 
         [disabled]="currentPage === 1"
         (click)="goToPage(currentPage - 1)">
-        <i class="anticon anticon-left"></i>
+        <i class="fas fa-chevron-left"></i>
       </button>
       
       <span class="page-number">{{ currentPage }}</span>
@@ -108,7 +108,7 @@
         class="btn-pagination" 
         [disabled]="currentPage === totalPages"
         (click)="goToPage(currentPage + 1)">
-        <i class="anticon anticon-right"></i>
+        <i class="fas fa-chevron-right"></i>
       </button>
       
       <select 
@@ -131,6 +131,72 @@
           [value]="currentPage"
           (change)="goToPage(+$any($event.target).value)">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal" [class.show]="showModal">
+  <div class="modal-backdrop" (click)="onModalClose()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ isEditMode ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới' }}</h3>
+      <button class="close-button" (click)="onModalClose()">×</button>
+    </div>
+    <div class="modal-body">
+      <form #categoryForm="ngForm">
+        <!-- Tên danh mục -->
+        <div class="form-group">
+          <label for="name">Tên danh mục <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name"
+            class="form-control"
+            [(ngModel)]="categoryData.name"
+            required>
+        </div>
+        
+        <!-- Mô tả danh mục -->
+        <div class="form-group">
+          <label for="description">Mô tả</label>
+          <textarea 
+            id="description" 
+            name="description"
+            class="form-control"
+            [(ngModel)]="categoryData.description"
+            rows="3"></textarea>
+        </div>
+        
+        <!-- Ảnh danh mục -->
+        <div class="form-group">
+          <label for="imageUrl">Ảnh danh mục</label>
+          <div class="image-upload-container">
+            <div class="image-preview" *ngIf="categoryData.imageUrl || imagePreview">
+              <img [src]="imagePreview || categoryData.imageUrl" alt="Category Preview">
+              <button type="button" class="remove-image" (click)="removeImage()">×</button>
+            </div>
+            <div class="upload-button" *ngIf="!imageFile && !categoryData.imageUrl">
+              <label for="image-upload" class="btn btn-secondary">
+                <i class="fas fa-upload"></i> Chọn ảnh
+              </label>
+              <input 
+                type="file" 
+                id="image-upload" 
+                (change)="onImageChange($event)"
+                accept="image/*"
+                style="display:none">
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onModalClose()">Hủy</button>
+          <button type="button" class="btn btn-primary" [disabled]="!categoryForm.valid" (click)="onModalSave()">
+            {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

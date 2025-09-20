@@ -1,0 +1,131 @@
+<div class="dashboard-container">
+  <!-- Summary Cards -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon orders">
+        <i class="anticon anticon-shopping-cart"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ dashboardStats.orders }}</div>
+        <div class="stat-title">Đơn hàng</div>
+        <div class="stat-subtitle">Tổng số đơn hàng</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon products">
+        <i class="anticon anticon-inbox"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ dashboardStats.products }}</div>
+        <div class="stat-title">Sản phẩm</div>
+        <div class="stat-subtitle">Tổng số sản phẩm</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon users">
+        <i class="anticon anticon-user"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ dashboardStats.users }}</div>
+        <div class="stat-title">Người dùng</div>
+        <div class="stat-subtitle">Tổng số người dùng</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon revenue">
+        <i class="anticon anticon-dollar"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ formatCurrency(dashboardStats.revenue) }}</div>
+        <div class="stat-title">Doanh thu</div>
+        <div class="stat-subtitle">Tổng doanh thu</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Status Cards -->
+  <div class="order-status-row">
+    <div class="order-status-card pending">
+      <div class="order-status-content">
+        <div class="status-value">{{ orderStatusStats.pending }}</div>
+        <div class="status-label">Chờ xử lý</div>
+      </div>
+    </div>
+
+    <div class="order-status-card processing">
+      <div class="order-status-content">
+        <div class="status-value">{{ orderStatusStats.processing }}</div>
+        <div class="status-label">Đang xử lý</div>
+      </div>
+    </div>
+
+    <div class="order-status-card delivering">
+      <div class="order-status-content">
+        <div class="status-value">{{ orderStatusStats.delivering }}</div>
+        <div class="status-label">Đang giao</div>
+      </div>
+    </div>
+
+    <div class="order-status-card delivered">
+      <div class="order-status-content">
+        <div class="status-value">{{ orderStatusStats.delivered }}</div>
+        <div class="status-label">Đã giao</div>
+      </div>
+    </div>
+
+    <div class="order-status-card cancelled">
+      <div class="order-status-content">
+        <div class="status-value">{{ orderStatusStats.cancelled }}</div>
+        <div class="status-label">Đã hủy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <!-- Monthly Revenue & Orders Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Doanh thu & Đơn hàng theo tháng</h3>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-color orders"></span>
+            <span>Đơn hàng</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color revenue"></span>
+            <span>Doanh thu (VND)</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="empty-chart">
+          <i class="anticon anticon-bar-chart"></i>
+          <p>Chưa có dữ liệu</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Status Distribution Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Phân bố trạng thái đơn hàng</h3>
+      </div>
+      <div class="chart-container">
+        <div class="order-status-legend">
+          <div class="legend-item" *ngFor="let item of orderStatusData">
+            <span class="legend-color" [style.background-color]="item.color"></span>
+            <span>{{ item.status }}</span>
+          </div>
+        </div>
+        <div class="empty-chart">
+          <i class="anticon anticon-pie-chart"></i>
+          <p>Chưa có dữ liệu</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div class="admin-sider" [class.collapsed]="isCollapsed">
+    <div class="admin-logo">
+      <h3>Trang Quản Trị Viên</h3>
+    </div>
+    
+    <ul class="admin-menu">
+      <li 
+        *ngFor="let item of menuItems"
+        [class.active]="selectedMenuKey === item.key"
+        (click)="onMenuClick(item)">
+        <i class="anticon anticon-{{ item.icon }}"></i>
+        <span *ngIf="!isCollapsed">{{ item.title }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="admin-content-layout">
+    <!-- Header -->
+    <div class="admin-header">
+      <div class="header-content">
+        <div class="breadcrumb">
+          <i class="anticon anticon-home"></i>
+          <span>Home</span>
+        </div>
+        
+        <div class="header-actions">
+          <span class="time-label">Thời gian:</span>
+          <select 
+            [value]="currentTime"
+            (change)="onTimeRangeChange($any($event.target).value)"
+            class="time-select">
+            <option value="7 ngày qua">7 ngày qua</option>
+            <option value="30 ngày qua">30 ngày qua</option>
+            <option value="90 ngày qua">90 ngày qua</option>
+            <option value="1 năm qua">1 năm qua</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

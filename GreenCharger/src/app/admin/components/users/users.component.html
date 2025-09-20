@@ -58,25 +58,25 @@
           <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
           <td>
             <div class="user-info">
-              <i class="anticon anticon-user user-icon"></i>
+              <i class="fas fa-user user-icon"></i>
               <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
             </div>
           </td>
           <td>
             <div class="email-info">
-              <i class="anticon anticon-mail"></i>
+              <i class="fas fa-envelope"></i>
               {{ user.email }}
             </div>
           </td>
           <td>
             <div class="phone-info">
-              <i class="anticon anticon-phone"></i>
+              <i class="fas fa-phone"></i>
               {{ user.phoneNumber || 'N/A' }}
             </div>
           </td>
           <td>
             <span class="status-badge" [class.badge-success]="!isUserLocked(user)" [class.badge-danger]="isUserLocked(user)">
-              <i class="anticon" [class.anticon-check]="!isUserLocked(user)" [class.anticon-close]="isUserLocked(user)"></i>
+              <i class="fas" [ngClass]="isUserLocked(user) ? 'fa-lock' : 'fa-check'"></i>
               {{ isUserLocked(user) ? 'Đã khóa' : 'Hoạt động' }}
             </span>
           </td>
@@ -84,13 +84,10 @@
           <td>
             <div class="action-buttons">
               <button class="btn-action btn-view" (click)="onViewUser(user)" title="Xem chi tiết">
-                <i class="anticon anticon-eye"></i>
+                <i class="fas fa-eye"></i>
               </button>
               <button class="btn-action btn-edit" (click)="onEditUser(user)" title="Sửa">
-                <i class="anticon anticon-edit"></i>
-              </button>
-              <button class="btn-action btn-copy" (click)="onCopyUser(user)" title="Sao chép">
-                <i class="anticon anticon-copy"></i>
+                <i class="fas fa-edit"></i>
               </button>
               <button 
                 class="btn-action" 
@@ -98,10 +95,10 @@
                 [class.btn-unlock]="isUserLocked(user)"
                 (click)="isUserLocked(user) ? onUnlockUser(user) : onLockUser(user)" 
                 [title]="isUserLocked(user) ? 'Mở khóa' : 'Khóa tài khoản'">
-                <i class="anticon" [class.anticon-lock]="!isUserLocked(user)" [class.anticon-unlock]="isUserLocked(user)"></i>
+                <i class="fas" [ngClass]="isUserLocked(user) ? 'fa-unlock' : 'fa-lock'"></i>
               </button>
               <button class="btn-action btn-delete" (click)="onDeleteUser(user)" title="Xóa">
-                <i class="anticon anticon-delete"></i>
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>

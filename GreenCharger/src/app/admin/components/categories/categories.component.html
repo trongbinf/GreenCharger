@@ -60,30 +60,27 @@
           <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
           <td>
             <div class="category-info">
-              <i class="anticon anticon-tags category-icon"></i>
+              <i class="fas fa-tags category-icon"></i>
               <span class="category-name">{{ category.name }}</span>
             </div>
           </td>
           <td>{{ category.description }}</td>
           <td>
             <span class="badge" [class.badge-primary]="category.productCount > 0" [class.badge-danger]="category.productCount === 0">
-              <i class="anticon anticon-inbox"></i>
+              <i class="fas fa-box"></i>
               {{ category.productCount }}
             </span>
           </td>
           <td>
             <div class="action-buttons">
               <button class="btn-action btn-view" (click)="onViewCategory(category)" title="Xem chi tiết">
-                <i class="anticon anticon-eye"></i>
+                <i class="fas fa-eye"></i>
               </button>
               <button class="btn-action btn-edit" (click)="onEditCategory(category)" title="Sửa">
-                <i class="anticon anticon-edit"></i>
-              </button>
-              <button class="btn-action btn-copy" (click)="onCopyCategory(category)" title="Sao chép">
-                <i class="anticon anticon-copy"></i>
+                <i class="fas fa-edit"></i>
               </button>
               <button class="btn-action btn-delete" (click)="onDeleteCategory(category)" title="Xóa">
-                <i class="anticon anticon-delete"></i>
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>

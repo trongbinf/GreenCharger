@@ -18,8 +18,8 @@ export class ProductsComponent implements OnInit {
   filteredProducts: Product[] = [];
   categories: Category[] = [];
   searchTerm: string = '';
-  selectedCategory: number | null = null;
-  selectedStatus: string | null = null;
+  selectedCategory: number | string = '';
+  selectedStatus: string = '';
   loading = false;
   error: string | null = null;
 
@@ -34,8 +34,11 @@ export class ProductsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadProducts();
-    this.loadCategories();
+  // Hiển thị mặc định tất cả filter
+  this.selectedCategory = '';
+  this.selectedStatus = '';
+  this.loadProducts();
+  this.loadCategories();
   }
 
   loadProducts(): void {
@@ -94,12 +97,12 @@ export class ProductsComponent implements OnInit {
     }
 
     // Category filter
-    if (this.selectedCategory) {
+    if (this.selectedCategory !== '' && this.selectedCategory !== null) {
       filtered = filtered.filter(product => product.categoryId === this.selectedCategory);
     }
 
     // Status filter
-    if (this.selectedStatus) {
+    if (this.selectedStatus !== '' && this.selectedStatus !== null) {
       filtered = filtered.filter(product => 
         this.selectedStatus === 'active' ? product.isActive : !product.isActive
       );
@@ -155,8 +158,8 @@ export class ProductsComponent implements OnInit {
 
   clearFilters(): void {
     this.searchTerm = '';
-    this.selectedCategory = null;
-    this.selectedStatus = null;
+  this.selectedCategory = '';
+  this.selectedStatus = '';
     this.applyFilters();
   }
 

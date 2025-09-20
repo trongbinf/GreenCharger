@@ -149,13 +149,10 @@
           <td>
             <div class="action-buttons">
               <button class="btn-action btn-view" (click)="onViewProduct(product)" title="Xem chi tiết">
-                <i class="anticon anticon-eye"></i>
+                <i class="fas fa-eye"></i>
               </button>
               <button class="btn-action btn-edit" (click)="onEditProduct(product)" title="Sửa">
-                <i class="anticon anticon-edit"></i>
-              </button>
-              <button class="btn-action btn-copy" (click)="onCopyProduct(product)" title="Sao chép">
-                <i class="anticon anticon-copy"></i>
+                <i class="fas fa-edit"></i>
               </button>
               <button 
                 class="btn-action" 
@@ -163,10 +160,10 @@
                 [class.btn-warning]="product.isActive"
                 (click)="onToggleStatus(product)" 
                 [title]="product.isActive ? 'Ngừng hoạt động' : 'Kích hoạt'">
-                <i class="anticon" [class.anticon-pause]="product.isActive" [class.anticon-play]="!product.isActive"></i>
+                <i class="fas" [ngClass]="product.isActive ? 'fa-pause' : 'fa-play'"></i>
               </button>
               <button class="btn-action btn-delete" (click)="onDeleteProduct(product)" title="Xóa">
-                <i class="anticon anticon-delete"></i>
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>

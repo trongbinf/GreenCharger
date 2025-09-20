@@ -1,30 +1,48 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>Quản lý Slider</h2>
+    <h2>Quản lý slider</h2>
     <button class="btn btn-primary">
       <i class="anticon anticon-plus"></i>
-      Thêm Slider
+      Thêm slider mới
     </button>
   </div>
-  
+
   <div class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Tiêu đề</th>
           <th>Hình ảnh</th>
           <th>Trạng thái</th>
-          <th>Ngày tạo</th>
-          <th>Hành động</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="6" class="text-center">
-            <div class="empty-state">
-              <i class="anticon anticon-inbox"></i>
-              <p>Chưa có dữ liệu</p>
+        <tr *ngFor="let slider of sliders; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ slider.title }}</td>
+          <td>
+            <div class="slider-image">
+              <img [src]="slider.image" [alt]="slider.title" />
+            </div>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="slider.isActive" [class.badge-danger]="!slider.isActive">
+              {{ slider.isActive ? 'Hoạt động' : 'Ngừng hoạt động' }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action btn-view" title="Xem chi tiết">
+                <i class="anticon anticon-eye"></i>
+              </button>
+              <button class="btn-action btn-edit" title="Sửa">
+                <i class="anticon anticon-edit"></i>
+              </button>
+              <button class="btn-action btn-delete" title="Xóa">
+                <i class="anticon anticon-delete"></i>
+              </button>
             </div>
           </td>
         </tr>

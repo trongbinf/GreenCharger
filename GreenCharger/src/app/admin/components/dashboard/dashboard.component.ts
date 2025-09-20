@@ -1,87 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface DashboardStats {
-  orders: number;
-  products: number;
-  users: number;
-  revenue: number;
-}
-
-interface OrderStatusStats {
-  pending: number;
-  processing: number;
-  delivering: number;
-  delivered: number;
-  cancelled: number;
-}
-
-interface ChartData {
-  month: string;
-  orders: number;
-  revenue: number;
-}
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  dashboardStats: DashboardStats = {
-    orders: 0,
-    products: 0,
-    users: 0,
-    revenue: 0
+  stats = {
+    totalUsers: 1250,
+    totalProducts: 89,
+    totalOrders: 156,
+    totalRevenue: 125000000
   };
 
-  orderStatusStats: OrderStatusStats = {
-    pending: 0,
-    processing: 0,
-    delivering: 0,
-    delivered: 0,
-    cancelled: 0
-  };
+  recentOrders = [
+    { id: 1, customer: 'Nguyễn Văn A', amount: 1500000, status: 'Đã giao' },
+    { id: 2, customer: 'Trần Thị B', amount: 2300000, status: 'Đang giao' },
+    { id: 3, customer: 'Lê Văn C', amount: 850000, status: 'Chờ xử lý' },
+    { id: 4, customer: 'Phạm Thị D', amount: 3200000, status: 'Đã giao' },
+    { id: 5, customer: 'Hoàng Văn E', amount: 1200000, status: 'Đang giao' }
+  ];
 
-  chartData: ChartData[] = [];
-  orderStatusData: any[] = [];
+  constructor() { }
 
-  constructor() {}
-
-  ngOnInit() {
-    this.loadDashboardData();
-  }
-
-  loadDashboardData() {
-    // TODO: Gọi API để lấy dữ liệu thực tế
-    // Hiện tại sử dụng dữ liệu mẫu
-    this.dashboardStats = {
-      orders: 0,
-      products: 0,
-      users: 0,
-      revenue: 0
-    };
-
-    this.orderStatusStats = {
-      pending: 0,
-      processing: 0,
-      delivering: 0,
-      delivered: 0,
-      cancelled: 0
-    };
-
-    this.chartData = [];
-    this.orderStatusData = [
-      { status: 'Chờ xử lý', value: 0, color: '#faad14' },
-      { status: 'Đang xử lý', value: 0, color: '#13c2c2' },
-      { status: 'Đang giao hàng', value: 0, color: '#722ed1' },
-      { status: 'Đã giao hàng', value: 0, color: '#52c41a' },
-      { status: 'Đã hủy', value: 0, color: '#ff4d4f' }
-    ];
+  ngOnInit(): void {
   }
 
   formatCurrency(amount: number): string {

@@ -1,30 +1,43 @@
 <div class="page-container">
   <div class="page-header">
-    <h2>Quản lý Đơn hàng</h2>
-    <button class="btn btn-primary">
-      <i class="anticon anticon-plus"></i>
-      Thêm Đơn hàng
-    </button>
+    <h2>Quản lý đơn hàng</h2>
   </div>
-  
+
   <div class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
+          <th>ID Đơn hàng</th>
           <th>Khách hàng</th>
-          <th>Tổng tiền</th>
+          <th>Số tiền</th>
           <th>Trạng thái</th>
           <th>Ngày tạo</th>
-          <th>Hành động</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="6" class="text-center">
-            <div class="empty-state">
-              <i class="anticon anticon-inbox"></i>
-              <p>Chưa có dữ liệu</p>
+        <tr *ngFor="let order of orders; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>#{{ order.id }}</td>
+          <td>{{ order.customer }}</td>
+          <td>{{ formatCurrency(order.amount) }}</td>
+          <td>
+            <span class="status-badge" [class.delivered]="order.status === 'Đã giao'" 
+                  [class.shipping]="order.status === 'Đang giao'" 
+                  [class.pending]="order.status === 'Chờ xử lý'">
+              {{ order.status }}
+            </span>
+          </td>
+          <td>{{ order.date }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action btn-view" title="Xem chi tiết">
+                <i class="anticon anticon-eye"></i>
+              </button>
+              <button class="btn-action btn-edit" title="Sửa">
+                <i class="anticon anticon-edit"></i>
+              </button>
             </div>
           </td>
         </tr>

@@ -1,5 +1,8 @@
 /* Global Styles for GreenCharger Admin */
 
+/* Import Font Awesome first */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
 /* Import ng-zorro styles */
 @import 'ng-zorro-antd/ng-zorro-antd.css';
 
@@ -49,7 +52,7 @@ html, body {
 
 .ant-card-head {
   border-bottom: 1px solid #f0f0f0;
-  padding: 0 24px;
+  padding: 16px 24px;
 }
 
 .ant-card-body {
@@ -60,7 +63,7 @@ html, body {
 .ant-btn {
   border-radius: 6px;
   font-weight: 500;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
 }
 
 .ant-btn-primary {
@@ -71,192 +74,132 @@ html, body {
 .ant-btn-primary:hover {
   background: #40a9ff;
   border-color: #40a9ff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }
 
-/* Menu styles */
-.ant-menu {
-  border: none;
+/* Table styles */
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.ant-menu-dark {
-  background: #001529 !important;
-}
-
-.ant-menu-dark .ant-menu-item {
-  margin: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-
-.ant-menu-dark .ant-menu-item:hover {
-  background: #1890ff !important;
-  color: #fff !important;
-}
-
-.ant-menu-dark .ant-menu-item-selected {
-  background: #1890ff !important;
-  color: #fff !important;
-}
-
-.ant-menu-dark .ant-menu-item-selected::after {
-  display: none;
-}
-
-/* Statistic styles */
-.ant-statistic {
-  text-align: center;
-}
-
-.ant-statistic-title {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.ant-statistic-content {
-  color: #000;
-  font-size: 24px;
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
   font-weight: 600;
+  color: #333;
 }
 
-/* Grid styles */
-.ant-row {
-  margin-left: -8px;
-  margin-right: -8px;
+.ant-table-tbody > tr:hover > td {
+  background: #f8f9fa;
 }
 
-.ant-col {
-  padding-left: 8px;
-  padding-right: 8px;
+/* Form styles */
+.ant-input {
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  transition: all 0.3s ease;
 }
 
-/* Breadcrumb styles */
-.ant-breadcrumb {
-  font-size: 14px;
+.ant-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
-.ant-breadcrumb a {
+.ant-select {
+  border-radius: 6px;
+}
+
+.ant-select .ant-select-selector {
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+}
+
+.ant-select-focused .ant-select-selector {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Modal styles */
+.ant-modal {
+  border-radius: 8px;
+}
+
+.ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.ant-modal-body {
+  padding: 24px;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+/* Pagination styles */
+.ant-pagination {
+  text-align: right;
+  margin-top: 16px;
+}
+
+.ant-pagination-item {
+  border-radius: 6px;
+}
+
+.ant-pagination-item-active {
+  background: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-pagination-item-active a {
+  color: white;
+}
+
+/* Loading styles */
+.ant-spin {
   color: #1890ff;
-  text-decoration: none;
 }
 
-.ant-breadcrumb a:hover {
-  color: #40a9ff;
+.ant-spin-dot {
+  color: #1890ff;
 }
 
-/* Icon styles */
+/* Custom Icon Classes */
 .anticon {
-  font-size: 16px;
+  font-family: 'Font Awesome 6 Free' !important;
+  font-weight: 900;
 }
 
-/* Responsive utilities */
-@media (max-width: 768px) {
-  .ant-layout-content {
-    padding: 16px;
-  }
-  
-  .ant-card-body {
-    padding: 16px;
-  }
-  
-  .ant-layout-header {
-    padding: 0 16px;
-  }
-}
+.anticon-dashboard::before { content: '\f3fd'; }
+.anticon-user::before { content: '\f007'; }
+.anticon-tags::before { content: '\f02c'; }
+.anticon-inbox::before { content: '\f01c'; }
+.anticon-shopping-cart::before { content: '\f07a'; }
+.anticon-picture::before { content: '\f03e'; }
+.anticon-plus::before { content: '\f067'; }
+.anticon-edit::before { content: '\f044'; }
+.anticon-delete::before { content: '\f1f8'; }
+.anticon-eye::before { content: '\f06e'; }
+.anticon-search::before { content: '\f002'; }
+.anticon-filter::before { content: '\f0b0'; }
+.anticon-left::before { content: '\f053'; }
+.anticon-right::before { content: '\f054'; }
+.anticon-menu-fold::before { content: '\f0c9'; }
+.anticon-menu-unfold::before { content: '\f0ca'; }
+.anticon-exclamation-circle::before { content: '\f06a'; }
+.anticon-lock::before { content: '\f023'; }
+.anticon-unlock::before { content: '\f09c'; }
+.anticon-pause::before { content: '\f04c'; }
+.anticon-play::before { content: '\f04b'; }
+.anticon-dollar::before { content: '\f155'; }
+.anticon-bar-chart::before { content: '\f080'; }
+.anticon-line-chart::before { content: '\f201'; }
+.anticon-mail::before { content: '\f0e0'; }
+.anticon-phone::before { content: '\f095'; }
+.anticon-check::before { content: '\f00c'; }
+.anticon-close::before { content: '\f00d'; }
+.anticon-star::before { content: '\f005'; }
 
-@media (max-width: 576px) {
-  .ant-layout-content {
-    padding: 12px;
-  }
-  
-  .ant-card-body {
-    padding: 12px;
-  }
-  
-  .ant-layout-header {
-    padding: 0 12px;
-  }
-}
-
-/* Custom animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.slide-in-up {
-  animation: slideInUp 0.5s ease-out;
-}
-
-/* Loading states */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* Error states */
-.error {
-  color: #ff4d4f;
-}
-
-.success {
-  color: #52c41a;
-}
-
-.warning {
-  color: #faad14;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Print styles */
-@media print {
-  .ant-layout-sider,
-  .ant-layout-header {
-    display: none;
-  }
-  
-  .ant-layout-content {
-    margin: 0;
-    padding: 0;
-  }
-}
+.anticon-copy::before { content: '\f0c5'; }

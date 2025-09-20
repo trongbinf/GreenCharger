@@ -1,34 +1,157 @@
 <div class="page-container">
   <div class="page-header">
     <h2>Quản lý người dùng</h2>
-    <button class="btn btn-primary">
-      <i class="anticon anticon-plus"></i>
-      Thêm người dùng
-    </button>
   </div>
-  
-  <div class="table-container">
+
+  <!-- Enhanced Search Bar -->
+  <div class="search-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="anticon anticon-search search-icon"></i>
+        <input 
+          type="text" 
+          class="search-input"
+          placeholder="Tìm kiếm theo tên, email, số điện thoại..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <i class="anticon anticon-exclamation-circle"></i>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadUsers()">Thử lại</button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading && !error" class="table-container">
     <table class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Tên</th>
+          <th>STT</th>
+          <th>Họ tên</th>
           <th>Email</th>
+          <th>Số điện thoại</th>
           <th>Trạng thái</th>
           <th>Ngày tạo</th>
-          <th>Hành động</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td colspan="6" class="text-center">
+        <tr *ngIf="paginatedUsers.length === 0">
+          <td colspan="7" class="text-center">
             <div class="empty-state">
               <i class="anticon anticon-inbox"></i>
               <p>Chưa có dữ liệu</p>
             </div>
           </td>
         </tr>
+        <tr *ngFor="let user of paginatedUsers; let i = index">
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td>
+            <div class="user-info">
+              <i class="anticon anticon-user user-icon"></i>
+              <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="email-info">
+              <i class="anticon anticon-mail"></i>
+              {{ user.email }}
+            </div>
+          </td>
+          <td>
+            <div class="phone-info">
+              <i class="anticon anticon-phone"></i>
+              {{ user.phoneNumber || 'N/A' }}
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [class.badge-success]="!isUserLocked(user)" [class.badge-danger]="isUserLocked(user)">
+              <i class="anticon" [class.anticon-check]="!isUserLocked(user)" [class.anticon-close]="isUserLocked(user)"></i>
+              {{ isUserLocked(user) ? 'Đã khóa' : 'Hoạt động' }}
+            </span>
+          </td>
+          <td>{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action btn-view" (click)="onViewUser(user)" title="Xem chi tiết">
+                <i class="anticon anticon-eye"></i>
+              </button>
+              <button class="btn-action btn-edit" (click)="onEditUser(user)" title="Sửa">
+                <i class="anticon anticon-edit"></i>
+              </button>
+              <button class="btn-action btn-copy" (click)="onCopyUser(user)" title="Sao chép">
+                <i class="anticon anticon-copy"></i>
+              </button>
+              <button 
+                class="btn-action" 
+                [class.btn-lock]="!isUserLocked(user)"
+                [class.btn-unlock]="isUserLocked(user)"
+                (click)="isUserLocked(user) ? onUnlockUser(user) : onLockUser(user)" 
+                [title]="isUserLocked(user) ? 'Mở khóa' : 'Khóa tài khoản'">
+                <i class="anticon" [class.anticon-lock]="!isUserLocked(user)" [class.anticon-unlock]="isUserLocked(user)"></i>
+              </button>
+              <button class="btn-action btn-delete" (click)="onDeleteUser(user)" title="Xóa">
+                <i class="anticon anticon-delete"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && !error && totalPages > 1" class="pagination-container">
+    <div class="pagination-info">
+      <span>Tổng số {{ totalItems }} người dùng</span>
+    </div>
+    <div class="pagination-controls">
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === 1"
+        (click)="goToPage(currentPage - 1)">
+        <i class="anticon anticon-left"></i>
+      </button>
+      
+      <span class="page-number">{{ currentPage }}</span>
+      
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(currentPage + 1)">
+        <i class="anticon anticon-right"></i>
+      </button>
+      
+      <select 
+        class="items-per-page"
+        [value]="itemsPerPage"
+        (change)="changeItemsPerPage(+$any($event.target).value)">
+        <option value="5">5/trang</option>
+        <option value="10">10/trang</option>
+        <option value="20">20/trang</option>
+        <option value="50">50/trang</option>
+      </select>
+      
+      <div class="go-to-page">
+        <span>Đến Trang</span>
+        <input 
+          type="number" 
+          class="page-input"
+          [min]="1"
+          [max]="totalPages"
+          [value]="currentPage"
+          (change)="goToPage(+$any($event.target).value)">
+      </div>
+    </div>
   </div>
 </div>

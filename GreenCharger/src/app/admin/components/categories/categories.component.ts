@@ -97,6 +97,11 @@ export class CategoriesComponent implements OnInit {
     console.log('View category:', category);
   }
 
+  onCopyCategory(category: Category): void {
+    console.log('Copy category:', category);
+    // TODO: Implement copy category functionality
+  }
+
   onModalClose(): void {
     this.showModal = false;
     this.selectedCategory = null;

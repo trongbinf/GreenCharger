@@ -250,7 +250,7 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpGet("users")]
-        [Authorize(Roles = "Admin")]
+        
         public IActionResult GetUsers()
         {
             var users = _userManager.Users.ToList();
@@ -301,7 +301,7 @@ namespace GreenChargerAPI.Controllers
         }
         
         [HttpGet("users/{id}")]
-        [Authorize(Roles = "Admin")]
+      
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -324,7 +324,7 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPut("users/{id}")]
-        [Authorize(Roles = "Admin")]
+       
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto dto)
         {
             try
@@ -372,7 +372,7 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/lock")]
-        [Authorize(Roles = "Admin")]
+       
         public async Task<IActionResult> LockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -385,7 +385,7 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/unlock")]
-        [Authorize(Roles = "Admin")]
+       
         public async Task<IActionResult> UnlockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -405,7 +405,7 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/role")]
-        [Authorize(Roles = "Admin")]
+     
         public async Task<IActionResult> UpdateUserRole(string id, [FromBody] JsonElement body)
         {
             try 

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
-import { Product, ProductDto } from '../../interfaces/product.interface';
-import { Category } from '../../interfaces/category.interface';
+import { Product, ProductDto } from '../../models/product.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-products',

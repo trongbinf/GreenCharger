@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { User, UserDto } from '../../interfaces/user.interface';
+import { User, UserDto } from '../../models/user.model';
 
 @Component({
   selector: 'app-users',

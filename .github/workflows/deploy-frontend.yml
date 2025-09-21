@@ -34,4 +34,4 @@ jobs:
           action: "upload"
           app_location: "GreenCharger"
           output_location: "dist/green-charger"
-          skip_app_build: false
+          skip_app_build: true

@@ -3,14 +3,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(rgba(39, 174, 96, 0.7), rgba(46, 204, 113, 0.7)), url('https://res.cloudinary.com/ddkvhnj27/image/upload/v1758463523/A%CC%89nh_ma%CC%80n_hi%CC%80nh_2025-09-21_lu%CC%81c_21.04.48_rl32fx.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding: 20px;
 }
 
 .register-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 40px rgba(46, 204, 113, 0.15);
   padding: 40px;
   width: 100%;
   max-width: 520px;
@@ -25,7 +29,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #1e3c72, #2a5298, #1e3c72);
+  background: linear-gradient(90deg, #27ae60, #2ecc71, #58d68d);
 }
 
 .register-header {
@@ -45,12 +49,12 @@
   height: 80px;
   border-radius: 50%;
   margin-bottom: 15px;
-  box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
   border: 3px solid #fff;
 }
 
 .register-header h2 {
-  color: #1e3c72;
+  color: #27ae60;
   margin: 0;
   font-size: 28px;
   font-weight: 700;
@@ -82,7 +86,7 @@
 .form-group label {
   display: block;
   margin-bottom: 6px;
-  color: #1e3c72;
+  color: #27ae60;
   font-weight: 600;
   font-size: 14px;
 }
@@ -100,8 +104,8 @@
 
 .form-control:focus {
   outline: none;
-  border-color: #1e3c72;
-  box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
   background: white;
 }
 
@@ -142,7 +146,7 @@
 
 .register-btn {
   width: 100%;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
   border: none;
   padding: 16px;
@@ -169,7 +173,7 @@
 
 .register-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(30, 60, 114, 0.4);
+  box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
 }
 
 .register-btn:hover:not(:disabled)::before {
@@ -198,14 +202,14 @@
 }
 
 .login-link {
-  color: #1e3c72;
+  color: #27ae60;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .login-link:hover {
-  color: #2a5298;
+  color: #2ecc71;
   text-decoration: underline;
 }
 
@@ -252,9 +256,9 @@
 }
 
 .back-home-btn:hover {
-  color: #1e3c72;
+  color: #27ae60;
   background: #f8f9fa;
-  border-color: #1e3c72;
+  border-color: #2ecc71;
   transform: translateY(-1px);
 }
 

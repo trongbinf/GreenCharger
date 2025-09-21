@@ -40,13 +40,13 @@
   border-radius: 8px;
   margin-right: 12px;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
 }
 
 .footer-logo-text {
   font-size: 20px;
   font-weight: bold;
-  color: #1e3c72;
+  color: #27ae60;
   letter-spacing: 1px;
 }
 
@@ -73,12 +73,15 @@
   text-decoration: none;
   font-size: 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(46, 204, 113, 0.1);
+  color: #27ae60;
 }
 
 .social-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+  background: #2ecc71;
+  color: white;
 }
 
 /* Footer Sections */
@@ -86,7 +89,7 @@
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 20px;
-  color: #333;
+  color: #27ae60;
   letter-spacing: 0.5px;
 }
 
@@ -108,7 +111,7 @@
 }
 
 .footer-link:hover {
-  color: #1e3c72;
+  color: #2ecc71;
 }
 
 /* Contact Info */
@@ -132,6 +135,7 @@
   width: 20px;
   flex-shrink: 0;
   margin-top: 2px;
+  color: #27ae60;
 }
 
 /* Newsletter */
@@ -152,7 +156,14 @@
   background: white;
   border-radius: 25px;
   padding: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.1);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.newsletter-input-group:focus-within {
+  border-color: #2ecc71;
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
 }
 
 .newsletter-input {
@@ -165,10 +176,14 @@
   background: transparent;
 }
 
+.newsletter-input::placeholder {
+  color: #999;
+}
+
 .newsletter-btn {
   width: 40px;
   height: 40px;
-  background: #1e3c72;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
   color: white;
   border: none;
   border-radius: 50%;
@@ -180,8 +195,9 @@
 }
 
 .newsletter-btn:hover {
-  background: #2a5298;
+  background: linear-gradient(135deg, #2ecc71 0%, #58d68d 100%);
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
 .newsletter-icon {
@@ -221,7 +237,7 @@
 }
 
 .footer-bottom-link:hover {
-  color: #1e3c72;
+  color: #2ecc71;
 }
 
 /* Responsive */
@@ -279,6 +295,7 @@
     padding: 0;
     background: transparent;
     box-shadow: none;
+    border: 1px solid #e9ecef;
   }
 
   .newsletter-input {

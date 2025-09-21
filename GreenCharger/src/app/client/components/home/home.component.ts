@@ -111,7 +111,7 @@ export class HomeComponent implements OnInit {
       id: 1,
       title: 'Sạc Điện Tử Chất Lượng Cao',
       subtitle: 'Khám phá bộ sưu tập sạc điện tử hiện đại và tiết kiệm năng lượng',
-      image: 'https://via.placeholder.com/1200x400/1e3c72/ffffff?text=Slide+1',
+      image: 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Banner/6c/d8/6cd83d1829cce54ea299e8095213b69c.png',
       buttonText: 'Mua ngay',
       buttonLink: '/products'
     },

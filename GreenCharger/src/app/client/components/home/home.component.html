@@ -5,21 +5,14 @@
   <!-- Hero Section - Image Only Slider -->
   <section class="hero-section">
     <div class="hero-slider">
-      <div class="slide" 
-           *ngFor="let slide of slides; let i = index"
-           [class.active]="i === currentSlide">
+      <div class="slide" [class.active]="currentSlide === 0">
         <div class="slide-image">
-          <img [src]="slide.image" [alt]="slide.title" />
+          <img [src]="slides[0].image" [alt]="slides[0].title">
         </div>
       </div>
-      <div class="slider-controls">
-        <button 
-          *ngFor="let slide of slides; let i = index"
-          class="slider-dot"
-          [class.active]="i === currentSlide"
-          (click)="goToSlide(i)">
-        </button>
-      </div>
+    </div>
+    <div class="slider-controls">
+      <div class="slider-dot" [class.active]="currentSlide === 0" (click)="goToSlide(0)"></div>
     </div>
   </section>
 
@@ -29,35 +22,34 @@
       <div class="section-header">
         <h2 class="main-title">Categories</h2>
         <h2 class="section-title">Danh Mục Sản Phẩm</h2>
-        <p class="section-subtitle">Các dòng sản phẩm chính tại GreenCharger</p>
+        <p class="section-subtitle">Khám phá các danh mục sản phẩm đa dạng</p>
       </div>
       
-      <!-- Loading State -->
-      <div *ngIf="isLoadingCategories" class="loading-container">
-        <div class="loading-spinner"></div>
+      <div class="categories-grid" *ngIf="!isLoadingCategories && !categoriesError">
+        <div class="category-card" *ngFor="let category of categories" routerLink="/products" [queryParams]="{category: category.id}">
+          <div class="category-image">
+            <img [src]="getCategoryImageUrl(category)" [alt]="category.name">
+          </div>
+          <div class="category-info">
+            <h3 class="category-name">{{ category.name }}</h3>
+            <p class="category-count">{{ getCategoryCount(category) }} sản phẩm</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="loading" *ngIf="isLoadingCategories">
+        <div class="spinner"></div>
         <p>Đang tải danh mục...</p>
       </div>
       
-      <!-- Error State -->
-      <div *ngIf="categoriesError && !isLoadingCategories" class="error-container">
-        <p class="error-message">{{ categoriesError }}</p>
-      </div>
-      
-      <!-- Categories Grid -->
-      <div *ngIf="!isLoadingCategories && !categoriesError" class="categories-grid">
-        <div class="category-card" *ngFor="let category of categories">
-          <div class="category-image">
-            <img [src]="getCategoryImageUrl(category)" [alt]="category.name" />
-          </div>
-          <h3 class="category-name">{{ category.name }}</h3>
-          <p class="category-count">{{ getCategoryCount(category) }} sản phẩm</p>
-        </div>
+      <div class="error" *ngIf="categoriesError">
+        <p>{{ categoriesError }}</p>
       </div>
     </div>
   </section>
 
   <!-- Featured Products Section -->
-  <section class="featured-section">
+  <section class="featured-products-section">
     <div class="container">
       <div class="section-header">
         <h2 class="main-title">Products</h2>
@@ -65,38 +57,27 @@
         <p class="section-subtitle">Những sản phẩm được yêu thích nhất</p>
       </div>
       
-      <!-- Loading State -->
-      <div *ngIf="isLoadingProducts" class="loading-container">
-        <div class="loading-spinner"></div>
-        <p>Đang tải sản phẩm...</p>
-      </div>
-      
-      <!-- Error State -->
-      <div *ngIf="productsError && !isLoadingProducts" class="error-container">
-        <p class="error-message">{{ productsError }}</p>
-      </div>
-      
-      <!-- Products Grid -->
-      <div *ngIf="!isLoadingProducts && !productsError" class="products-grid">
+      <div class="products-grid" *ngIf="!isLoadingProducts && !productsError">
         <div class="product-card" *ngFor="let product of featuredProducts">
-          <div class="product-badge">{{ getProductBadge(product) }}</div>
           <div class="product-image">
-            <img [src]="getProductImageUrl(product)" [alt]="product.name" />
+            <img [src]="getProductImageUrl(product)" [alt]="product.name">
+            <div class="product-badge">{{ getProductBadge(product) }}</div>
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <div class="product-rating">
+            <p class="product-description">{{ product.description }}</p>
+            <div class="product-price">
+              <span class="current-price">{{ formatPrice(product.finalPrice) }}</span>
+              <span class="original-price" *ngIf="product.discount > 0">{{ formatPrice(product.price) }}</span>
+            </div>
+            <div class="product-rating" *ngIf="product.averageRating > 0">
               <div class="stars">
                 <span 
-                  *ngFor="let star of getStars(product.averageRating || 0)"
+                  *ngFor="let star of getStars(product.averageRating)"
                   class="star"
                   [class.filled]="star === 1">★</span>
               </div>
-              <span class="rating-text">{{ product.averageRating || 0 }} ({{ product.reviewCount || 0 }} đánh giá)</span>
-            </div>
-            <div class="product-price">
-              <span class="current-price">{{ formatPrice(product.finalPrice) }}</span>
-              <span class="original-price" *ngIf="product.isOnSale && product.price > product.finalPrice">{{ formatPrice(product.price) }}</span>
+              <span class="rating-text">({{ product.reviewCount }})</span>
             </div>
             <button class="add-to-cart-btn">Thêm vào giỏ</button>
           </div>
@@ -125,7 +106,7 @@
           <p class="feature-description">Công nghệ sạc nhanh tiên tiến, tiết kiệm thời gian tối đa</p>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">��</div>
+          <div class="feature-icon safety-icon">🔒</div>
           <h3 class="feature-title">An Toàn Tuyệt Đối</h3>
           <p class="feature-description">Bảo vệ đa lớp, chống quá tải và chập cháy</p>
         </div>
@@ -135,7 +116,7 @@
           <p class="feature-description">Tiết kiệm năng lượng, góp phần bảo vệ môi trường</p>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">🛡️</div>
+          <div class="feature-icon warranty-icon">⭐</div>
           <h3 class="feature-title">Bảo Hành 2 Năm</h3>
           <p class="feature-description">Cam kết chất lượng với chế độ bảo hành toàn diện</p>
         </div>
@@ -171,8 +152,6 @@
       </div>
     </div>
   </section>
-
-  
 
   <!-- Footer -->
   <app-footer></app-footer>

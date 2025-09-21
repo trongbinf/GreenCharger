@@ -32,5 +32,5 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_BAY_0674FD800 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "GreenCharger/dist/green-charger"
+          app_location: "GreenCharger/dist/green-charger/browser"
           skip_app_build: true

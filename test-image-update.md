@@ -1,0 +1,1 @@
+Testing image update functionality

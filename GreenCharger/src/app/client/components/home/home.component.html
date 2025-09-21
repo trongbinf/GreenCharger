@@ -94,80 +94,10 @@
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="container">
-      <div class="features-grid">
-        <div class="feature-item">
-          <div class="feature-icon">🚚</div>
-          <h3 class="feature-title">Giao hàng nhanh</h3>
-          <p class="feature-description">Giao hàng trong 24h tại TP.HCM</p>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🛡️</div>
-          <h3 class="feature-title">Bảo hành 2 năm</h3>
-          <p class="feature-description">Cam kết chất lượng sản phẩm</p>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">💳</div>
-          <h3 class="feature-title">Thanh toán an toàn</h3>
-          <p class="feature-description">Hỗ trợ nhiều phương thức thanh toán</p>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🔄</div>
-          <h3 class="feature-title">Đổi trả dễ dàng</h3>
-          <p class="feature-description">Đổi trả trong 7 ngày đầu</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  
+ 
 
-  <!-- Testimonials Section -->
-  <section class="testimonials-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Khách Hàng Nói Gì</h2>
-        <p class="section-subtitle">Phản hồi từ những khách hàng đã tin tưởng sử dụng</p>
-      </div>
-      
-      <div class="testimonials-grid">
-        <div class="testimonial-card" *ngFor="let testimonial of testimonials">
-          <div class="testimonial-header">
-            <img [src]="testimonial.avatar" [alt]="testimonial.name" class="testimonial-avatar" />
-            <div class="testimonial-info">
-              <h4 class="testimonial-name">{{ testimonial.name }}</h4>
-              <div class="testimonial-rating">
-                <span *ngFor="let star of getStars(testimonial.rating)" 
-                      class="star filled">★</span>
-              </div>
-            </div>
-          </div>
-          <p class="testimonial-comment">{{ testimonial.comment }}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Newsletter Section -->
-  <section class="newsletter-section">
-    <div class="container">
-      <div class="newsletter-content">
-        <h2 class="newsletter-title">Đăng ký nhận tin</h2>
-        <p class="newsletter-description">
-          Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt
-        </p>
-        <form class="newsletter-form">
-          <input 
-            type="email" 
-            placeholder="Nhập email của bạn" 
-            class="newsletter-input"
-            required
-          />
-          <button type="submit" class="newsletter-btn">Đăng ký</button>
-        </form>
-      </div>
-    </div>
-  </section>
+  
 </main>
 
 <app-footer></app-footer>

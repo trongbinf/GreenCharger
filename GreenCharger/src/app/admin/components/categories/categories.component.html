@@ -190,13 +190,21 @@
                 accept="image/*"
                 style="display:none">
             </div>
+            <!-- Upload Progress -->
+            <div *ngIf="isUploading" class="upload-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+              </div>
+              <p>Đang tải lên ảnh...</p>
+            </div>
           </div>
         </div>
         
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="onModalClose()">Hủy</button>
-          <button type="button" class="btn btn-primary" [disabled]="!categoryForm.valid" (click)="onModalSave()">
-            {{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}
+          <button type="button" class="btn btn-primary" [disabled]="!categoryForm.valid || isUploading" (click)="onModalSave()">
+            <span *ngIf="isUploading">Đang xử lý...</span>
+            <span *ngIf="!isUploading">{{ isEditMode ? 'Cập nhật' : 'Thêm mới' }}</span>
           </button>
         </div>
       </form>

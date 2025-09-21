@@ -37,6 +37,7 @@ export class CategoriesComponent implements OnInit {
   // Image handling
   imageFile: File | null = null;
   imagePreview: string | null = null;
+  isUploading = false;
 
   // Pagination
   currentPage = 1;
@@ -100,7 +101,7 @@ export class CategoriesComponent implements OnInit {
       productCount: category.productCount
     };
     this.imageFile = null;
-    this.imagePreview = null;
+    this.imagePreview = category.imageUrl || null;
     this.showModal = true;
   }
 
@@ -131,10 +132,10 @@ export class CategoriesComponent implements OnInit {
   }
 
   onModalClose(): void {
-  this.showModal = false;
-  this.showDetailModal = false;
-  this.selectedCategory = null;
-  this.resetCategoryData();
+    this.showModal = false;
+    this.showDetailModal = false;
+    this.selectedCategory = null;
+    this.resetCategoryData();
   }
   
   resetCategoryData(): void {
@@ -147,9 +148,8 @@ export class CategoriesComponent implements OnInit {
     };
     this.imageFile = null;
     this.imagePreview = null;
+    this.isUploading = false;
   }
-
-  // Phương thức này được thay thế bởi các hàm mới
 
   // Pagination methods
   get totalPages(): number {
@@ -221,14 +221,17 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
+    this.isUploading = true;
     this.categoryService.uploadCategoryImage(this.imageFile).subscribe({
       next: (response) => {
+        console.log('Image upload successful:', response);
         this.categoryData.imageUrl = response.imageUrl;
         this.saveCategory();
       },
       error: (error) => {
         console.error('Error uploading image:', error);
         alert('Không thể tải lên ảnh danh mục');
+        this.isUploading = false;
         // Vẫn tiếp tục lưu danh mục
         this.saveCategory();
       }
@@ -236,10 +239,14 @@ export class CategoriesComponent implements OnInit {
   }
 
   saveCategory(): void {
+    console.log('Saving category with data:', this.categoryData);
+    
     if (this.isEditMode && this.selectedCategory) {
       // Cập nhật danh mục hiện có
+      console.log('Updating category with ID:', this.selectedCategory.id);
       this.categoryService.updateCategory(this.selectedCategory.id, this.categoryData).subscribe({
         next: () => {
+          console.log('Category updated successfully');
           alert('Cập nhật danh mục thành công');
           this.onModalClose();
           this.loadCategories();
@@ -252,8 +259,10 @@ export class CategoriesComponent implements OnInit {
       });
     } else {
       // Tạo danh mục mới
+      console.log('Creating new category');
       this.categoryService.createCategory(this.categoryData).subscribe({
         next: () => {
+          console.log('Category created successfully');
           alert('Thêm danh mục thành công');
           this.onModalClose();
           this.loadCategories();

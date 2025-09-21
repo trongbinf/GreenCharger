@@ -98,6 +98,8 @@ export class CategoryFormComponent implements OnInit {
     }
     
     try {
+      let imageUrl = this.categoryForm.get('imageUrl')?.value || '';
+      
       // Upload image if selected
       if (this.imageFile) {
         this.isUploading = true;
@@ -105,7 +107,8 @@ export class CategoryFormComponent implements OnInit {
         
         const imageResult = await this.categoryService.uploadCategoryImage(this.imageFile).toPromise();
         if (imageResult) {
-          this.categoryForm.get('imageUrl')?.setValue(imageResult.imageUrl);
+          imageUrl = imageResult.imageUrl;
+          this.categoryForm.get('imageUrl')?.setValue(imageUrl);
         }
       }
       
@@ -115,8 +118,11 @@ export class CategoryFormComponent implements OnInit {
       const categoryData: CategoryDto = {
         ...this.categoryForm.value,
         id: this.category?.id || 0,
-        productCount: this.category?.productCount || 0
+        productCount: this.category?.productCount || 0,
+        imageUrl: imageUrl // Ensure imageUrl is set correctly
       };
+      
+      console.log('Saving category data:', categoryData);
       
       // Emit to parent component
       this.save.emit(categoryData);

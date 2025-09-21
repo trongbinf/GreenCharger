@@ -1,0 +1,35 @@
+name: Deploy Backend API
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore GreenChargerAPI/GreenChargerAPI.csproj
+
+      - name: Build
+        run: dotnet build GreenChargerAPI/GreenChargerAPI.csproj --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish GreenChargerAPI/GreenChargerAPI.csproj -c Release -o ./publish
+
+      - name: Deploy to Azure WebApp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "GreenCharger-API" # đúng tên App Service
+          package: ./publish
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}

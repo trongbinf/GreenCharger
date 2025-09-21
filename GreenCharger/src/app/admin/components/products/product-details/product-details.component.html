@@ -1,12 +1,11 @@
-<div class="modal" [class.show]="isVisible">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Chi tiết sản phẩm</h5>
-        <button type="button" class="close-button" (click)="onClose()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+<div class="modal-overlay" *ngIf="isVisible">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Chi tiết sản phẩm</h5>
+      <button type="button" class="close-btn" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
       <div class="modal-body">
         <div *ngIf="!product" class="empty-state">
           <i class="anticon anticon-inbox"></i>
@@ -100,4 +99,3 @@
       </div>
     </div>
   </div>
-</div>

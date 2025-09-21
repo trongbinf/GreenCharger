@@ -6,6 +6,8 @@ import { CategoryService } from '../../../services/category.service';
 import { Product, ProductDto } from '../../../models/product.model';
 import { Category } from '../../../models/category.model';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { ProductFormComponent } from './product-form/product-form.component';
+import { ProductDetailsComponent } from './product-details/product-details.component';
 
 @Component({
   selector: 'app-products',
@@ -13,10 +15,12 @@ import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
   imports: [
     CommonModule, 
     FormsModule, 
-    NzMessageModule
+    NzMessageModule,
+    ProductFormComponent,
+    ProductDetailsComponent
   ],
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css']
+  styleUrls: ['./products.component.css', './products.component.modal.css']
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
@@ -217,21 +221,22 @@ export class ProductsComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  closeFormModal(): void {
+  onCloseForm(): void {
     this.showFormModal = false;
   }
 
-  closeDetailsModal(): void {
+  onCloseDetails(): void {
     this.showDetailsModal = false;
   }
 
-  handleSaveProduct(product: Product): void {
+  onSaveProduct(product: ProductDto): void {
     if (this.formMode === 'create') {
-      this.productService.createProduct(product as ProductDto).subscribe({
+      this.productService.createProduct(product).subscribe({
         next: (newProduct: Product) => {
           this.products.unshift(newProduct);
           this.showFormModal = false;
           this.message.success('Thêm sản phẩm thành công!');
+          this.loadProducts(); // Reload to get the correct product list
         },
         error: (error: any) => {
           console.error('Error adding product:', error);
@@ -239,14 +244,11 @@ export class ProductsComponent implements OnInit {
         }
       });
     } else {
-      this.productService.updateProduct(product.id, product as ProductDto).subscribe({
+      this.productService.updateProduct(product.id, product).subscribe({
         next: () => {
-          const index = this.products.findIndex(p => p.id === product.id);
-          if (index !== -1) {
-            this.products[index] = { ...product };
-          }
           this.showFormModal = false;
           this.message.success('Cập nhật sản phẩm thành công!');
+          this.loadProducts(); // Reload to get the updated product data
         },
         error: (error: any) => {
           console.error('Error updating product:', error);

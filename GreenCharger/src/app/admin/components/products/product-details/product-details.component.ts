@@ -7,7 +7,7 @@ import { Product } from '../../../../models/product.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.css']
+  styleUrls: ['./product-details.component.css', './product-details.component.modal.css']
 })
 export class ProductDetailsComponent {
   @Input() product: Product | null = null;

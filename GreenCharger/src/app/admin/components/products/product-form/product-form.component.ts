@@ -10,7 +10,7 @@ import { CategoryService } from '../../../../services/category.service';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.css']
+  styleUrls: ['./product-form.component.css', './product-form.component.modal.css']
 })
 export class ProductFormComponent implements OnInit {
   @Input() product: Product | null = null;

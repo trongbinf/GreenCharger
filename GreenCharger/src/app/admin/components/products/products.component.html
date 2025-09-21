@@ -221,4 +221,20 @@
   </div>
 </div>
 
+<!-- Product Form Modal -->
+<app-product-form 
+  *ngIf="showFormModal" 
+  [isVisible]="showFormModal"
+  [product]="selectedProduct"
+  [mode]="formMode"
+  (close)="onCloseForm()"
+  (save)="onSaveProduct($event)">
+</app-product-form>
 
+<!-- Product Details Modal -->
+<app-product-details
+  *ngIf="showDetailsModal"
+  [isVisible]="showDetailsModal"
+  [product]="selectedProduct"
+  (close)="onCloseDetails()">
+</app-product-details>

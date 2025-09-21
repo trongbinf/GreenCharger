@@ -1,0 +1,77 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="logo">
+      <a routerLink="/" class="logo-link">
+        <img src="/assets/logo.png" alt="GreenCharger" class="logo-img" />
+        <span class="logo-text">GreenCharger</span>
+      </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="nav" [class.nav-open]="isMenuOpen">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a routerLink="/" class="nav-link" routerLinkActive="active">Trang chủ</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/products" class="nav-link" routerLinkActive="active">Sản phẩm</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/about" class="nav-link" routerLinkActive="active">Giới thiệu</a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/contact" class="nav-link" routerLinkActive="active">Liên hệ</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- User Actions -->
+    <div class="user-actions">
+      <!-- Search -->
+      <div class="search-box">
+        <input type="text" placeholder="Tìm kiếm sản phẩm..." class="search-input" />
+        <button class="search-btn">
+          <i class="search-icon">🔍</i>
+        </button>
+      </div>
+
+      <!-- Cart -->
+      <a routerLink="/cart" class="cart-link">
+        <i class="cart-icon">🛒</i>
+        <span class="cart-count">0</span>
+      </a>
+
+      <!-- User Menu -->
+      <div class="user-menu" *ngIf="userService.isAuthenticated(); else loginButton">
+        <div class="user-info" (click)="toggleMenu()">
+          <img src="/assets/user-avatar.png" alt="User" class="user-avatar" />
+          <span class="user-name">{{ userService.getCurrentUser()?.firstName || 'User' }}</span>
+          <i class="dropdown-icon">▼</i>
+        </div>
+        
+        <div class="dropdown-menu" [class.show]="isMenuOpen">
+          <a routerLink="/profile" class="dropdown-item">Hồ sơ</a>
+          <a routerLink="/orders" class="dropdown-item">Đơn hàng</a>
+          <a routerLink="/admin" class="dropdown-item" *ngIf="userService.getCurrentUser()?.role === 'admin'">Quản trị</a>
+          <hr class="dropdown-divider">
+          <button class="dropdown-item logout-btn" (click)="logout()">Đăng xuất</button>
+        </div>
+      </div>
+
+      <ng-template #loginButton>
+        <div class="auth-buttons">
+          <a routerLink="/login" class="btn btn-outline">Đăng nhập</a>
+          <a routerLink="/register" class="btn btn-primary">Đăng ký</a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" (click)="toggleMenu()">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+  </div>
+</header>

@@ -1,0 +1,84 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-section">
+        <img src="https://res.cloudinary.com/ddkvhnj27/image/upload/v1758400063/z7019344847597_aa447955326b74efcd30844f0ddafb97_mcbqgu.jpg" 
+             alt="GreenCharger Logo" 
+             class="auth-logo" />
+        <h2>Đăng Nhập</h2>
+      </div>
+      <p>Chào mừng bạn quay trở lại!</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="getFieldError('email')"
+          placeholder="Nhập email của bạn"
+        />
+        <div class="error-message" *ngIf="getFieldError('email')">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="getFieldError('password')"
+          placeholder="Nhập mật khẩu của bạn"
+        />
+        <div class="error-message" *ngIf="getFieldError('password')">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="rememberMe" />
+          <span class="checkmark"></span>
+          Ghi nhớ đăng nhập
+        </label>
+      </div>
+
+      <div class="error-message global-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="isLoading"
+        [class.loading]="isLoading"
+      >
+        <span *ngIf="!isLoading">Đăng Nhập</span>
+        <span *ngIf="isLoading">Đang đăng nhập...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <a routerLink="/forgot-password" class="forgot-password-link">
+        Quên mật khẩu?
+      </a>
+      <p>
+        Chưa có tài khoản?
+        <a routerLink="/register" class="register-link">Đăng ký ngay</a>
+      </p>
+    </div>
+
+    <!-- Back to Home Button -->
+    <div class="back-to-home">
+      <a routerLink="/home" class="back-home-btn">
+        ← Quay về trang chủ
+      </a>
+    </div>
+  </div>
+</div>

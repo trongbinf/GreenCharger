@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductService } from '../../services/product.service';
-import { CategoryService } from '../../services/category.service';
-import { Product, ProductDto } from '../../models/product.model';
-import { Category } from '../../models/category.model';
+import { ProductService } from '../../../services/product.service';
+import { CategoryService } from '../../../services/category.service';
+import { Product, ProductDto } from '../../../models/product.model';
+import { Category } from '../../../models/category.model';
 
 @Component({
   selector: 'app-products',

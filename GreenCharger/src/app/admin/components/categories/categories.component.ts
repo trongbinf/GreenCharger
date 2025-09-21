@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CategoryService } from '../../services/category.service';
-import { Category, CategoryDto } from '../../models/category.model';
+import { CategoryService } from '../../../services/category.service';
+import { Category, CategoryDto } from '../../../models/category.model';
 
 @Component({
   selector: 'app-categories',

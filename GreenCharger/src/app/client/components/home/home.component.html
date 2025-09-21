@@ -1,23 +1,14 @@
 <app-header></app-header>
 
 <main class="home-main">
-  <!-- Hero Section -->
+  <!-- Hero Slider Section -->
   <section class="hero-section">
     <div class="hero-slider">
       <div class="slide" 
            *ngFor="let slide of slides; let i = index"
            [class.active]="i === currentSlide">
-        <div class="slide-content">
-          <div class="slide-text">
-            <h1 class="slide-title">{{ slide.title }}</h1>
-            <p class="slide-subtitle">{{ slide.subtitle }}</p>
-            <a [routerLink]="slide.buttonLink" class="slide-btn">
-              {{ slide.buttonText }}
-            </a>
-          </div>
-          <div class="slide-image">
-            <img [src]="slide.image" [alt]="slide.title" />
-          </div>
+        <div class="slide-image">
+          <img [src]="slide.image" [alt]="slide.title" />
         </div>
       </div>
       
@@ -37,8 +28,9 @@
   <section class="categories-section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Danh Mục Sản Phẩm</h2>
-        <p class="section-subtitle">Khám phá các loại sạc điện tử phù hợp với thiết bị của bạn</p>
+        <h1 class="main-title">Categories</h1>
+        <h2 class="section-title">Danh mục sản phẩm</h2>
+        <p class="section-subtitle">Các dòng sản phẩm chính tại GreenCharger</p>
       </div>
       
       <div class="categories-grid">
@@ -59,13 +51,14 @@
   <section class="featured-section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
+        <h1 class="main-title">Products</h1>
+        <h2 class="section-title">Sản phẩm nổi bật</h2>
         <p class="section-subtitle">Những sản phẩm được yêu thích nhất</p>
       </div>
       
       <div class="products-grid">
         <div class="product-card" *ngFor="let product of featuredProducts">
-          <div class="product-badge">{{ product.badge }}</div>
+          <div class="product-badge" *ngIf="product.badge">{{ product.badge }}</div>
           <div class="product-image">
             <img [src]="product.image" [alt]="product.name" />
           </div>
@@ -81,7 +74,7 @@
             </div>
             <div class="product-price">
               <span class="current-price">{{ formatPrice(product.price) }}</span>
-              <span class="original-price">{{ formatPrice(product.originalPrice) }}</span>
+              <span class="original-price" *ngIf="product.originalPrice">{{ formatPrice(product.originalPrice) }}</span>
             </div>
             <button class="add-to-cart-btn">Thêm vào giỏ</button>
           </div>
@@ -94,10 +87,103 @@
     </div>
   </section>
 
-  
- 
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h1 class="main-title">Features</h1>
+        <h2 class="section-title">Tại Sao Chọn GreenCharger?</h2>
+        <p class="section-subtitle">Những lý do khiến khách hàng tin tưởng lựa chọn chúng tôi</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Sạc Nhanh</h3>
+          <p class="feature-description">Công nghệ sạc nhanh tiên tiến, tiết kiệm thời gian</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔋</div>
+          <h3 class="feature-title">An Toàn Tuyệt Đối</h3>
+          <p class="feature-description">Bảo vệ thiết bị khỏi quá tải và chập điện</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🌱</div>
+          <h3 class="feature-title">Thân Thiện Môi Trường</h3>
+          <p class="feature-description">Vật liệu tái chế, góp phần bảo vệ môi trường</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🚚</div>
+          <h3 class="feature-title">Giao Hàng Nhanh</h3>
+          <p class="feature-description">Miễn phí vận chuyển toàn quốc trong 24h</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <h1 class="main-title">Customers</h1>
+        <h2 class="section-title">Khách Hàng Nói Gì</h2>
+        <p class="section-subtitle">Phản hồi từ những khách hàng đã sử dụng sản phẩm</p>
+      </div>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
+            <div>
+              <h4 class="testimonial-name">Nguyễn Văn A</h4>
+              <div class="testimonial-rating">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+              </div>
+            </div>
+          </div>
+          <p class="testimonial-comment">"Sản phẩm chất lượng tốt, sạc nhanh và bền. Tôi rất hài lòng!"</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
+            <div>
+              <h4 class="testimonial-name">Trần Thị B</h4>
+              <div class="testimonial-rating">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star">★</span>
+              </div>
+            </div>
+          </div>
+          <p class="testimonial-comment">"Dịch vụ khách hàng tuyệt vời, giao hàng đúng hẹn."</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
+            <div>
+              <h4 class="testimonial-name">Lê Văn C</h4>
+              <div class="testimonial-rating">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+              </div>
+            </div>
+          </div>
+          <p class="testimonial-comment">"Giá cả hợp lý, chất lượng vượt trội so với mong đợi."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <
 </main>
 
 <app-footer></app-footer>

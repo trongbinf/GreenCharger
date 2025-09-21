@@ -111,23 +111,15 @@ export class HomeComponent implements OnInit {
       id: 1,
       title: 'Sạc Điện Tử Chất Lượng Cao',
       subtitle: 'Khám phá bộ sưu tập sạc điện tử hiện đại và tiết kiệm năng lượng',
-      image: 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Banner/6c/d8/6cd83d1829cce54ea299e8095213b69c.png',
+      image: 'https://res.cloudinary.com/ddkvhnj27/image/upload/v1758463523/A%CC%89nh_ma%CC%80n_hi%CC%80nh_2025-09-21_lu%CC%81c_21.04.48_rl32fx.png',
       buttonText: 'Mua ngay',
       buttonLink: '/products'
     },
     {
       id: 2,
-      title: 'Công Nghệ Sạc Nhanh',
-      subtitle: 'Trải nghiệm tốc độ sạc nhanh gấp 3 lần với công nghệ mới nhất',
-      image: 'https://via.placeholder.com/1200x400/2a5298/ffffff?text=Slide+2',
-      buttonText: 'Tìm hiểu thêm',
-      buttonLink: '/about'
-    },
-    {
-      id: 3,
       title: 'Bảo Hành 2 Năm',
       subtitle: 'Cam kết chất lượng với chế độ bảo hành toàn diện',
-      image: 'https://via.placeholder.com/1200x400/1e3c72/ffffff?text=Slide+3',
+      image: 'https://res.cloudinary.com/ddkvhnj27/image/upload/v1758465324/Screenshot_at_Sep_21_21-35-04_akwenk.png',
       buttonText: 'Xem sản phẩm',
       buttonLink: '/products'
     }

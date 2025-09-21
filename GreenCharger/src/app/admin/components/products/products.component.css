@@ -72,6 +72,7 @@
 
 .search-input-wrapper {
   position: relative;
+  display: flex;
 }
 
 .search-icon {
@@ -87,10 +88,27 @@
   width: 100%;
   padding: 10px 12px 10px 40px;
   border: 2px solid #e8e8e8;
-  border-radius: 8px;
+  border-radius: 8px 0 0 8px;
   font-size: 14px;
   transition: all 0.3s ease;
   background: #fafafa;
+}
+
+.search-button {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  background-color: #096dd9;
 }
 
 .search-input:focus {

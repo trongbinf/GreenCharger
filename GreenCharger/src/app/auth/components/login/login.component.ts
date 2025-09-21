@@ -34,15 +34,38 @@ export class LoginComponent {
       this.isLoading = true;
       this.errorMessage = '';
 
-      const loginData: LoginRequest = this.loginForm.value;
+      const loginData: LoginRequest = {
+        email: this.loginForm.value.email,
+        password: this.loginForm.value.password,
+        rememberMe: this.loginForm.value.rememberMe
+      };
+      
+      // For testing with admin credentials
+      if (loginData.email === 'admin@mocviet.com' && loginData.password === 'Admin@123') {
+        console.log('Using admin credentials:', loginData);
+      }
       
       this.userService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.router.navigate(['/admin/dashboard']);
+          
+          // Get current user with roles from the service
+          const currentUser = this.userService.getCurrentUser();
+          console.log('Current user:', currentUser);
+          
+          if (currentUser && currentUser.roles && currentUser.roles.includes('Admin')) {
+            console.log('Admin user detected, redirecting to dashboard');
+            // Redirect to admin dashboard
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            console.log('Regular user detected, redirecting to home');
+            // Redirect to user homepage
+            this.router.navigate(['/']);
+          }
         },
         error: (error) => {
           this.isLoading = false;
+          console.error('Login error:', error);
           this.errorMessage = error.error?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
         }
       });

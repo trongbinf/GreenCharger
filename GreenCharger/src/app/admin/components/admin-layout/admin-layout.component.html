@@ -36,8 +36,13 @@
           </select>
         </div>
         <div class="user-info">
-          <span>Admin User</span>
-          <i class="anticon anticon-user"></i>
+          <span>{{ currentUser?.displayName || 'Admin User' }}</span>
+          <div class="dropdown">
+            <i class="anticon anticon-user"></i>
+            <div class="dropdown-menu">
+              <a (click)="logout()">Đăng xuất</a>
+            </div>
+          </div>
         </div>
       </div>
     </header>

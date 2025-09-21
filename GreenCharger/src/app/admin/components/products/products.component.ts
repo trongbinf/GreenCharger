@@ -5,11 +5,16 @@ import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { Product, ProductDto } from '../../../models/product.model';
 import { Category } from '../../../models/category.model';
+import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    NzMessageModule
+  ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
@@ -28,9 +33,16 @@ export class ProductsComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
+  // Modals
+  showFormModal = false;
+  showDetailsModal = false;
+  selectedProduct: Product | null = null;
+  formMode: 'create' | 'edit' = 'create';
+
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private message: NzMessageService
   ) { }
 
   ngOnInit(): void {
@@ -114,11 +126,15 @@ export class ProductsComponent implements OnInit {
   }
 
   onAddProduct(): void {
-    console.log('Add product');
+    this.selectedProduct = {} as Product;
+    this.formMode = 'create';
+    this.showFormModal = true;
   }
 
   onEditProduct(product: Product): void {
-    console.log('Edit product:', product);
+    this.selectedProduct = product;
+    this.formMode = 'edit';
+    this.showFormModal = true;
   }
 
   onDeleteProduct(product: Product): void {
@@ -136,12 +152,21 @@ export class ProductsComponent implements OnInit {
   }
 
   onViewProduct(product: Product): void {
-    console.log('View product:', product);
+    this.selectedProduct = product;
+    this.showDetailsModal = true;
   }
 
   onCopyProduct(product: Product): void {
-    console.log('Copy product:', product);
-    // TODO: Implement copy product functionality
+    // Create a copy without ID to add as new
+    const productCopy: Product = {
+      ...product,
+      id: 0, // Set to 0 as this will be a new product
+      name: `${product.name} (Sao chép)`
+    };
+    
+    this.selectedProduct = productCopy;
+    this.formMode = 'create';
+    this.showFormModal = true;
   }
 
   onToggleStatus(product: Product): void {
@@ -190,5 +215,44 @@ export class ProductsComponent implements OnInit {
   changeItemsPerPage(items: number): void {
     this.itemsPerPage = items;
     this.currentPage = 1;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+  }
+
+  handleSaveProduct(product: Product): void {
+    if (this.formMode === 'create') {
+      this.productService.createProduct(product as ProductDto).subscribe({
+        next: (newProduct: Product) => {
+          this.products.unshift(newProduct);
+          this.showFormModal = false;
+          this.message.success('Thêm sản phẩm thành công!');
+        },
+        error: (error: any) => {
+          console.error('Error adding product:', error);
+          this.message.error('Lỗi khi thêm sản phẩm. Vui lòng thử lại!');
+        }
+      });
+    } else {
+      this.productService.updateProduct(product.id, product as ProductDto).subscribe({
+        next: () => {
+          const index = this.products.findIndex(p => p.id === product.id);
+          if (index !== -1) {
+            this.products[index] = { ...product };
+          }
+          this.showFormModal = false;
+          this.message.success('Cập nhật sản phẩm thành công!');
+        },
+        error: (error: any) => {
+          console.error('Error updating product:', error);
+          this.message.error('Lỗi khi cập nhật sản phẩm. Vui lòng thử lại!');
+        }
+      });
+    }
   }
 }

@@ -18,6 +18,9 @@
           placeholder="Tìm kiếm theo tên, mô tả, danh mục..."
           [(ngModel)]="searchTerm"
           (input)="onSearch()">
+        <button class="search-button" (click)="onSearch()">
+          <i class="fas fa-search"></i>
+        </button>
       </div>
     </div>
     
@@ -217,3 +220,5 @@
     </div>
   </div>
 </div>
+
+

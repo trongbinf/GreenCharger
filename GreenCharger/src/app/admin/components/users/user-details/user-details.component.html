@@ -1,0 +1,85 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Chi tiết người dùng</h3>
+      <button class="close-btn" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body" *ngIf="user">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      
+      <div class="user-info-section">
+        <h4>Thông tin cá nhân</h4>
+        
+        <div class="info-group">
+          <div class="info-item">
+            <label>Họ tên:</label>
+            <p>{{ user.firstName }} {{ user.lastName }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Email:</label>
+            <p>{{ user.email }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Số điện thoại:</label>
+            <p>{{ user.phoneNumber || 'Không có' }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Địa chỉ:</label>
+            <p>{{ user.address || 'Không có' }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="account-info-section">
+        <h4>Thông tin tài khoản</h4>
+        
+        <div class="info-group">
+          <div class="info-item">
+            <label>Username:</label>
+            <p>{{ user.userName }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Trạng thái xác thực email:</label>
+            <p [class.text-success]="user.emailConfirmed" [class.text-danger]="!user.emailConfirmed">
+              {{ user.emailConfirmed ? 'Đã xác thực' : 'Chưa xác thực' }}
+            </p>
+          </div>
+          
+          <div class="info-item">
+            <label>Trạng thái tài khoản:</label>
+            <p [class.text-success]="!isUserLocked()" [class.text-danger]="isUserLocked()">
+              {{ isUserLocked() ? 'Đã khóa' : 'Hoạt động' }}
+            </p>
+          </div>
+          
+          <div class="info-item" *ngIf="isUserLocked()">
+            <label>Khóa đến:</label>
+            <p class="text-danger">{{ formatDate(user.lockoutEnd) }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Ngày tạo:</label>
+            <p>{{ formatDate(user.createdAt) }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Cập nhật lần cuối:</label>
+            <p>{{ formatDate(user.updatedAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()">Đóng</button>
+    </div>
+  </div>
+</div>

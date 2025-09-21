@@ -1,0 +1,123 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ formTitle }}</h3>
+      <button class="close-btn" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">Họ <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName" 
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['firstName'].errors }" />
+            <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
+              <div *ngIf="f['firstName'].errors['required']">Họ không được để trống</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Tên <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName" 
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['lastName'].errors }" />
+            <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
+              <div *ngIf="f['lastName'].errors['required']">Tên không được để trống</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" 
+            [readonly]="mode === 'edit'" />
+          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+            <div *ngIf="f['email'].errors['required']">Email không được để trống</div>
+            <div *ngIf="f['email'].errors['email']">Email không đúng định dạng</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="phoneNumber">Số điện thoại</label>
+          <input 
+            type="text" 
+            id="phoneNumber" 
+            formControlName="phoneNumber" 
+            class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && f['phoneNumber'].errors }" />
+          <div *ngIf="submitted && f['phoneNumber'].errors" class="invalid-feedback">
+            <div *ngIf="f['phoneNumber'].errors['pattern']">Số điện thoại không hợp lệ</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Địa chỉ</label>
+          <textarea 
+            id="address" 
+            formControlName="address" 
+            class="form-control"
+            rows="3"></textarea>
+        </div>
+        
+        <ng-container *ngIf="mode === 'add'">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="password">Mật khẩu <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="password" 
+                formControlName="password" 
+                class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" />
+              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                <div *ngIf="f['password'].errors['required']">Mật khẩu không được để trống</div>
+                <div *ngIf="f['password'].errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword">Xác nhận mật khẩu <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                formControlName="confirmPassword" 
+                class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && (f['confirmPassword'].errors || passwordsMismatch) }" />
+              <div *ngIf="submitted && (f['confirmPassword'].errors || passwordsMismatch)" class="invalid-feedback">
+                <div *ngIf="f['confirmPassword'].errors?.['required']">Xác nhận mật khẩu không được để trống</div>
+                <div *ngIf="passwordsMismatch">Mật khẩu xác nhận không khớp</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-note">
+            <i class="fas fa-info-circle"></i>
+            <span>Tài khoản sẽ được kích hoạt ngay mà không cần xác nhận email.</span>
+          </div>
+        </ng-container>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
+      <button type="button" class="btn btn-primary" (click)="onSubmit()">
+        {{ mode === 'add' ? 'Thêm mới' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>

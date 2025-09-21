@@ -78,7 +78,7 @@ namespace GreenChargerAPI.Controllers
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 Console.WriteLine($"[Register] Token: {token}");
                 
-                var confirmLink = $"http://www.vietcrafty.me/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
+                var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
                 // var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
 
                 // Gửi email xác nhận
@@ -195,7 +195,7 @@ namespace GreenChargerAPI.Controllers
             _cache.Set(cacheKey, true, TimeSpan.FromMinutes(2));
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetLink = $"http://www.vietcrafty.me/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
+            var resetLink = $"http://localhost:4200/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
 
             await _emailService.SendPasswordResetEmailAsync(user.Email ?? "", resetLink);
 
@@ -243,7 +243,7 @@ namespace GreenChargerAPI.Controllers
                 return BadRequest(new { message = "Email đã được xác nhận trước đó." });
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmLink = $"http://www.vietcrafty.me/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
+            var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
             await _emailService.SendRegistrationEmailAsync(user.Email ?? "", confirmLink);
 
             return Ok(new { message = "Đã gửi lại email xác nhận. Vui lòng kiểm tra hộp thư." });

@@ -1,0 +1,84 @@
+<div class="modal-overlay" *ngIf="isVisible">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ formTitle }}</h3>
+      <button type="button" class="close-btn" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="categoryForm">
+        <div class="form-group">
+          <label for="name">
+            Tên danh mục <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="name" 
+            class="form-control"
+            formControlName="name"
+            [ngClass]="{'is-invalid': submitted && f['name'].errors}" />
+          <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+            <div *ngIf="f['name'].errors['required']">Tên danh mục không được để trống</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">
+            Mô tả
+          </label>
+          <textarea 
+            id="description" 
+            class="form-control"
+            formControlName="description"
+            rows="4"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="image">
+            Hình ảnh danh mục
+          </label>
+          <div class="image-upload-container">
+            <div class="image-preview" (click)="fileInput.click()">
+              <img *ngIf="imagePreview" [src]="imagePreview" alt="Category preview" />
+              <div *ngIf="!imagePreview" class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Nhấn để tải lên hình ảnh</p>
+              </div>
+              <input 
+                #fileInput
+                type="file" 
+                class="file-input" 
+                accept="image/*"
+                (change)="onImageChange($event)" />
+              <button 
+                *ngIf="imagePreview" 
+                type="button" 
+                class="remove-image-btn"
+                (click)="removeImage(); $event.stopPropagation()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="isUploading" class="upload-progress">
+          <div class="progress-bar">
+            <div class="progress-value" [style.width.%]="uploadProgress"></div>
+          </div>
+          <p>Đang tải lên: {{ uploadProgress }}%</p>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        [disabled]="categoryForm.invalid || isUploading"
+        (click)="onSubmit()">
+        {{ mode === 'add' ? 'Thêm mới' : 'Cập nhật' }}
+      </button>
+    </div>
+  </div>
+</div>

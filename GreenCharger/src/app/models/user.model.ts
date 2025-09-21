@@ -35,14 +35,17 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  success: boolean;
   token: string;
-  refreshToken: string;
   user: {
     id: string;
-    userName: string;
     email: string;
     firstName: string;
     lastName: string;
+    emailConfirmed: boolean;
+    roles: string[];
+    createdAt: string;
+    updatedAt: string;
   };
 }
 
@@ -80,4 +83,23 @@ export interface ResetPasswordRequest {
 export interface ResetPasswordResponse {
   success: boolean;
   message: string;
+}
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phoneNumber?: string;
+  address?: string;
+  emailConfirmed: boolean;
+}
+
+export interface UpdateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  address?: string;
 }

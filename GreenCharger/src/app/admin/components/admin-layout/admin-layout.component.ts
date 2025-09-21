@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -14,6 +15,12 @@ export class AdminLayoutComponent implements OnInit {
   isCollapsed = false;
   selectedMenuKey: string = 'dashboard';
   currentTime: string = 'today';
+  currentUser: any = null;
+
+  constructor(
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   menuItems = [
     { key: 'dashboard', icon: 'dashboard', text: 'Tổng quan', link: '/admin/dashboard' },
@@ -26,6 +33,12 @@ export class AdminLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateSelectedMenuKey();
+    this.currentUser = this.userService.getCurrentUser();
+    
+    // Subscribe to user changes
+    this.userService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
   }
 
   toggleCollapsed(): void {
@@ -44,5 +57,10 @@ export class AdminLayoutComponent implements OnInit {
     const selectElement = event.target as HTMLSelectElement;
     this.currentTime = selectElement.value;
     console.log('Selected time range:', this.currentTime);
+  }
+  
+  logout(): void {
+    this.userService.logout();
+    this.router.navigate(['/login']);
   }
 }

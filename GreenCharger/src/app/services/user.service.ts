@@ -12,8 +12,11 @@ import {
   ForgotPasswordRequest, 
   ForgotPasswordResponse,
   ResetPasswordRequest,
-  ResetPasswordResponse 
+  ResetPasswordResponse,
+  CreateUserRequest,
+  UpdateUserRequest
 } from '../models/user.model';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +26,26 @@ export class UserService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService
+  ) {
     // Check for stored token on service initialization
     const token = localStorage.getItem('token');
     if (token) {
-      this.currentUserSubject.next(JSON.parse(localStorage.getItem('currentUser') || '{}'));
+      // Get stored user data
+      const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      
+      // If roles are not in the stored user data, try to get them from the token
+      if (!userData.roles || userData.roles.length === 0) {
+        const roles = this.tokenService.getRolesFromToken(token);
+        if (roles && roles.length > 0) {
+          userData.roles = roles;
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+        }
+      }
+      
+      this.currentUserSubject.next(userData);
     }
   }
 
@@ -61,10 +79,23 @@ export class UserService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginData)
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('refreshToken', response.refreshToken);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+          const token = response.token;
+          localStorage.setItem('token', token);
+          
+          // Store user data with roles
+          const userData = response.user;
+          console.log('Login response:', response);
+          
+          // If roles are not in the response, try to get them from the token
+          if (!userData.roles || userData.roles.length === 0) {
+            const roles = this.tokenService.getRolesFromToken(token);
+            if (roles && roles.length > 0) {
+              userData.roles = roles;
+            }
+          }
+          
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          this.currentUserSubject.next(userData);
         })
       );
   }
@@ -98,5 +129,20 @@ export class UserService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+  
+  // New admin user management methods
+  createUser(userData: CreateUserRequest): Observable<User> {
+    // Set emailConfirmed to true by default
+    userData.emailConfirmed = true;
+    return this.http.post<User>(`${this.apiUrl}/admin/users`, userData);
+  }
+  
+  updateUserProfile(userId: string, userData: UpdateUserRequest): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/admin/users/${userId}`, userData);
+  }
+  
+  deleteUser(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/admin/users/${userId}`);
   }
 }

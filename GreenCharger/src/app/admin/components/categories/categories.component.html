@@ -136,12 +136,13 @@
 </div>
 
 <!-- Category Modal -->
-<div class="modal" [class.show]="showModal">
-  <div class="modal-backdrop" (click)="onModalClose()"></div>
+<div class="modal-overlay" *ngIf="showModal">
   <div class="modal-content">
     <div class="modal-header">
       <h3>{{ isEditMode ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới' }}</h3>
-      <button class="close-button" (click)="onModalClose()">×</button>
+      <button type="button" class="close-btn" (click)="onModalClose()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     <div class="modal-body">
       <form #categoryForm="ngForm">
@@ -200,3 +201,11 @@
     </div>
   </div>
 </div>
+
+<!-- Category Detail Modal -->
+<app-category-detail 
+  *ngIf="showDetailModal"
+  [category]="selectedCategory"
+  [isVisible]="showDetailModal"
+  (close)="onModalClose()">
+</app-category-detail>

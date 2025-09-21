@@ -41,11 +41,7 @@
         <h4>Thông tin tài khoản</h4>
         
         <div class="info-group">
-          <div class="info-item">
-            <label>Username:</label>
-            <p>{{ user.userName }}</p>
-          </div>
-          
+         
           <div class="info-item">
             <label>Trạng thái xác thực email:</label>
             <p [class.text-success]="user.emailConfirmed" [class.text-danger]="!user.emailConfirmed">

@@ -1,0 +1,28 @@
+<div class="modal-overlay" *ngIf="isVisible">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Chi tiết danh mục</h3>
+      <button type="button" class="close-btn" (click)="close.emit()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body" *ngIf="category">
+      <div class="detail-row">
+        <strong>Tên danh mục:</strong>
+        <span>{{ category.name }}</span>
+      </div>
+      <div class="detail-row">
+        <strong>Mô tả:</strong>
+        <span>{{ category.description }}</span>
+      </div>
+      <div class="detail-row">
+        <strong>Số sản phẩm:</strong>
+        <span>{{ category.productCount }}</span>
+      </div>
+      <div class="detail-row" *ngIf="category.imageUrl">
+        <strong>Ảnh:</strong>
+        <img [src]="category.imageUrl" alt="Category Image" class="detail-image" />
+      </div>
+    </div>
+  </div>
+</div>

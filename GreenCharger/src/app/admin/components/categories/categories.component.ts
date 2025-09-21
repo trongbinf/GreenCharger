@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../../services/category.service';
 import { Category, CategoryDto } from '../../../models/category.model';
+import { CategoryDetailComponent } from './category-detail/category-detail.component';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CategoryDetailComponent],
   templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.css']
+  styleUrls: ['./categories.component.css', './categories.component.modal.css']
 })
 export class CategoriesComponent implements OnInit {
   categories: Category[] = [];
@@ -22,6 +23,7 @@ export class CategoriesComponent implements OnInit {
   showModal = false;
   isEditMode = false;
   selectedCategory: Category | null = null;
+  showDetailModal = false;
   
   // Category form data
   categoryData: CategoryDto = {
@@ -120,16 +122,7 @@ export class CategoriesComponent implements OnInit {
 
   onViewCategory(category: Category): void {
     this.selectedCategory = category;
-    this.categoryData = {
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      imageUrl: category.imageUrl,
-      productCount: category.productCount
-    };
-    this.isEditMode = false;
-    // Hiển thị modal xem chi tiết - có thể tạo modal view riêng sau này
-    this.showModal = true;
+    this.showDetailModal = true;
   }
 
   onCopyCategory(category: Category): void {
@@ -138,9 +131,10 @@ export class CategoriesComponent implements OnInit {
   }
 
   onModalClose(): void {
-    this.showModal = false;
-    this.selectedCategory = null;
-    this.resetCategoryData();
+  this.showModal = false;
+  this.showDetailModal = false;
+  this.selectedCategory = null;
+  this.resetCategoryData();
   }
   
   resetCategoryData(): void {

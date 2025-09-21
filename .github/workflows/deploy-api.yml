@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.x'   # App Service bạn dùng .NET 9
+        dotnet-version: '9.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
@@ -29,7 +29,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: greencharger-api   # đúng tên App Service
-        slot-name: Production
+        app-name: greencharger-api
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
         package: ./publish

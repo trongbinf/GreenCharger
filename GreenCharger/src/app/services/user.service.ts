@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable, BehaviorSubject } from "rxjs";
+import { tap } from "rxjs/operators";
 import { 
   User, 
   UserDto,
@@ -15,14 +15,14 @@ import {
   ResetPasswordResponse,
   CreateUserRequest,
   UpdateUserRequest
-} from '../models/user.model';
-import { TokenService } from './token.service';
+} from "../models/user.model";
+import { TokenService } from "./token.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class UserService {
-  private apiUrl = 'http://localhost:5001/api/Account';
+  private apiUrl = "http://localhost:5001/api/Account";
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -31,17 +31,17 @@ export class UserService {
     private tokenService: TokenService
   ) {
     // Check for stored token on service initialization
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       // Get stored user data
-      const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const userData = JSON.parse(localStorage.getItem("currentUser") || "{}");
       
       // If roles are not in the stored user data, try to get them from the token
       if (!userData.roles || userData.roles.length === 0) {
         const roles = this.tokenService.getRolesFromToken(token);
         if (roles && roles.length > 0) {
           userData.roles = roles;
-          localStorage.setItem('currentUser', JSON.stringify(userData));
+          localStorage.setItem("currentUser", JSON.stringify(userData));
         }
       }
       
@@ -49,42 +49,24 @@ export class UserService {
     }
   }
 
-  // User management methods
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/users`);
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem("token");
+    return new HttpHeaders({
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    });
   }
 
-  getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
-  }
-
-  updateUser(id: string, user: UserDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/users/${id}`, user);
-  }
-
-  lockUser(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/users/${id}/lock`, {});
-  }
-
-  unlockUser(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/users/${id}/unlock`, {});
-  }
-
-  updateUserRole(id: string, role: string): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/users/${id}/role`, { role });
-  }
-
-  // Authentication methods
   login(loginData: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginData)
       .pipe(
         tap(response => {
           const token = response.token;
-          localStorage.setItem('token', token);
+          localStorage.setItem("token", token);
           
           // Store user data with roles
           const userData = response.user;
-          console.log('Login response:', response);
+          console.log("Login response:", response);
           
           // If roles are not in the response, try to get them from the token
           if (!userData.roles || userData.roles.length === 0) {
@@ -94,7 +76,7 @@ export class UserService {
             }
           }
           
-          localStorage.setItem('currentUser', JSON.stringify(userData));
+          localStorage.setItem("currentUser", JSON.stringify(userData));
           this.currentUserSubject.next(userData);
         })
       );
@@ -113,14 +95,14 @@ export class UserService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("currentUser");
     this.currentUserSubject.next(null);
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem("token");
   }
 
   getCurrentUser(): any {
@@ -128,21 +110,32 @@ export class UserService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem("token");
   }
   
-  // New admin user management methods
+  // Admin user management methods
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/admin/users`, { headers: this.getAuthHeaders() });
+  }
+
   createUser(userData: CreateUserRequest): Observable<User> {
-    // Set emailConfirmed to true by default
     userData.emailConfirmed = true;
-    return this.http.post<User>(`${this.apiUrl}/admin/users`, userData);
+    return this.http.post<User>(`${this.apiUrl}/admin/users`, userData, { headers: this.getAuthHeaders() });
   }
   
   updateUserProfile(userId: string, userData: UpdateUserRequest): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/admin/users/${userId}`, userData);
+    return this.http.put<User>(`${this.apiUrl}/admin/users/${userId}`, userData, { headers: this.getAuthHeaders() });
   }
   
   deleteUser(userId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/admin/users/${userId}`);
+    return this.http.delete<void>(`${this.apiUrl}/admin/users/${userId}`, { headers: this.getAuthHeaders() });
+  }
+
+  lockUser(userId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/admin/users/${userId}/lock`, {}, { headers: this.getAuthHeaders() });
+  }
+
+  unlockUser(userId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/admin/users/${userId}/unlock`, {}, { headers: this.getAuthHeaders() });
   }
 }

@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
+import { AdminAuthGuard } from '../guards/admin-auth.guard';
 
 export const adminRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./components/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
+    canActivate: [AdminAuthGuard],
     children: [
       {
         path: '',

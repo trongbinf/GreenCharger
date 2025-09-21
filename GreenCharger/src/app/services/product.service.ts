@@ -1,15 +1,30 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Product, ProductDto } from '../models/product.model';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Product, ProductDto } from "../models/product.model";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:5001/api/Product';
+  private apiUrl = "http://localhost:5001/api/Product";
 
   constructor(private http: HttpClient) { }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem("token");
+    return new HttpHeaders({
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    });
+  }
+
+  private getAuthHeadersForFormData(): HttpHeaders {
+    const token = localStorage.getItem("token");
+    return new HttpHeaders({
+      "Authorization": `Bearer ${token}`
+    });
+  }
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);
@@ -20,39 +35,26 @@ export class ProductService {
   }
 
   createProduct(product: ProductDto): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+    return this.http.post<Product>(this.apiUrl, product, { headers: this.getAuthHeaders() });
   }
 
   updateProduct(id: number, product: ProductDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, product);
+    return this.http.put<void>(`${this.apiUrl}/${id}`, product, { headers: this.getAuthHeaders() });
   }
 
   deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  uploadMainImage(file: File): Observable<{ imageUrl: string }> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload-main-image`, formData);
-  }
-
-  uploadDetailImages(files: File[]): Observable<{ imageUrls: string[] }> {
-    const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
-    return this.http.post<{ imageUrls: string[] }>(`${this.apiUrl}/upload-detail-images`, formData);
-  }
-
-  getProductsByCategory(categoryId: number): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/category/${categoryId}`);
-  }
-
-  searchProducts(searchTerm: string): Observable<Product[]> {
-    let params = new HttpParams().set('searchTerm', searchTerm);
-    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 
   updateProductStatus(id: number, isActive: boolean): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/status`, { isActive });
+    return this.http.put<void>(`${this.apiUrl}/${id}/status`, { isActive }, { headers: this.getAuthHeaders() });
+  }
+
+  uploadProductImage(file: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload-image`, formData, { 
+      headers: this.getAuthHeadersForFormData() 
+    });
   }
 }

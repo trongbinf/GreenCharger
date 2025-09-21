@@ -7,21 +7,40 @@
       </button>
     </div>
     <div class="modal-body" *ngIf="category">
-      <div class="detail-row">
-        <strong>Tên danh mục:</strong>
-        <span>{{ category.name }}</span>
+      <!-- Category Image Section -->
+      <div class="image-section" *ngIf="category.imageUrl">
+        <div class="image-container">
+          <img [src]="category.imageUrl" [alt]="category.name" class="category-image" />
+          <div class="image-label">Ảnh danh mục</div>
+        </div>
       </div>
-      <div class="detail-row">
-        <strong>Mô tả:</strong>
-        <span>{{ category.description }}</span>
+      
+      <!-- Category Details Section -->
+      <div class="details-section">
+        <div class="detail-row">
+          <strong>Tên danh mục:</strong>
+          <span>{{ category.name }}</span>
+        </div>
+        <div class="detail-row">
+          <strong>Mô tả:</strong>
+          <span>{{ category.description || 'Chưa có mô tả' }}</span>
+        </div>
+        <div class="detail-row">
+          <strong>Số sản phẩm:</strong>
+          <span class="product-count">{{ category.productCount || 0 }}</span>
+        </div>
+        <div class="detail-row">
+          <strong>Trạng thái:</strong>
+          <span class="status active">Đang hoạt động</span>
+        </div>
       </div>
-      <div class="detail-row">
-        <strong>Số sản phẩm:</strong>
-        <span>{{ category.productCount }}</span>
-      </div>
-      <div class="detail-row" *ngIf="category.imageUrl">
-        <strong>Ảnh:</strong>
-        <img [src]="category.imageUrl" alt="Category Image" class="detail-image" />
+
+      <!-- No Image Placeholder -->
+      <div class="no-image-section" *ngIf="!category.imageUrl">
+        <div class="no-image-placeholder">
+          <i class="fas fa-image"></i>
+          <span>Chưa có ảnh</span>
+        </div>
       </div>
     </div>
   </div>

@@ -119,6 +119,37 @@ namespace GreenChargerAPI.Controllers
             return Ok(new { url });
         }
 
-       
+        // TEST: api/category/test-update/5 - Temporary endpoint for testing without auth
+        [HttpPut("test-update/{id}")]
+        public async Task<IActionResult> TestUpdateCategory(int id, [FromBody] CategoryDto dto)
+        {
+            if (id != dto.Id)
+                return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null)
+                return NotFound();
+
+            Console.WriteLine($"Updating category {id} with data: {System.Text.Json.JsonSerializer.Serialize(dto)}");
+
+            // Delete old image if URL is changing
+            if (!string.IsNullOrEmpty(category.ImageUrl) && 
+                category.ImageUrl != dto.ImageUrl)
+            {
+                Console.WriteLine($"Deleting old image: {category.ImageUrl}");
+                await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
+            }
+
+            _mapper.Map(dto, category);
+            _unitOfWork.Categories.Update(category);
+            var result = await _unitOfWork.CompleteAsync();
+            
+            Console.WriteLine($"Update result: {result}");
+            Console.WriteLine($"Updated category: {System.Text.Json.JsonSerializer.Serialize(category)}");
+            
+            return Ok(new { message = "Update successful", category = _mapper.Map<CategoryDto>(category) });
+        }
     }
-} 
+}

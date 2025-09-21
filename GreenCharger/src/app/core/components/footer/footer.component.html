@@ -3,86 +3,75 @@
     <!-- Main Footer Content -->
     <div class="footer-main">
       <!-- Company Info -->
-      <div class="footer-section">
+      <div class="footer-section company-info">
         <div class="footer-logo">
-          <img src="/assets/logo.png" alt="GreenCharger" class="footer-logo-img" />
-          <span class="footer-logo-text">GreenCharger</span>
+          <img src="https://res.cloudinary.com/ddkvhnj27/image/upload/v1758400063/z7019344847597_aa447955326b74efcd30844f0ddafb97_mcbqgu.jpg" 
+               alt="GreenCharger Logo" 
+               class="footer-logo-img" />
+          <span class="footer-logo-text">GREEN CHARGER</span>
         </div>
         <p class="footer-description">
-          Chuyên cung cấp các sản phẩm sạc điện tử chất lượng cao, 
-          thân thiện với môi trường và tiết kiệm năng lượng.
+          GreenCharger không chỉ là sản phẩm, mà còn là cách thể hiện phong cách, 
+          làm mới không gian sống và tạo cảm giác vui vẻ. Chúng tôi chuyên cung cấp 
+          dây sạc chất lượng cao, củ sạc nhanh và tai nghe hiện đại, tất cả đều góp phần 
+          tạo nên trải nghiệm tiện lợi và độc đáo cho người dùng.
         </p>
-        <div class="social-links">
-          <a href="#" class="social-link facebook">📘</a>
-          <a href="#" class="social-link twitter">🐦</a>
-          <a href="#" class="social-link instagram">📷</a>
-          <a href="#" class="social-link youtube">📺</a>
-        </div>
+        
       </div>
 
       <!-- Quick Links -->
       <div class="footer-section">
-        <h3 class="footer-title">Liên kết nhanh</h3>
+        <h3 class="footer-title">LIÊN KẾT NHANH</h3>
         <ul class="footer-links">
-          <li><a routerLink="/" class="footer-link">Trang chủ</a></li>
           <li><a routerLink="/products" class="footer-link">Sản phẩm</a></li>
-          <li><a routerLink="/about" class="footer-link">Giới thiệu</a></li>
+          <li><a routerLink="/about" class="footer-link">Về chúng tôi</a></li>
+          <li><a routerLink="/news" class="footer-link">Tin tức & Blog</a></li>
           <li><a routerLink="/contact" class="footer-link">Liên hệ</a></li>
-          <li><a routerLink="/news" class="footer-link">Tin tức</a></li>
-        </ul>
-      </div>
-
-      <!-- Customer Service -->
-      <div class="footer-section">
-        <h3 class="footer-title">Hỗ trợ khách hàng</h3>
-        <ul class="footer-links">
-          <li><a routerLink="/help" class="footer-link">Trung tâm trợ giúp</a></li>
-          <li><a routerLink="/shipping" class="footer-link">Vận chuyển</a></li>
-          <li><a routerLink="/returns" class="footer-link">Đổi trả</a></li>
-          <li><a routerLink="/warranty" class="footer-link">Bảo hành</a></li>
           <li><a routerLink="/faq" class="footer-link">Câu hỏi thường gặp</a></li>
         </ul>
       </div>
 
       <!-- Contact Info -->
       <div class="footer-section">
-        <h3 class="footer-title">Thông tin liên hệ</h3>
+        <h3 class="footer-title">THÔNG TIN LIÊN HỆ</h3>
         <div class="contact-info">
           <div class="contact-item">
             <i class="contact-icon">📍</i>
-            <span>123 Đường ABC, Quận 1, TP.HCM</span>
+            <span>Khu CNC Hoà Lạc, Thạch Thất, Hà Nội</span>
           </div>
           <div class="contact-item">
             <i class="contact-icon">📞</i>
-            <span>+84 123 456 789</span>
+            <span>0968 736 913</span>
           </div>
           <div class="contact-item">
             <i class="contact-icon">✉️</i>
-            <span>info&#64;greencharger.com</span>
+            <span>greencharger&#64;gmail.com</span>
           </div>
           <div class="contact-item">
             <i class="contact-icon">🕒</i>
-            <span>Thứ 2 - Chủ nhật: 8:00 - 22:00</span>
+            <span>8:00 - 17:00, Thứ 2 - Thứ 7</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Newsletter Subscription -->
-    <div class="newsletter">
-      <div class="newsletter-content">
-        <h3 class="newsletter-title">Đăng ký nhận tin</h3>
+      <!-- Newsletter Subscription -->
+      <div class="footer-section">
+        <h3 class="footer-title">ĐĂNG KÝ NHẬN TIN</h3>
         <p class="newsletter-description">
-          Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt
+          Đăng ký để nhận thông tin về sản phẩm mới và ưu đãi đặc biệt
         </p>
         <form class="newsletter-form">
-          <input 
-            type="email" 
-            placeholder="Nhập email của bạn" 
-            class="newsletter-input"
-            required
-          />
-          <button type="submit" class="newsletter-btn">Đăng ký</button>
+          <div class="newsletter-input-group">
+            <input 
+              type="email" 
+              placeholder="Email của bạn" 
+              class="newsletter-input"
+              required
+            />
+            <button type="submit" class="newsletter-btn">
+              <i class="newsletter-icon">✈️</i>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -91,12 +80,12 @@
     <div class="footer-bottom">
       <div class="footer-bottom-content">
         <div class="copyright">
-          <p>&copy; {{ currentYear }} GreenCharger. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; 2025 GREEN CHARGER. Phát triển bởi GREEN CHARGER.</p>
         </div>
         <div class="footer-bottom-links">
           <a routerLink="/privacy" class="footer-bottom-link">Chính sách bảo mật</a>
           <a routerLink="/terms" class="footer-bottom-link">Điều khoản sử dụng</a>
-          <a routerLink="/cookies" class="footer-bottom-link">Chính sách cookie</a>
+          <a routerLink="/shipping" class="footer-bottom-link">Chính sách vận chuyển</a>
         </div>
       </div>
     </div>

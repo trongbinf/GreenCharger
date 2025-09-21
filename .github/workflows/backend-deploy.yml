@@ -1,11 +1,11 @@
-name: Backend CI/CD Pipeline
+name: Backend Deploy Pipeline
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'GreenChargerAPI/**'
-      - '.github/workflows/backend-workflow.yml'
+      - '.github/workflows/backend-deploy.yml'
   pull_request:
     branches: [ main ]
     paths:

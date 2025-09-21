@@ -1,11 +1,11 @@
-name: Frontend CI/CD Pipeline
+name: Frontend Deploy Pipeline
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'GreenCharger/**'
-      - '.github/workflows/frontend-workflow.yml'
+      - '.github/workflows/frontend-deploy.yml'
   pull_request:
     branches: [ main ]
     paths:

@@ -1,7 +1,8 @@
-<app-header></app-header>
+<div class="home-main">
+  <!-- Header -->
+  <app-header></app-header>
 
-<main class="home-main">
-  <!-- Hero Slider Section -->
+  <!-- Hero Section - Image Only Slider -->
   <section class="hero-section">
     <div class="hero-slider">
       <div class="slide" 
@@ -11,8 +12,6 @@
           <img [src]="slide.image" [alt]="slide.title" />
         </div>
       </div>
-      
-      <!-- Slider Controls -->
       <div class="slider-controls">
         <button 
           *ngFor="let slide of slides; let i = index"
@@ -28,20 +27,30 @@
   <section class="categories-section">
     <div class="container">
       <div class="section-header">
-        <h1 class="main-title">Categories</h1>
-        <h2 class="section-title">Danh mục sản phẩm</h2>
+        <h2 class="main-title">Categories</h2>
+        <h2 class="section-title">Danh Mục Sản Phẩm</h2>
         <p class="section-subtitle">Các dòng sản phẩm chính tại GreenCharger</p>
       </div>
       
-      <div class="categories-grid">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingCategories" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Đang tải danh mục...</p>
+      </div>
+      
+      <!-- Error State -->
+      <div *ngIf="categoriesError && !isLoadingCategories" class="error-container">
+        <p class="error-message">{{ categoriesError }}</p>
+      </div>
+      
+      <!-- Categories Grid -->
+      <div *ngIf="!isLoadingCategories && !categoriesError" class="categories-grid">
         <div class="category-card" *ngFor="let category of categories">
           <div class="category-image">
-            <img [src]="category.image" [alt]="category.name" />
+            <img [src]="getCategoryImageUrl(category)" [alt]="category.name" />
           </div>
-          <div class="category-info">
-            <h3 class="category-name">{{ category.name }}</h3>
-            <p class="category-count">{{ category.count }} sản phẩm</p>
-          </div>
+          <h3 class="category-name">{{ category.name }}</h3>
+          <p class="category-count">{{ getCategoryCount(category) }} sản phẩm</p>
         </div>
       </div>
     </div>
@@ -51,38 +60,51 @@
   <section class="featured-section">
     <div class="container">
       <div class="section-header">
-        <h1 class="main-title">Products</h1>
-        <h2 class="section-title">Sản phẩm nổi bật</h2>
+        <h2 class="main-title">Products</h2>
+        <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
         <p class="section-subtitle">Những sản phẩm được yêu thích nhất</p>
       </div>
       
-      <div class="products-grid">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingProducts" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Đang tải sản phẩm...</p>
+      </div>
+      
+      <!-- Error State -->
+      <div *ngIf="productsError && !isLoadingProducts" class="error-container">
+        <p class="error-message">{{ productsError }}</p>
+      </div>
+      
+      <!-- Products Grid -->
+      <div *ngIf="!isLoadingProducts && !productsError" class="products-grid">
         <div class="product-card" *ngFor="let product of featuredProducts">
-          <div class="product-badge" *ngIf="product.badge">{{ product.badge }}</div>
+          <div class="product-badge">{{ getProductBadge(product) }}</div>
           <div class="product-image">
-            <img [src]="product.image" [alt]="product.name" />
+            <img [src]="getProductImageUrl(product)" [alt]="product.name" />
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
             <div class="product-rating">
               <div class="stars">
-                <span *ngFor="let star of getStars(product.rating)" 
-                      class="star" 
-                      [class.filled]="star === 1">★</span>
+                <span 
+                  *ngFor="let star of getStars(product.averageRating || 0)"
+                  class="star"
+                  [class.filled]="star === 1">★</span>
               </div>
-              <span class="rating-text">{{ product.rating }} ({{ product.reviews }})</span>
+              <span class="rating-text">{{ product.averageRating || 0 }} ({{ product.reviewCount || 0 }} đánh giá)</span>
             </div>
             <div class="product-price">
-              <span class="current-price">{{ formatPrice(product.price) }}</span>
-              <span class="original-price" *ngIf="product.originalPrice">{{ formatPrice(product.originalPrice) }}</span>
+              <span class="current-price">{{ formatPrice(product.finalPrice) }}</span>
+              <span class="original-price" *ngIf="product.isOnSale && product.price > product.finalPrice">{{ formatPrice(product.price) }}</span>
             </div>
             <button class="add-to-cart-btn">Thêm vào giỏ</button>
           </div>
         </div>
       </div>
       
-      <div class="section-footer">
-        <a routerLink="/products" class="view-all-btn">Xem tất cả sản phẩm</a>
+      <div class="section-footer" *ngIf="!isLoadingProducts && !productsError">
+        <a href="/products" class="view-all-btn">Xem tất cả sản phẩm</a>
       </div>
     </div>
   </section>
@@ -91,7 +113,7 @@
   <section class="features-section">
     <div class="container">
       <div class="section-header">
-        <h1 class="main-title">Features</h1>
+        <h2 class="main-title">Features</h2>
         <h2 class="section-title">Tại Sao Chọn GreenCharger?</h2>
         <p class="section-subtitle">Những lý do khiến khách hàng tin tưởng lựa chọn chúng tôi</p>
       </div>
@@ -99,23 +121,23 @@
       <div class="features-grid">
         <div class="feature-item">
           <div class="feature-icon">⚡</div>
-          <h3 class="feature-title">Sạc Nhanh</h3>
-          <p class="feature-description">Công nghệ sạc nhanh tiên tiến, tiết kiệm thời gian</p>
+          <h3 class="feature-title">Sạc Siêu Nhanh</h3>
+          <p class="feature-description">Công nghệ sạc nhanh tiên tiến, tiết kiệm thời gian tối đa</p>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">🔋</div>
+          <div class="feature-icon">��</div>
           <h3 class="feature-title">An Toàn Tuyệt Đối</h3>
-          <p class="feature-description">Bảo vệ thiết bị khỏi quá tải và chập điện</p>
+          <p class="feature-description">Bảo vệ đa lớp, chống quá tải và chập cháy</p>
         </div>
         <div class="feature-item">
           <div class="feature-icon">🌱</div>
           <h3 class="feature-title">Thân Thiện Môi Trường</h3>
-          <p class="feature-description">Vật liệu tái chế, góp phần bảo vệ môi trường</p>
+          <p class="feature-description">Tiết kiệm năng lượng, góp phần bảo vệ môi trường</p>
         </div>
         <div class="feature-item">
-          <div class="feature-icon">🚚</div>
-          <h3 class="feature-title">Giao Hàng Nhanh</h3>
-          <p class="feature-description">Miễn phí vận chuyển toàn quốc trong 24h</p>
+          <div class="feature-icon">🛡️</div>
+          <h3 class="feature-title">Bảo Hành 2 Năm</h3>
+          <p class="feature-description">Cam kết chất lượng với chế độ bảo hành toàn diện</p>
         </div>
       </div>
     </div>
@@ -125,65 +147,33 @@
   <section class="testimonials-section">
     <div class="container">
       <div class="section-header">
-        <h1 class="main-title">Customers</h1>
+        <h2 class="main-title">Customers</h2>
         <h2 class="section-title">Khách Hàng Nói Gì</h2>
         <p class="section-subtitle">Phản hồi từ những khách hàng đã sử dụng sản phẩm</p>
       </div>
       
       <div class="testimonials-grid">
-        <div class="testimonial-card">
+        <div class="testimonial-card" *ngFor="let testimonial of testimonials">
           <div class="testimonial-header">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
+            <img [src]="testimonial.avatar" [alt]="testimonial.name" class="testimonial-avatar">
             <div>
-              <h4 class="testimonial-name">Nguyễn Văn A</h4>
+              <h4 class="testimonial-name">{{ testimonial.name }}</h4>
               <div class="testimonial-rating">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
+                <span 
+                  *ngFor="let star of getStars(testimonial.rating)"
+                  class="star"
+                  [class.filled]="star === 1">★</span>
               </div>
             </div>
           </div>
-          <p class="testimonial-comment">"Sản phẩm chất lượng tốt, sạc nhanh và bền. Tôi rất hài lòng!"</p>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-header">
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
-            <div>
-              <h4 class="testimonial-name">Trần Thị B</h4>
-              <div class="testimonial-rating">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star">★</span>
-              </div>
-            </div>
-          </div>
-          <p class="testimonial-comment">"Dịch vụ khách hàng tuyệt vời, giao hàng đúng hẹn."</p>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-header">
-            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face&auto=format" alt="Customer" class="testimonial-avatar">
-            <div>
-              <h4 class="testimonial-name">Lê Văn C</h4>
-              <div class="testimonial-rating">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-              </div>
-            </div>
-          </div>
-          <p class="testimonial-comment">"Giá cả hợp lý, chất lượng vượt trội so với mong đợi."</p>
+          <p class="testimonial-comment">"{{ testimonial.comment }}"</p>
         </div>
       </div>
     </div>
   </section>
 
-  <
-</main>
+  
 
-<app-footer></app-footer>
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

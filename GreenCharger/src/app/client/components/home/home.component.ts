@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent, FooterComponent } from '../../../core';
+import { CategoryService } from '../../../services/category.service';
+import { ProductService } from '../../../services/product.service';
+import { Category } from '../../../models/category.model';
+import { Product } from '../../../models/product.model';
 
 @Component({
   selector: 'app-home',
@@ -11,95 +15,33 @@ import { HeaderComponent, FooterComponent } from '../../../core';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  featuredProducts = [
-    {
-      id: 1,
-      name: 'Sạc iPhone 15 Pro Max',
-      price: 299000,
-      originalPrice: 399000,
-      image: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=iPhone+15+Pro+Max',
-      rating: 4.8,
-      reviews: 156,
-      badge: 'Bán chạy'
-    },
-    {
-      id: 2,
-      name: 'Sạc Samsung Galaxy S24',
-      price: 249000,
-      originalPrice: 349000,
-      image: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Galaxy+S24',
-      rating: 4.7,
-      reviews: 89,
-      badge: 'Mới'
-    },
-    {
-      id: 3,
-      name: 'Sạc USB-C Universal',
-      price: 199000,
-      originalPrice: 299000,
-      image: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=USB-C+Universal',
-      rating: 4.6,
-      reviews: 234,
-      badge: 'Tiết kiệm'
-    },
-    {
-      id: 4,
-      name: 'Sạc Wireless Fast',
-      price: 399000,
-      originalPrice: 499000,
-      image: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Wireless+Fast',
-      rating: 4.9,
-      reviews: 67,
-      badge: 'Cao cấp'
-    }
-  ];
+  categories: Category[] = [];
+  isLoadingCategories = false;
+  categoriesError = '';
 
-  categories = [
-    {
-      id: 1,
-      name: 'Sạc iPhone',
-      image: 'https://via.placeholder.com/200x200/1e3c72/ffffff?text=iPhone',
-      count: 25
-    },
-    {
-      id: 2,
-      name: 'Sạc Samsung',
-      image: 'https://via.placeholder.com/200x200/2a5298/ffffff?text=Samsung',
-      count: 18
-    },
-    {
-      id: 3,
-      name: 'Sạc USB-C',
-      image: 'https://via.placeholder.com/200x200/1e3c72/ffffff?text=USB-C',
-      count: 32
-    },
-    {
-      id: 4,
-      name: 'Sạc Wireless',
-      image: 'https://via.placeholder.com/200x200/2a5298/ffffff?text=Wireless',
-      count: 15
-    }
-  ];
+  featuredProducts: Product[] = [];
+  isLoadingProducts = false;
+  productsError = '';
 
   testimonials = [
     {
       id: 1,
       name: 'Nguyễn Văn A',
-      avatar: 'https://via.placeholder.com/60x60/1e3c72/ffffff?text=NV',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face&auto=format',
       rating: 5,
       comment: 'Sạc rất nhanh và chất lượng tốt. Tôi rất hài lòng với sản phẩm này!'
     },
     {
       id: 2,
       name: 'Trần Thị B',
-      avatar: 'https://via.placeholder.com/60x60/2a5298/ffffff?text=TT',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face&auto=format',
       rating: 5,
       comment: 'Giao hàng nhanh, sản phẩm đúng như mô tả. Sẽ mua tiếp!'
     },
     {
       id: 3,
       name: 'Lê Văn C',
-      avatar: 'https://via.placeholder.com/60x60/1e3c72/ffffff?text=LV',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face&auto=format',
       rating: 4,
       comment: 'Giá cả hợp lý, chất lượng ổn. Khuyến nghị cho mọi người.'
     }
@@ -114,19 +56,319 @@ export class HomeComponent implements OnInit {
       image: 'https://res.cloudinary.com/ddkvhnj27/image/upload/v1758463523/A%CC%89nh_ma%CC%80n_hi%CC%80nh_2025-09-21_lu%CC%81c_21.04.48_rl32fx.png',
       buttonText: 'Mua ngay',
       buttonLink: '/products'
-    },
-    {
-      id: 2,
-      title: 'Bảo Hành 2 Năm',
-      subtitle: 'Cam kết chất lượng với chế độ bảo hành toàn diện',
-      image: 'https://res.cloudinary.com/ddkvhnj27/image/upload/v1758465324/Screenshot_at_Sep_21_21-35-04_akwenk.png',
-      buttonText: 'Xem sản phẩm',
-      buttonLink: '/products'
     }
   ];
 
+  constructor(
+    private categoryService: CategoryService,
+    private productService: ProductService
+  ) {}
+
   ngOnInit(): void {
     this.startSlider();
+    this.loadCategories();
+    this.loadFeaturedProducts();
+  }
+
+  loadCategories(): void {
+    this.isLoadingCategories = true;
+    this.categoriesError = '';
+    
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.isLoadingCategories = false;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.categoriesError = 'Không thể tải danh mục sản phẩm';
+        this.isLoadingCategories = false;
+        
+        // Fallback to mock data if API fails
+        this.categories = [
+          {
+            id: 1,
+            name: 'Sạc iPhone',
+            imageUrl: 'https://via.placeholder.com/200x200/1e3c72/ffffff?text=iPhone',
+            description: 'Sạc chuyên dụng cho iPhone',
+            productCount: 25
+          },
+          {
+            id: 2,
+            name: 'Sạc Samsung',
+            imageUrl: 'https://via.placeholder.com/200x200/2a5298/ffffff?text=Samsung',
+            description: 'Sạc chuyên dụng cho Samsung',
+            productCount: 18
+          },
+          {
+            id: 3,
+            name: 'Sạc USB-C',
+            imageUrl: 'https://via.placeholder.com/200x200/1e3c72/ffffff?text=USB-C',
+            description: 'Sạc USB-C đa năng',
+            productCount: 32
+          },
+          {
+            id: 4,
+            name: 'Sạc Wireless',
+            imageUrl: 'https://via.placeholder.com/200x200/2a5298/ffffff?text=Wireless',
+            description: 'Sạc không dây tiện lợi',
+            productCount: 15
+          }
+        ];
+      }
+    });
+  }
+
+  loadFeaturedProducts(): void {
+    this.isLoadingProducts = true;
+    this.productsError = '';
+    
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        // Filter only active products
+        const activeProducts = products.filter(product => product.isActive);
+        
+        // Shuffle array and take first 9 products
+        const shuffled = this.shuffleArray([...activeProducts]);
+        this.featuredProducts = shuffled.slice(0, 9);
+        
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.productsError = 'Không thể tải sản phẩm nổi bật';
+        this.isLoadingProducts = false;
+        
+        // Fallback to mock data if API fails
+        this.featuredProducts = [
+          {
+            id: 1,
+            name: 'Sạc iPhone 15 Pro Max',
+            description: 'Sạc nhanh cho iPhone 15 Pro Max',
+            price: 299000,
+            discount: 25,
+            discountPrice: 224250,
+            finalPrice: 224250,
+            stockQuantity: 50,
+            quantityInStock: 50,
+            mainImageUrl: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=iPhone+15+Pro+Max',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/1e3c72/ffffff?text=iPhone+15+Pro+Max'],
+            categoryId: 1,
+            categoryName: 'Sạc điện thoại',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.8,
+            reviewCount: 156,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 2,
+            name: 'Sạc Samsung Galaxy S24',
+            description: 'Sạc nhanh cho Samsung Galaxy S24',
+            price: 249000,
+            discount: 15,
+            discountPrice: 211650,
+            finalPrice: 211650,
+            stockQuantity: 30,
+            quantityInStock: 30,
+            mainImageUrl: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Galaxy+S24',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/2a5298/ffffff?text=Galaxy+S24'],
+            categoryId: 1,
+            categoryName: 'Sạc điện thoại',
+            isActive: true,
+            isNew: true,
+            isOnSale: false,
+            isFeatured: true,
+            averageRating: 4.7,
+            reviewCount: 89,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 3,
+            name: 'Sạc USB-C Universal',
+            description: 'Sạc USB-C đa năng',
+            price: 199000,
+            discount: 20,
+            discountPrice: 159200,
+            finalPrice: 159200,
+            stockQuantity: 75,
+            quantityInStock: 75,
+            mainImageUrl: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=USB-C+Universal',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/1e3c72/ffffff?text=USB-C+Universal'],
+            categoryId: 3,
+            categoryName: 'Dây sạc',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.6,
+            reviewCount: 234,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 4,
+            name: 'Sạc Wireless Fast',
+            description: 'Sạc không dây tốc độ cao',
+            price: 399000,
+            discount: 20,
+            discountPrice: 319200,
+            finalPrice: 319200,
+            stockQuantity: 25,
+            quantityInStock: 25,
+            mainImageUrl: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Wireless+Fast',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/2a5298/ffffff?text=Wireless+Fast'],
+            categoryId: 1,
+            categoryName: 'Sạc điện thoại',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.9,
+            reviewCount: 67,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 5,
+            name: 'Tai nghe Bluetooth',
+            description: 'Tai nghe Bluetooth chất lượng cao',
+            price: 599000,
+            discount: 25,
+            discountPrice: 449250,
+            finalPrice: 449250,
+            stockQuantity: 40,
+            quantityInStock: 40,
+            mainImageUrl: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=Bluetooth+Headphones',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/1e3c72/ffffff?text=Bluetooth+Headphones'],
+            categoryId: 2,
+            categoryName: 'Tai nghe',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.5,
+            reviewCount: 123,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 6,
+            name: 'Dây sạc Lightning',
+            description: 'Dây sạc Lightning cho iPhone',
+            price: 149000,
+            discount: 10,
+            discountPrice: 134100,
+            finalPrice: 134100,
+            stockQuantity: 60,
+            quantityInStock: 60,
+            mainImageUrl: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Lightning+Cable',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/2a5298/ffffff?text=Lightning+Cable'],
+            categoryId: 3,
+            categoryName: 'Dây sạc',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.4,
+            reviewCount: 89,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 7,
+            name: 'Sạc dự phòng 10000mAh',
+            description: 'Pin dự phòng 10000mAh',
+            price: 499000,
+            discount: 30,
+            discountPrice: 349300,
+            finalPrice: 349300,
+            stockQuantity: 35,
+            quantityInStock: 35,
+            mainImageUrl: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=Power+Bank+10000',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/1e3c72/ffffff?text=Power+Bank+10000'],
+            categoryId: 1,
+            categoryName: 'Sạc điện thoại',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.7,
+            reviewCount: 201,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 8,
+            name: 'Tai nghe có dây',
+            description: 'Tai nghe có dây chất lượng cao',
+            price: 299000,
+            discount: 15,
+            discountPrice: 254150,
+            finalPrice: 254150,
+            stockQuantity: 45,
+            quantityInStock: 45,
+            mainImageUrl: 'https://via.placeholder.com/300x300/2a5298/ffffff?text=Wired+Headphones',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/2a5298/ffffff?text=Wired+Headphones'],
+            categoryId: 2,
+            categoryName: 'Tai nghe',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.3,
+            reviewCount: 156,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 9,
+            name: 'Dây sạc USB-C 2m',
+            description: 'Dây sạc USB-C dài 2m',
+            price: 179000,
+            discount: 20,
+            discountPrice: 143200,
+            finalPrice: 143200,
+            stockQuantity: 55,
+            quantityInStock: 55,
+            mainImageUrl: 'https://via.placeholder.com/300x300/1e3c72/ffffff?text=USB-C+2m',
+            detailImageUrls: [],
+            imageUrls: ['https://via.placeholder.com/300x300/1e3c72/ffffff?text=USB-C+2m'],
+            categoryId: 3,
+            categoryName: 'Dây sạc',
+            isActive: true,
+            isNew: false,
+            isOnSale: true,
+            isFeatured: true,
+            averageRating: 4.6,
+            reviewCount: 98,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          }
+        ];
+      }
+    });
+  }
+
+  shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   }
 
   startSlider(): void {
@@ -148,5 +390,27 @@ export class HomeComponent implements OnInit {
 
   getStars(rating: number): number[] {
     return Array(5).fill(0).map((_, i) => i < Math.floor(rating) ? 1 : 0);
+  }
+
+  getCategoryImageUrl(category: Category): string {
+    return category.imageUrl || "https://via.placeholder.com/200x200/1e3c72/ffffff?text=Category";
+  }
+
+  getCategoryCount(category: Category): number {
+    return category.productCount || 0;
+  }
+
+  getProductImageUrl(product: Product): string {
+    return product.mainImageUrl || "https://via.placeholder.com/300x300/1e3c72/ffffff?text=Product";
+  }
+
+  getProductBadge(product: Product): string {
+    if (product.isOnSale && product.discount > 0) {
+      return `Giảm ${product.discount}%`;
+    }
+    if (product.isNew) {
+      return 'Mới';
+    }
+    return 'Nổi bật';
   }
 }

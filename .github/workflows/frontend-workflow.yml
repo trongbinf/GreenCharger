@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd GreenCharger
-        npm ci
+        npm install
       
     - name: Lint
       run: |
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://<your-swa-name>.azurestaticapps.net # Update this to your actual SWA domain
+      url: https://\<your-swa-name\>.azurestaticapps.net # Update this to your actual SWA domain
     
     steps:
     - name: Download artifact

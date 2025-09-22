@@ -113,8 +113,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";  // truy cập UI tại https://<app>/swagger
 });
 
-// 2. HTTPS redirection
-app.UseHttpsRedirection();
+// 2. HTTPS redirection (commented for development)
+// app.UseHttpsRedirection();
 
 // 3. CORS (cho Angular FE gọi thoải mái)
 app.UseCors(options =>

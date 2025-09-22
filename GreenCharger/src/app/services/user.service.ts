@@ -17,12 +17,13 @@ import {
   UpdateUserRequest
 } from "../models/user.model";
 import { TokenService } from "./token.service";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: "root"
 })
 export class UserService {
-  private apiUrl = "http://localhost:5001/api/Account";
+  private apiUrl = `${environment.apiUrl}/Account`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -115,27 +116,27 @@ export class UserService {
   
   // Admin user management methods
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/admin/users`, { headers: this.getAuthHeaders() });
+    return this.http.get<User[]>(`${this.apiUrl}/users`, { headers: this.getAuthHeaders() });
   }
 
   createUser(userData: CreateUserRequest): Observable<User> {
     userData.emailConfirmed = true;
-    return this.http.post<User>(`${this.apiUrl}/admin/users`, userData, { headers: this.getAuthHeaders() });
+    return this.http.post<User>(`${this.apiUrl}/register`, userData, { headers: this.getAuthHeaders() });
   }
   
   updateUserProfile(userId: string, userData: UpdateUserRequest): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/admin/users/${userId}`, userData, { headers: this.getAuthHeaders() });
+    return this.http.put<User>(`${this.apiUrl}/users/${userId}`, userData, { headers: this.getAuthHeaders() });
   }
   
   deleteUser(userId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/admin/users/${userId}`, { headers: this.getAuthHeaders() });
+    return this.http.delete<void>(`${this.apiUrl}/users/${userId}`, { headers: this.getAuthHeaders() });
   }
 
   lockUser(userId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/admin/users/${userId}/lock`, {}, { headers: this.getAuthHeaders() });
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/lock`, {}, { headers: this.getAuthHeaders() });
   }
 
   unlockUser(userId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/admin/users/${userId}/unlock`, {}, { headers: this.getAuthHeaders() });
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/unlock`, {}, { headers: this.getAuthHeaders() });
   }
 }

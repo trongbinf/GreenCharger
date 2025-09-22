@@ -119,6 +119,70 @@ namespace GreenChargerAPI.Controllers
             return Ok(new { url });
         }
 
+        // POST: api/category/upload-image-and-update/{id}
+        [HttpPost("upload-image-and-update/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadImageAndUpdateCategory(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null)
+                return NotFound("Category not found");
+
+            // Delete old image if exists
+            if (!string.IsNullOrEmpty(category.ImageUrl))
+            {
+                await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
+            }
+
+            // Upload new image
+            var newImageUrl = await _cloudinaryService.UploadFileAsync(file);
+            
+            // Update category with new image URL
+            category.ImageUrl = newImageUrl;
+            _unitOfWork.Categories.Update(category);
+            await _unitOfWork.CompleteAsync();
+
+            var dto = _mapper.Map<CategoryDto>(category);
+            return Ok(new { message = "Image uploaded and category updated successfully", category = dto });
+        }
+
+        // PUT: api/category/update-with-image/{id}
+        [HttpPut("update-with-image/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateCategoryWithImage(int id, [FromForm] CategoryUpdateWithImageDto dto)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null)
+                return NotFound("Category not found");
+
+            // Update basic info
+            category.Name = dto.Name;
+            category.Description = dto.Description;
+
+            // Handle image upload if provided
+            if (dto.File != null && dto.File.Length > 0)
+            {
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(category.ImageUrl))
+                {
+                    await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
+                }
+
+                // Upload new image
+                var newImageUrl = await _cloudinaryService.UploadFileAsync(dto.File);
+                category.ImageUrl = newImageUrl;
+            }
+
+            _unitOfWork.Categories.Update(category);
+            await _unitOfWork.CompleteAsync();
+
+            var resultDto = _mapper.Map<CategoryDto>(category);
+            return Ok(new { message = "Category updated successfully", category = resultDto });
+        }
+
         // TEST: api/category/test-update/5 - Temporary endpoint for testing without auth
         [HttpPut("test-update/{id}")]
         public async Task<IActionResult> TestUpdateCategory(int id, [FromBody] CategoryDto dto)
@@ -150,6 +214,84 @@ namespace GreenChargerAPI.Controllers
             Console.WriteLine($"Updated category: {System.Text.Json.JsonSerializer.Serialize(category)}");
             
             return Ok(new { message = "Update successful", category = _mapper.Map<CategoryDto>(category) });
+        }
+
+        // TEST: api/category/test-upload-image-and-update/{id}
+        [HttpPost("test-upload-image-and-update/{id}")]
+        public async Task<IActionResult> TestUploadImageAndUpdateCategory(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null)
+                return NotFound("Category not found");
+
+            Console.WriteLine($"Updating category {id} with new image");
+
+            // Delete old image if exists
+            if (!string.IsNullOrEmpty(category.ImageUrl))
+            {
+                Console.WriteLine($"Deleting old image: {category.ImageUrl}");
+                await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
+            }
+
+            // Upload new image
+            var newImageUrl = await _cloudinaryService.UploadFileAsync(file);
+            Console.WriteLine($"New image uploaded: {newImageUrl}");
+            
+            // Update category with new image URL
+            category.ImageUrl = newImageUrl;
+            _unitOfWork.Categories.Update(category);
+            var result = await _unitOfWork.CompleteAsync();
+
+            Console.WriteLine($"Update result: {result}");
+            Console.WriteLine($"Updated category: {System.Text.Json.JsonSerializer.Serialize(category)}");
+
+            var dto = _mapper.Map<CategoryDto>(category);
+            return Ok(new { message = "Image uploaded and category updated successfully", category = dto });
+        }
+
+        // TEST: api/category/test-update-with-image/{id}
+        [HttpPut("test-update-with-image/{id}")]
+        public async Task<IActionResult> TestUpdateCategoryWithImage(int id, [FromForm] CategoryUpdateWithImageDto updateDto)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null)
+                return NotFound("Category not found");
+
+            Console.WriteLine($"Updating category {id} - Name: {updateDto.Name}, Description: {updateDto.Description}, HasFile: {updateDto.File != null}");
+
+            // Update basic info
+            category.Name = updateDto.Name;
+            category.Description = updateDto.Description;
+
+            // Handle image upload if provided
+            if (updateDto.File != null && updateDto.File.Length > 0)
+            {
+                Console.WriteLine($"Processing new image file: {updateDto.File.FileName}");
+                
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(category.ImageUrl))
+                {
+                    Console.WriteLine($"Deleting old image: {category.ImageUrl}");
+                    await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
+                }
+
+                // Upload new image
+                var newImageUrl = await _cloudinaryService.UploadFileAsync(updateDto.File);
+                Console.WriteLine($"New image uploaded: {newImageUrl}");
+                category.ImageUrl = newImageUrl;
+            }
+
+            _unitOfWork.Categories.Update(category);
+            var result = await _unitOfWork.CompleteAsync();
+
+            Console.WriteLine($"Update result: {result}");
+            Console.WriteLine($"Final category: {System.Text.Json.JsonSerializer.Serialize(category)}");
+
+            var dto = _mapper.Map<CategoryDto>(category);
+            return Ok(new { message = "Category updated successfully", category = dto });
         }
     }
 }

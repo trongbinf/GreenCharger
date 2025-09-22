@@ -1,68 +1,73 @@
+/* Simple Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
+/* Clean Modal Content */
 .modal-content {
-  background: #fff;
-  border-radius: 8px;
+  background: white;
+  border-radius: 12px;
   padding: 0;
-  min-width: 450px;
-  max-width: 500px;
+  min-width: 480px;
+  max-width: 520px;
   max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
-  border: none;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
+/* Simple Header */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
-  border-radius: 8px 8px 0 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: rgba(0, 0, 0, 0.85);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
+  color: #1f2937;
 }
 
+/* Simple Close Button */
 .close-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
-  color: rgba(0, 0, 0, 0.45);
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  width: 24px;
-  height: 24px;
+  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: rgba(0, 0, 0, 0.75);
+  background: #f3f4f6;
+  color: #1f2937;
 }
 
+/* Clean Modal Body */
 .modal-body {
   padding: 24px;
+  overflow-y: auto;
+  max-height: calc(80vh - 80px);
 }
 
-/* Image Section */
+/* Simple Image Section */
 .image-section {
   margin-bottom: 24px;
   text-align: center;
@@ -77,144 +82,94 @@
   width: 200px;
   height: 150px;
   object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .category-image:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #d9d9d9;
 }
 
-.image-label {
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1890ff;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+/* ng-zorro Descriptions Styling */
+::ng-deep .ant-descriptions {
+  background: white;
+}
+
+::ng-deep .ant-descriptions-item-label {
+  font-weight: 600;
+  color: #374151;
+  width: 120px;
+}
+
+::ng-deep .ant-descriptions-item-content {
+  color: #6b7280;
+}
+
+::ng-deep .ant-descriptions-title {
+  color: #1f2937;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* ng-zorro Empty Component */
+::ng-deep .no-image-section .ant-empty {
+  margin: 20px 0;
+}
+
+::ng-deep .no-image-section .ant-empty-image {
+  height: 80px;
+  margin-bottom: 12px;
+}
+
+/* ng-zorro Tags Enhancement */
+::ng-deep .ant-tag {
+  border-radius: 16px;
+  padding: 4px 12px;
   font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* No Image Placeholder */
+/* ng-zorro Statistic Enhancement */
+::ng-deep .ant-statistic-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Simple No Image Placeholder - Updated for ng-zorro */
 .no-image-section {
   margin-bottom: 24px;
   text-align: center;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
 }
 
-.no-image-placeholder {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  height: 150px;
-  background: #fafafa;
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  color: rgba(0, 0, 0, 0.45);
-  transition: all 0.3s ease;
-}
+/* Remove old details section styles - now using ng-zorro descriptions */
 
-.no-image-placeholder:hover {
-  border-color: #1890ff;
-  background: #f0f8ff;
-}
+/* Remove old badge styles - now using ng-zorro tags */
 
-.no-image-placeholder i {
-  font-size: 48px;
-  margin-bottom: 8px;
-  opacity: 0.5;
-  color: rgba(0, 0, 0, 0.25);
-}
-
-.no-image-placeholder span {
-  font-size: 14px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.45);
-}
-
-/* Details Section */
-.details-section {
-  background: #fafafa;
-  padding: 16px;
-  border-radius: 6px;
-  border: 1px solid #f0f0f0;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.detail-row:last-child {
-  border-bottom: none;
-}
-
-.detail-row strong {
-  color: rgba(0, 0, 0, 0.85);
-  font-weight: 500;
-  min-width: 120px;
-  font-size: 14px;
-}
-
-.detail-row span {
-  color: rgba(0, 0, 0, 0.65);
-  font-weight: 400;
-  text-align: right;
-  flex: 1;
-  font-size: 14px;
-}
-
-.product-count {
-  background: #1890ff;
-  color: white !important;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.status {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-block;
-}
-
-.status.active {
-  background: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
-}
-
-/* Responsive */
-@media (max-width: 576px) {
+/* Simple Responsive Design */
+@media (max-width: 768px) {
   .modal-content {
     min-width: 90vw;
     max-width: 90vw;
     margin: 20px;
   }
   
-  .category-image {
-    width: 150px;
-    height: 120px;
+  .modal-header {
+    padding: 16px 20px;
   }
   
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .category-image,
   .no-image-placeholder {
-    width: 150px;
+    width: 160px;
     height: 120px;
   }
   
@@ -222,9 +177,26 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+    padding: 10px 0;
   }
   
   .detail-row span {
     text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    min-width: 95vw;
+    max-width: 95vw;
+    margin: 10px;
+  }
+  
+  .modal-header {
+    padding: 16px;
+  }
+  
+  .modal-body {
+    padding: 16px;
   }
 }

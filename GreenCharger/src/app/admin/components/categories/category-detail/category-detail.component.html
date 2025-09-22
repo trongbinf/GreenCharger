@@ -1,9 +1,12 @@
 <div class="modal-overlay" *ngIf="isVisible">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Chi tiết danh mục</h3>
-      <button type="button" class="close-btn" (click)="close.emit()">
-        <i class="fas fa-times"></i>
+      <h3>
+        <i nz-icon nzType="info-circle" nzTheme="outline"></i>
+        Chi tiết danh mục
+      </h3>
+      <button type="button" class="close-btn" (click)="close.emit()" nz-button nzType="text" nzShape="circle">
+        <i nz-icon nzType="close" nzTheme="outline"></i>
       </button>
     </div>
     <div class="modal-body" *ngIf="category">
@@ -11,37 +14,58 @@
       <div class="image-section" *ngIf="category.imageUrl">
         <div class="image-container">
           <img [src]="category.imageUrl" [alt]="category.name" class="category-image" />
-          <div class="image-label">Ảnh danh mục</div>
         </div>
       </div>
       
-      <!-- Category Details Section -->
-      <div class="details-section">
-        <div class="detail-row">
-          <strong>Tên danh mục:</strong>
-          <span>{{ category.name }}</span>
-        </div>
-        <div class="detail-row">
-          <strong>Mô tả:</strong>
-          <span>{{ category.description || 'Chưa có mô tả' }}</span>
-        </div>
-        <div class="detail-row">
-          <strong>Số sản phẩm:</strong>
-          <span class="product-count">{{ category.productCount || 0 }}</span>
-        </div>
-        <div class="detail-row">
-          <strong>Trạng thái:</strong>
-          <span class="status active">Đang hoạt động</span>
-        </div>
-      </div>
+      <!-- Category Details Section with ng-zorro -->
+      <nz-descriptions nzTitle="Thông tin danh mục" nzBordered [nzColumn]="1">
+        <nz-descriptions-item nzTitle="Tên danh mục">
+          <nz-tag nz-tooltip="Tên danh mục" nzColor="blue">
+            {{ category.name }}
+          </nz-tag>
+        </nz-descriptions-item>
+        
+        <nz-descriptions-item nzTitle="Mô tả">
+          <span *ngIf="category.description; else noDescription">
+            {{ category.description }}
+          </span>
+          <ng-template #noDescription>
+            <nz-tag nzColor="default">Chưa có mô tả</nz-tag>
+          </ng-template>
+        </nz-descriptions-item>
+        
+        <nz-descriptions-item nzTitle="Số sản phẩm">
+          <nz-statistic 
+            [nzValue]="category.productCount || 0" 
+            nzTitle="" 
+            [nzValueStyle]="{ color: '#1890ff', fontSize: '16px', fontWeight: '600' }">
+            <ng-template #nzSuffix>
+              <nz-tag nzColor="processing">sản phẩm</nz-tag>
+            </ng-template>
+          </nz-statistic>
+        </nz-descriptions-item>
+        
+        <nz-descriptions-item nzTitle="Trạng thái">
+          <nz-tag nzColor="success">
+            <i nz-icon nzType="check-circle" nzTheme="outline"></i>
+            Đang hoạt động
+          </nz-tag>
+        </nz-descriptions-item>
+      </nz-descriptions>
 
-      <!-- No Image Placeholder -->
-      <div class="no-image-section" *ngIf="!category.imageUrl">
-        <div class="no-image-placeholder">
-          <i class="fas fa-image"></i>
-          <span>Chưa có ảnh</span>
-        </div>
-      </div>
+      <!-- No Image Placeholder with ng-zorro -->
+      <nz-empty 
+        *ngIf="!category.imageUrl" 
+        nzNotFoundImage="simple" 
+        nzNotFoundContent="Chưa có ảnh danh mục"
+        class="no-image-section">
+        <ng-template #nzNotFoundFooter>
+          <nz-tag nzColor="default">
+            <i nz-icon nzType="picture" nzTheme="outline"></i>
+            Ảnh sẽ được hiển thị tại đây
+          </nz-tag>
+        </ng-template>
+      </nz-empty>
     </div>
   </div>
 </div>

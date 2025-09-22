@@ -1,0 +1,18 @@
+<div class="container" style="padding:2rem 0" *ngIf="!isLoading && !error && product as p">
+  <div class="product-detail">
+    <div class="product-image" style="height:360px">
+      <img [src]="p.mainImageUrl || 'https://via.placeholder.com/600x400?text=Product'" [alt]="p.name"/>
+    </div>
+    <div class="product-info">
+      <h1 class="section-title" style="margin-bottom:1rem">{{ p.name }}</h1>
+      <p class="product-description">{{ p.description }}</p>
+      <div class="product-price" style="margin: 1rem 0">
+        <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+        <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+      </div>
+      <button class="add-to-cart-btn">Thêm vào giỏ</button>
+    </div>
+  </div>
+</div>
+<div *ngIf="isLoading" class="loading" style="padding:2rem">Đang tải...</div>
+<div *ngIf="error" class="error" style="padding:2rem">{{ error }}</div> 

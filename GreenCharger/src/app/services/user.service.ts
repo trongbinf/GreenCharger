@@ -19,6 +19,8 @@ import {
 import { TokenService } from "./token.service";
 import { environment } from "../../environments/environment";
 
+export interface EmailStatusResponse { exists: boolean; emailConfirmed: boolean; message: string; }
+
 @Injectable({
   providedIn: "root"
 })
@@ -93,6 +95,25 @@ export class UserService {
 
   resetPassword(resetPasswordData: ResetPasswordRequest): Observable<ResetPasswordResponse> {
     return this.http.post<ResetPasswordResponse>(`${this.apiUrl}/reset-password`, resetPasswordData);
+  }
+
+  // New: Check if email exists / status
+  checkEmailStatus(email: string): Observable<EmailStatusResponse> {
+    return this.http.get<EmailStatusResponse>(`${this.apiUrl}/check-email-status`, {
+      params: { email }
+    });
+  }
+
+  // New: Confirm email
+  confirmEmail(email: string, token: string): Observable<{ message: string }> {
+    return this.http.get<{ message: string }>(`${this.apiUrl}/confirm-email`, {
+      params: { email, token }
+    });
+  }
+
+  // New: Resend confirmation
+  resendConfirmation(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/resend-confirmation`, { email });
   }
 
   logout(): void {

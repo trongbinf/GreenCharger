@@ -102,6 +102,42 @@
   background: #fafbfc;
 }
 
+/* Ensure space for toggle icon inside inputs */
+.password-wrapper .form-control {
+  padding-right: 42px;
+}
+
+/* Wrapper to position eye icon */
+.password-wrapper {
+  position: relative;
+}
+
+/* Eye toggle button */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  background: #f3f5f7;
+}
+
+.toggle-password span {
+  font-size: 18px;
+  line-height: 1;
+}
+
 .form-control:focus {
   outline: none;
   border-color: #2ecc71;

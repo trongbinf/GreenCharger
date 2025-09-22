@@ -24,7 +24,7 @@ namespace GreenChargerAPI.Services
                 var email = new MimeMessage();
                 var settings = _configuration.GetSection("EmailSettings");
 
-                email.From.Add(new MailboxAddress(settings["FromName"] ?? "VIET CRAFTY", settings["FromEmail"] ?? "noreply@vietcrafty.com"));
+                email.From.Add(new MailboxAddress(settings["FromName"] ?? "GreenCharger", settings["FromEmail"] ?? "noreply@greencharger.com"));
                 email.To.Add(MailboxAddress.Parse(to));
                 email.Subject = subject;
 
@@ -56,7 +56,7 @@ namespace GreenChargerAPI.Services
 
         public async Task SendPasswordResetEmailAsync(string to, string resetLink)
         {
-            var subject = "Đặt lại mật khẩu - VIET CRAFTY";
+            var subject = "Đặt lại mật khẩu - GreenCharger";
             var body = $@"
                 <!DOCTYPE html>
                 <html>
@@ -72,11 +72,11 @@ namespace GreenChargerAPI.Services
                             <h2 style='color: #8B4513; margin-bottom: 20px; font-size: 24px;'>Đặt lại mật khẩu</h2>
                             <p style='color: #333; line-height: 1.6; margin-bottom: 20px;'>Xin chào,</p>
                             <p style='color: #333; line-height: 1.6; margin-bottom: 25px;'>
-                                Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản VIET CRAFTY của mình. 
+                                Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản GreenCharger của mình. 
                                 Vui lòng nhấp vào nút bên dưới để tạo mật khẩu mới:
                             </p>
                             <div style='text-align: center; margin: 35px 0;'>
-                                <a href='{resetLink}' style='background: linear-gradient(135deg, #8B4513, #D2691E); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;'>
+                                <a href='{resetLink}' style='background: #2ecc71; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;'>
                                     🔑 Đặt lại mật khẩu
                                 </a>
                             </div>
@@ -93,28 +93,28 @@ namespace GreenChargerAPI.Services
 
         public async Task SendRegistrationEmailAsync(string to, string confirmLink)
         {
-            var subject = "Xác nhận đăng ký tài khoản - VIET CRAFTY";
+            var subject = "Xác nhận đăng ký tài khoản - GreenCharger";
             var body = $@"
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <meta charset='utf-8'>
                     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-                    <title>Chào mừng đến với VIET CRAFTY</title>
+                    <title>Chào mừng đến với GreenCharger</title>
                 </head>
                 <body style='margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;'>
                     <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>
                         <div style='padding: 40px 30px;'>
-                            <h2 style='color: #8B4513; margin-bottom: 20px; font-size: 24px;'>Chào mừng bạn đến với VIET CRAFTY!</h2>
+                            <h2 style='color: #8B4513; margin-bottom: 20px; font-size: 24px;'>Chào mừng bạn đến với GreenCharger!</h2>
                             <p style='color: #333; line-height: 1.6; margin-bottom: 20px;'>Xin chào,</p>
                             <p style='color: #333; line-height: 1.6; margin-bottom: 25px;'>
-                                Cảm ơn bạn đã đăng ký tài khoản tại VIET CRAFTY - shop chuyên các loại nón thời trang Việt Nam.
+                                Cảm ơn bạn đã đăng ký tài khoản tại GreenCharger - hệ thống sạc điện xanh bền vững.
                             </p>
                             <p style='color: #333; line-height: 1.6; margin-bottom: 25px;'>
                                 Để hoàn tất đăng ký, vui lòng xác nhận địa chỉ email của bạn:
                             </p>
                             <div style='text-align: center; margin: 35px 0;'>
-                                <a href='{confirmLink}' style='background: linear-gradient(135deg, #8B4513, #D2691E); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;'>
+                                <a href='{confirmLink}' style='background: #2ecc71; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold;'>
                                     Xác nhận email
                                 </a>
                             </div>
@@ -128,7 +128,7 @@ namespace GreenChargerAPI.Services
 
         public async Task SendPaymentSuccessEmailAsync(string to, string customerName, int orderId, decimal totalAmount, IEnumerable<object> orderItems)
         {
-            var subject = "Thanh toán thành công - VIET CRAFTY";
+            var subject = "Thanh toán thành công - GreenCharger";
             var itemsHtml = "";
             
             foreach (var item in orderItems)
@@ -221,7 +221,7 @@ namespace GreenChargerAPI.Services
                                 </ul>
                             </div>
                             <div style='text-align: center; margin: 30px 0;'>
-                                <a href='http://www.vietcrafty.me/orders' style='background: linear-gradient(135deg, #8B4513, #D2691E); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold; box-shadow: 0 4px 15px rgba(139,69,19,0.3); margin-right: 15px;'>
+                                <a href='http://www.greencharger.me/orders' style='background: #2ecc71; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; display: inline-block; font-weight: bold; box-shadow: 0 4px 15px rgba(46,204,113,0.3); margin-right: 15px;'>
                                     📋 Xem đơn hàng
                                 </a>
                                

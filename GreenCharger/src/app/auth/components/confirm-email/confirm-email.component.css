@@ -1,0 +1,36 @@
+.confirm-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(rgba(39, 174, 96, 0.7), rgba(46, 204, 113, 0.7)), url('https://res.cloudinary.com/ddkvhnj27/image/upload/v1758463523/A%CC%89nh_ma%CC%80n_hi%CC%80nh_2025-09-21_lu%CC%81c_21.04.48_rl32fx.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 20px;
+}
+
+.confirm-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(46, 204, 113, 0.15);
+  padding: 40px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.confirm-header h2 {
+  color: #27ae60;
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.confirm-body p { color: #444; margin-bottom: 16px; }
+
+.actions { display: flex; gap: 10px; }
+
+.btn { padding: 10px 16px; border-radius: 8px; border: 1px solid #e9ecef; cursor: pointer; }
+.btn.primary { background: #27ae60; color: #fff; border-color: #27ae60; }
+.btn.ghost { background: #fff; color: #27ae60; } 

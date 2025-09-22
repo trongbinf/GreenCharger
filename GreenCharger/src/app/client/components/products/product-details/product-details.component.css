@@ -1,0 +1,3 @@
+.product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+@media (max-width: 768px) { .product-detail { grid-template-columns: 1fr; } }
+.product-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; } 

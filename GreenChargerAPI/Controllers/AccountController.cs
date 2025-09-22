@@ -74,12 +74,11 @@ namespace GreenChargerAPI.Controllers
 
             if (result.Succeeded)
             {
-                // Tạo token xác nhận email
+                // Tạo token xác nhận email (token lifespan cấu hình 5 phút trong Program.cs)
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 Console.WriteLine($"[Register] Token: {token}");
                 
                 var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
-                // var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
 
                 // Gửi email xác nhận
                 await _emailService.SendRegistrationEmailAsync(user.Email ?? "", confirmLink);
@@ -122,12 +121,22 @@ namespace GreenChargerAPI.Controllers
                 return BadRequest(new { message = "Không tìm thấy người dùng" });
 
             if (user.EmailConfirmed)
-                return BadRequest(new { message = "Email đã được xác nhận trước đó" });
+                return Ok(new { message = "Tài khoản đã được kích hoạt trước đó." });
 
             var fixedToken = token.Replace(' ', '+');
             var result = await _userManager.ConfirmEmailAsync(user, fixedToken);
             if (result.Succeeded)
                 return Ok(new { message = "Xác nhận email thành công" });
+
+            // Phân loại lỗi token hết hạn/không hợp lệ (token lifespan 5 phút được cấu hình trong Program.cs)
+            var errorCodes = string.Join(",", result.Errors.Select(e => e.Code));
+            var errorDesc  = string.Join("; ", result.Errors.Select(e => e.Description));
+
+            // Identity thường trả về InvalidToken khi hết hạn/không hợp lệ
+            if (result.Errors.Any(e => e.Code.Equals("InvalidToken", StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest(new { message = "Token đã hết hạn hoặc không hợp lệ. Vui lòng yêu cầu gửi lại email xác nhận.", code = "TOKEN_INVALID_OR_EXPIRED" });
+            }
 
             return BadRequest(new { message = "Xác nhận email thất bại", errors = result.Errors });
         }
@@ -150,7 +159,7 @@ namespace GreenChargerAPI.Controllers
                 return Unauthorized(new { success = false, message = "Thông tin đăng nhập không hợp lệ" });
 
             // Tạo JWT token
-            var token = await GenerateJwtToken(user);
+            var tokenJwt = await GenerateJwtToken(user);
             
             // Lấy thông tin người dùng để trả về
             var roles = await _userManager.GetRolesAsync(user);
@@ -169,7 +178,7 @@ namespace GreenChargerAPI.Controllers
             };
             
             // Trả về cả token và thông tin người dùng
-            return Ok(new { success = true, token, user = userInfo });
+            return Ok(new { success = true, token = tokenJwt, user = userInfo });
         }
 
         [HttpPost("forgot-password")]
@@ -194,8 +203,8 @@ namespace GreenChargerAPI.Controllers
             }
             _cache.Set(cacheKey, true, TimeSpan.FromMinutes(2));
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetLink = $"http://localhost:4200/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(token)}";
+            var tokenReset = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetLink = $"http://localhost:4200/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={HttpUtility.UrlEncode(tokenReset)}";
 
             await _emailService.SendPasswordResetEmailAsync(user.Email ?? "", resetLink);
 
@@ -227,9 +236,9 @@ namespace GreenChargerAPI.Controllers
 
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return Ok(new { exists = false, message = "Email chưa được đăng ký" });
+                return Ok(new { exists = false, emailConfirmed = false, message = "Email chưa được đăng ký" });
 
-            return Ok(new { exists = true, message = "Email đã tồn tại trong hệ thống" });
+            return Ok(new { exists = true, emailConfirmed = user.EmailConfirmed, message = "Email đã tồn tại trong hệ thống" });
         }
 
         [HttpPost("resend-confirmation")]

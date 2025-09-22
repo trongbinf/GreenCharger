@@ -29,12 +29,12 @@
     <!-- User Actions -->
     <div class="user-actions">
       <!-- Search -->
-      <div class="search-box">
-        <input type="text" placeholder="Tìm kiếm sản phẩm..." class="search-input" />
-        <button class="search-btn">
+      <form class="search-box" (submit)="$event.preventDefault(); onSearch(searchInput.value)">
+        <input #searchInput type="text" placeholder="Tìm kiếm sản phẩm..." class="search-input" />
+        <button class="search-btn" type="submit">
           <i class="search-icon"></i>
         </button>
-      </div>
+      </form>
 
       <!-- Cart -->
       <a routerLink="/cart" class="cart-link">
@@ -45,15 +45,15 @@
       <!-- User Menu -->
       <div class="user-menu" *ngIf="userService.isAuthenticated(); else loginButton">
         <div class="user-info" (click)="toggleMenu()">
-          <img src="/assets/user-avatar.png" alt="User" class="user-avatar" />
-          <span class="user-name">{{ userService.getCurrentUser()?.firstName || 'User' }}</span>
+          <span class="user-name">{{ currentUser?.firstName || currentUser?.lastName || currentUser?.email || 'User' }}</span>
           <i class="dropdown-icon">▼</i>
         </div>
         
         <div class="dropdown-menu" [class.show]="isMenuOpen">
+          <div class="dropdown-item" style="cursor:default;opacity:.8">Xin chào, {{ currentUser?.firstName || currentUser?.email }}</div>
           <a routerLink="/profile" class="dropdown-item">Hồ sơ</a>
           <a routerLink="/orders" class="dropdown-item">Đơn hàng</a>
-          <a routerLink="/admin" class="dropdown-item" *ngIf="userService.getCurrentUser()?.role === 'admin'">Quản trị</a>
+          <a routerLink="/admin" class="dropdown-item" *ngIf="currentUser?.roles?.includes('Admin')">Quản trị</a>
           <hr class="dropdown-divider">
           <button class="dropdown-item logout-btn" (click)="logout()">Đăng xuất</button>
         </div>

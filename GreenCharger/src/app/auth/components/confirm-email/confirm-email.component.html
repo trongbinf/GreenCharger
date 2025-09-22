@@ -1,0 +1,17 @@
+<div class="confirm-container">
+  <div class="confirm-card">
+    <div class="confirm-header">
+      <h2 *ngIf="isLoading">Đang xác nhận...</h2>
+      <h2 *ngIf="!isLoading && success">Xác Nhận Email Thành Công</h2>
+      <h2 *ngIf="!isLoading && !success">Xác Nhận Email Thất Bại</h2>
+    </div>
+
+    <div class="confirm-body">
+      <p>{{ message }}</p>
+
+      <div class="actions" *ngIf="!isLoading">
+        <button class="btn primary" (click)="goLogin()">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+</div> 

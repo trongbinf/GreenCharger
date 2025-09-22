@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { ForgotPasswordRequest } from '../../../models/user.model';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -22,7 +23,8 @@ export class ForgotPasswordComponent {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private msg: MessageService
   ) {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -35,21 +37,41 @@ export class ForgotPasswordComponent {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const forgotPasswordData: ForgotPasswordRequest = this.forgotPasswordForm.value;
-      
-      this.userService.forgotPassword(forgotPasswordData).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          this.emailSent = true;
-          this.successMessage = response.message || 'Email khôi phục mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư của bạn.';
+      const email = this.forgotPasswordForm.value.email;
+
+      // Check email existence first
+      this.userService.checkEmailStatus(email).subscribe({
+        next: check => {
+          if (!check.exists) {
+            this.isLoading = false;
+            this.msg.error('Email chưa đăng ký', 'Không thể gửi yêu cầu quên mật khẩu.');
+            this.forgotPasswordForm.get('email')?.setErrors({ notExists: true });
+            return;
+          }
+
+          const forgotPasswordData: ForgotPasswordRequest = this.forgotPasswordForm.value;
+          this.userService.forgotPassword(forgotPasswordData).subscribe({
+            next: (response) => {
+              this.isLoading = false;
+              this.emailSent = true;
+              this.successMessage = response.message || 'Email khôi phục mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư của bạn.';
+              this.msg.success('Đã gửi email', this.successMessage);
+            },
+            error: (error) => {
+              this.isLoading = false;
+              this.errorMessage = error.error?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+              this.msg.error('Gửi thất bại', this.errorMessage);
+            }
+          });
         },
-        error: (error) => {
+        error: _ => {
           this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+          this.msg.error('Lỗi', 'Không thể kiểm tra trạng thái email.');
         }
       });
     } else {
       this.markFormGroupTouched();
+      this.msg.warning('Thiếu thông tin', 'Vui lòng nhập email hợp lệ');
     }
   }
 
@@ -68,6 +90,9 @@ export class ForgotPasswordComponent {
       }
       if (field.errors['email']) {
         return 'Email không hợp lệ';
+      }
+      if (field.errors['notExists']) {
+        return 'Email chưa đăng ký';
       }
     }
     return '';

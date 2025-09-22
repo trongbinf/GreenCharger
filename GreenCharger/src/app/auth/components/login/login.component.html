@@ -28,14 +28,20 @@
 
       <div class="form-group">
         <label for="password">Mật khẩu</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="getFieldError('password')"
-          placeholder="Nhập mật khẩu của bạn"
-        />
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="getFieldError('password')"
+            placeholder="Nhập mật khẩu của bạn"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" aria-label="Hiện/ẩn mật khẩu">
+            <span *ngIf="!showPassword">👁️</span>
+            <span *ngIf="showPassword">🙈</span>
+          </button>
+        </div>
         <div class="error-message" *ngIf="getFieldError('password')">
           {{ getFieldError('password') }}
         </div>

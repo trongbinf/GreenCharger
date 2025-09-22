@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { LoginRequest } from '../../../models/user.model';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-login',
@@ -16,17 +17,29 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
+  // Password visibility state
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private msg: MessageService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      // password must be at least 6 characters
+      password: [
+        '',
+        [Validators.required, Validators.minLength(6)]
+      ],
       rememberMe: [false]
     });
+  }
+
+  // Toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
@@ -40,37 +53,39 @@ export class LoginComponent {
         rememberMe: this.loginForm.value.rememberMe
       };
       
-      // For testing with admin credentials
-      if (loginData.email === 'admin@mocviet.com' && loginData.password === 'Admin@123') {
-        console.log('Using admin credentials:', loginData);
-      }
-      
       this.userService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading = false;
           
           // Get current user with roles from the service
           const currentUser = this.userService.getCurrentUser();
-          console.log('Current user:', currentUser);
           
+          this.msg.success('Đăng nhập thành công');
           if (currentUser && currentUser.roles && currentUser.roles.includes('Admin')) {
-            console.log('Admin user detected, redirecting to dashboard');
-            // Redirect to admin dashboard
             this.router.navigate(['/admin/dashboard']);
           } else {
-            console.log('Regular user detected, redirecting to home');
-            // Redirect to user homepage
             this.router.navigate(['/']);
           }
         },
         error: (error) => {
           this.isLoading = false;
-          console.error('Login error:', error);
-          this.errorMessage = error.error?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
+          const serverMsg: string = error?.error?.message || '';
+          // Heuristics to show friendly errors
+          if (/not\s*found|no\s*user|unregistered|không\s*tồn\s*tại/i.test(serverMsg)) {
+            this.msg.error('Email chưa đăng ký', 'Vui lòng kiểm tra lại hoặc đăng ký tài khoản.');
+          } else if (/inactive|locked|not\s*activated|chưa\s*kích\s*hoạt/i.test(serverMsg)) {
+            this.msg.warning('Tài khoản chưa kích hoạt', 'Vui lòng kiểm tra email để kích hoạt.');
+          } else if (/password|mật\s*khẩu|invalid\s*credentials/i.test(serverMsg)) {
+            this.msg.error('Sai mật khẩu', 'Vui lòng nhập đúng mật khẩu 6 ký tự trở lên.');
+          } else {
+            this.msg.error('Đăng nhập thất bại', 'Có lỗi xảy ra. Vui lòng thử lại.');
+          }
+          this.errorMessage = serverMsg || 'Đăng nhập thất bại. Vui lòng thử lại.';
         }
       });
     } else {
       this.markFormGroupTouched();
+      this.msg.warning('Thiếu thông tin', 'Vui lòng kiểm tra các trường bắt buộc');
     }
   }
 
@@ -90,7 +105,7 @@ export class LoginComponent {
       if (field.errors['email']) {
         return 'Email không hợp lệ';
       }
-      if (field.errors['minlength']) {
+      if (field.errors['minlength'] && fieldName === 'password') {
         return 'Mật khẩu phải có ít nhất 6 ký tự';
       }
     }

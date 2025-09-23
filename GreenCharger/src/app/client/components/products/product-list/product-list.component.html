@@ -1,30 +1,44 @@
-<div class="container" style="padding:2rem 0">
+<app-header></app-header>
+
+<div class="container">
+  <nz-breadcrumb>
+    <nz-breadcrumb-item><a routerLink="/">Home</a></nz-breadcrumb-item>
+    <nz-breadcrumb-item>Sản phẩm</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
   <h2 class="section-title">Tất cả sản phẩm</h2>
-  <p class="section-subtitle" *ngIf="categoryId">Lọc theo danh mục #{{categoryId}}</p>
+  <p class="section-subtitle" *ngIf="categoryId">Đang lọc theo danh mục #{{categoryId}}</p>
 
   <div *ngIf="isLoading" class="loading">Đang tải...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <div class="products-grid" *ngIf="!isLoading && !error">
-    <div class="product-card" *ngFor="let p of pagedProducts" (click)="viewDetails(p)" style="cursor:pointer">
-      <div class="product-image">
-        <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name">
-        <div class="product-badge" *ngIf="p.isOnSale && p.discount>0">Giảm {{p.discount}}%</div>
-      </div>
-      <div class="product-info">
-        <h3 class="product-name">{{ p.name }}</h3>
-        <p class="product-description">{{ p.description }}</p>
-        <div class="product-price">
-          <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-          <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-        </div>
-      </div>
+  <div nz-row [nzGutter]="16" *ngIf="!isLoading && !error">
+    <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let p of pagedProducts">
+      <a [routerLink]="['/product', p.id]">
+        <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
+          <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
+            <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+            <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+            <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
+          </div>
+        </nz-card>
+        <ng-template #coverTpl>
+          <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" style="width:100%; height:200px; object-fit:cover"/>
+        </ng-template>
+      </a>
     </div>
   </div>
 
-  <div class="pagination" *ngIf="totalPages > 1">
-    <button (click)="goToPage(page-1)" [disabled]="page===1">‹</button>
-    <button *ngFor="let p of [].constructor(totalPages); let i = index" (click)="goToPage(i+1)" [class.active]="page===i+1">{{ i+1 }}</button>
-    <button (click)="goToPage(page+1)" [disabled]="page===totalPages">›</button>
-  </div>
-</div> 
+  <nz-pagination
+    *ngIf="total > pageSize"
+    [nzPageIndex]="page"
+    [nzPageSize]="pageSize"
+    [nzTotal]="total"
+    nzSimple
+    (nzPageIndexChange)="onPageChange($event)"
+    style="margin-top:16px; display:flex; justify-content:center">
+  </nz-pagination>
+</div>
+
+<app-footer></app-footer> 

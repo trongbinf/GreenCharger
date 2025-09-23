@@ -1,13 +1,29 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../services/product.service';
 import { Product } from '../../../../models/product.model';
+import { HeaderComponent, FooterComponent } from '../../../../core';
+import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderComponent,
+    FooterComponent,
+    NzBreadCrumbModule,
+    NzGridModule,
+    NzCardModule,
+    NzPaginationModule,
+    NzTagModule
+  ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
@@ -46,7 +62,7 @@ export class ProductListComponent implements OnInit {
         this.products = this.categoryId ? active.filter(p => p.categoryId === this.categoryId) : active;
         this.isLoading = false;
       },
-      error: (e) => {
+      error: () => {
         this.error = 'Không thể tải sản phẩm';
         this.isLoading = false;
         this.products = [];
@@ -59,12 +75,9 @@ export class ProductListComponent implements OnInit {
     return this.products.slice(start, start + this.pageSize);
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.products.length / this.pageSize));
-  }
+  get total(): number { return this.products.length; }
 
-  goToPage(p: number): void {
-    if (p < 1 || p > this.totalPages) return;
+  onPageChange(p: number): void {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { category: this.categoryId ?? undefined, page: p },

@@ -1,21 +1,34 @@
-<div class="container" style="padding:2rem 0">
-  <h2 class="section-title">Kết quả tìm kiếm</h2>
+<app-header></app-header>
+
+<div class="container" style="padding:24px 20px">
+  <nz-breadcrumb style="margin-bottom:16px">
+    <nz-breadcrumb-item><a routerLink="/">Home</a></nz-breadcrumb-item>
+    <nz-breadcrumb-item>Kết quả tìm kiếm</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <h2 class="section-title" style="margin-bottom:4px">Kết quả tìm kiếm</h2>
   <p class="section-subtitle" *ngIf="q">Từ khóa: "{{ q }}"</p>
 
   <div *ngIf="isLoading" class="loading">Đang tìm...</div>
   <div *ngIf="!isLoading && results.length === 0">Không tìm thấy sản phẩm phù hợp.</div>
 
-  <div class="products-grid" *ngIf="!isLoading && results.length > 0">
-    <div class="product-card" *ngFor="let p of results" [routerLink]="['/product', p.id]">
-      <div class="product-image">
-        <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name">
-      </div>
-      <div class="product-info">
-        <h3 class="product-name">{{ p.name }}</h3>
-        <div class="product-price">
-          <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-        </div>
-      </div>
+  <div nz-row [nzGutter]="16" *ngIf="!isLoading && results.length > 0">
+    <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let p of results">
+      <a [routerLink]="['/product', p.id]">
+        <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
+          <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
+            <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+            <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+            <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
+          </div>
+        </nz-card>
+        <ng-template #coverTpl>
+          <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" style="width:100%; height:200px; object-fit:cover"/>
+        </ng-template>
+      </a>
     </div>
   </div>
-</div> 
+</div>
+
+<app-footer></app-footer> 

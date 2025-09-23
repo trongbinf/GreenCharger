@@ -1,5 +1,6 @@
 .home-main {
   min-height: 100vh;
+  background: #ffffff; /* override global gradient on Home */
 }
 
 /* Hero Section - Image Only Slider */
@@ -91,18 +92,21 @@
   position: relative;
 }
 
+/* Big background heading behind section titles */
 .main-title {
   font-size: 6rem;
   font-weight: 700;
-  color: #e8e8e8;
+  color: rgba(0, 0, 0, 0.04); /* much lighter so it won't affect readability */
   margin: 0;
   line-height: 1;
   position: absolute;
   top: -40px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1;
+  z-index: 0; /* push further behind */
   letter-spacing: 2px;
+  pointer-events: none;
+  user-select: none;
 }
 
 .section-title {
@@ -175,16 +179,18 @@
   z-index: 2;
 }
 
+/* Make cover fill container better */
 .product-image {
-  height: 200px;
+  height: 260px;
   overflow: hidden;
-  flex-shrink: 0; /* Prevent image from shrinking */
 }
 
 .product-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
   transition: transform 0.3s ease;
 }
 

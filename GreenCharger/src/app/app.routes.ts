@@ -8,11 +8,6 @@ import { ConfirmEmailComponent } from './auth/components/confirm-email/confirm-e
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
-  },
-  {
-    path: 'home',
     loadChildren: () => import('./client/client.routes').then(m => m.clientRoutes)
   },
   {

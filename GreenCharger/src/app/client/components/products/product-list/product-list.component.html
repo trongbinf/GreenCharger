@@ -9,36 +9,66 @@
   <h2 class="section-title">Tất cả sản phẩm</h2>
   <p class="section-subtitle" *ngIf="categoryId">Đang lọc theo danh mục #{{categoryId}}</p>
 
-  <div *ngIf="isLoading" class="loading">Đang tải...</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+  <div nz-row [nzGutter]="16">
+    <!-- Sidebar filters -->
+    <div nz-col [nzXs]="24" [nzMd]="7" [nzLg]="6">
+      <nz-card nzTitle="Bộ lọc" [nzBordered]="true">
+        <div style="margin-bottom:12px">
+          <label class="filter-label">Sắp xếp</label>
+          <nz-radio-group [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
+            <label nz-radio nzValue="priceAsc">Giá tăng dần</label>
+            <br>
+            <label nz-radio nzValue="priceDesc">Giá giảm dần</label>
+          </nz-radio-group>
+        </div>
 
-  <div nz-row [nzGutter]="16" *ngIf="!isLoading && !error">
-    <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let p of pagedProducts">
-      <a [routerLink]="['/product', p.id]">
-        <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
-          <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
-            <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-            <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-            <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
-          </div>
-        </nz-card>
-        <ng-template #coverTpl>
-          <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" style="width:100%; height:200px; object-fit:cover"/>
-        </ng-template>
-      </a>
+        <div style="margin-bottom:12px">
+          <label class="filter-label">Khoảng giá</label>
+          <nz-radio-group [(ngModel)]="selectedRangeKey" (ngModelChange)="onSelectRange()" style="display:flex; flex-direction:column; gap:6px">
+            <label nz-radio nzValue="all">Tất cả</label>
+            <label nz-radio nzValue="50-100">50.000 - 100.000</label>
+            <label nz-radio nzValue="100-300">100.000 - 300.000</label>
+            <label nz-radio nzValue="300-700">300.000 - 700.000</label>
+            <label nz-radio nzValue="gt700">Trên 700.000</label>
+          </nz-radio-group>
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Content grid -->
+    <div nz-col [nzXs]="24" [nzMd]="17" [nzLg]="18">
+      <div *ngIf="isLoading" class="loading">Đang tải...</div>
+      <div *ngIf="error" class="error">{{ error }}</div>
+
+      <div nz-row [nzGutter]="16" *ngIf="!isLoading && !error">
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="8" *ngFor="let p of pagedProducts">
+          <a [routerLink]="['/product', p.id]">
+            <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
+              <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
+                <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+                <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+                <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
+              </div>
+            </nz-card>
+            <ng-template #coverTpl>
+              <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" style="width:100%; height:200px; object-fit:cover"/>
+            </ng-template>
+          </a>
+        </div>
+      </div>
+
+      <nz-pagination
+        *ngIf="total > pageSize"
+        [nzPageIndex]="page"
+        [nzPageSize]="pageSize"
+        [nzTotal]="total"
+        nzSimple
+        (nzPageIndexChange)="onPageChange($event)"
+        style="margin-top:16px; display:flex; justify-content:center">
+      </nz-pagination>
     </div>
   </div>
-
-  <nz-pagination
-    *ngIf="total > pageSize"
-    [nzPageIndex]="page"
-    [nzPageSize]="pageSize"
-    [nzTotal]="total"
-    nzSimple
-    (nzPageIndexChange)="onPageChange($event)"
-    style="margin-top:16px; display:flex; justify-content:center">
-  </nz-pagination>
 </div>
 
 <app-footer></app-footer> 

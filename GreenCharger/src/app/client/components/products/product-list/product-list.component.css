@@ -1,49 +1,48 @@
-/* Container styling */
+/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px !important;
 }
 
-/* Breadcrumb styling */
-nz-breadcrumb {
-  margin-bottom: 16px !important;
-  margin-left: 4px;
+/* Breadcrumb */
+.pd-breadcrumb, .pl-breadcrumb {
+  margin: 0 0 12px;
 }
 
-/* Title styling */
-.section-title {
-  margin-bottom: 4px !important;
-  margin-left: 4px;
-  font-size: 24px;
+/* Title */
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 16px;
+  color: #1f2937;
+}
+
+.page-subtitle {
+  margin: 0 0 20px;
+  color: #6b7280;
+}
+
+/* Sidebar filter helpers */
+.filter-label {
+  display: block;
+  margin-bottom: 6px;
   font-weight: 600;
-  color: #2c3e50;
 }
 
-.section-subtitle {
-  margin-left: 4px;
-  color: #666;
-  font-size: 14px;
+/* Product cards */
+.current-price {
+  color: #ef4444;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.original-price {
+  color: #9ca3af;
+  text-decoration: line-through;
 }
 
 .pagination {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-.pagination button {
-  border: 1px solid #e1e5e9;
-  background: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.pagination button.active {
-  background: #27ae60;
-  color: #fff;
-  border-color: #27ae60;
-}
-.pagination button:disabled { opacity: .5; cursor: not-allowed; } 
-.current-price { font-weight: 700; color: #27ae60; }
-.original-price { text-decoration: line-through; color: #999; font-size: 13px; } 
+  margin-top: 16px;
+  text-align: center;
+} 

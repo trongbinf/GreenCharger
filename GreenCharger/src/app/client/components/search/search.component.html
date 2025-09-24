@@ -1,32 +1,67 @@
 <app-header></app-header>
 
-<div class="container" style="padding:24px 20px">
-  <nz-breadcrumb style="margin-bottom:16px">
-    <nz-breadcrumb-item><a routerLink="/">Home</a></nz-breadcrumb-item>
-    <nz-breadcrumb-item>Kết quả tìm kiếm</nz-breadcrumb-item>
+<div class="container">
+  <nz-breadcrumb class="pl-breadcrumb">
+    <nz-breadcrumb-item>Home</nz-breadcrumb-item>
+    <nz-breadcrumb-item>Tìm kiếm</nz-breadcrumb-item>
   </nz-breadcrumb>
 
-  <h2 class="section-title" style="margin-bottom:4px">Kết quả tìm kiếm</h2>
-  <p class="section-subtitle" *ngIf="q">Từ khóa: "{{ q }}"</p>
+  <h2 class="page-title">Kết quả tìm kiếm</h2>
+  <p class="page-subtitle" *ngIf="query">Cho từ khóa: "{{ query }}"</p>
 
-  <div *ngIf="isLoading" class="loading">Đang tìm...</div>
-  <div *ngIf="!isLoading && results.length === 0">Không tìm thấy sản phẩm phù hợp.</div>
+  <div *ngIf="isLoading" class="pd-loading">Đang tải...</div>
+  <div *ngIf="error" class="pd-error">{{ error }}</div>
 
-  <div nz-row [nzGutter]="16" *ngIf="!isLoading && results.length > 0">
-    <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let p of results">
-      <a [routerLink]="['/product', p.id]">
-        <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
-          <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
-            <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-            <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-            <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
-          </div>
-        </nz-card>
-        <ng-template #coverTpl>
-          <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" style="width:100%; height:200px; object-fit:cover"/>
-        </ng-template>
-      </a>
+  <div nz-row [nzGutter]="16" *ngIf="!isLoading">
+    <!-- Sidebar filters -->
+    <div nz-col [nzXs]="24" [nzMd]="7" [nzLg]="6">
+      <nz-card nzTitle="Bộ lọc" [nzBordered]="true">
+        <div style="margin-bottom:12px">
+          <label class="filter-label">Sắp xếp</label>
+          <nz-radio-group [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
+            <label nz-radio nzValue="priceAsc">Giá tăng dần</label>
+            <br>
+            <label nz-radio nzValue="priceDesc">Giá giảm dần</label>
+          </nz-radio-group>
+        </div>
+
+        <div>
+          <label class="filter-label">Khoảng giá</label>
+          <nz-radio-group [(ngModel)]="selectedRangeKey" (ngModelChange)="onSelectRange()">
+            <label nz-radio nzValue="all">Tất cả</label>
+            <br />
+            <label nz-radio nzValue="50-100">50.000 - 100.000</label>
+            <br />
+            <label nz-radio nzValue="100-300">100.000 - 300.000</label>
+            <br />
+            <label nz-radio nzValue="300-700">300.000 - 700.000</label>
+            <br />
+            <label nz-radio nzValue="gt700">Trên 700.000</label>
+          </nz-radio-group>
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Results grid -->
+    <div nz-col [nzXs]="24" [nzMd]="17" [nzLg]="18">
+      <div *ngIf="results.length === 0 && !isLoading" class="pd-error">Không có sản phẩm phù hợp.</div>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="8" [nzLg]="6" *ngFor="let p of results">
+          <a [routerLink]="['/product', p.id]">
+          <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" class="search-card">
+            <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
+            <div style="margin-top:8px">
+              <span class="current-price">{{ (p.finalPrice || p.price) | number:'1.0-0' }} đ</span>
+              <span *ngIf="p.finalPrice && p.finalPrice < p.price" class="original-price">{{ p.price | number:'1.0-0' }} đ</span>
+            </div>
+          </nz-card>
+          <ng-template #coverTpl>
+            <img [src]="p.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="p.name" class="search-image" />
+          </ng-template>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,19 @@
+/* Layout spacing to avoid left-edge crowding */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px !important;
+}
+
+.pl-breadcrumb { margin: 0 0 12px; }
+.page-title { font-size: 32px; font-weight: 800; margin: 0 0 16px; color: #1f2937; }
+.page-subtitle { margin: 0 0 20px; color: #6b7280; }
+.filter-label { display: block; margin-bottom: 6px; font-weight: 600; }
+
+/* Card visuals */
+.nz-card, nz-card { border-radius: 12px; overflow: hidden; }
+.search-card { margin-bottom: 16px; border-radius: 12px; overflow: hidden; }
+.search-image { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
+
+.current-price { color: #ef4444; font-weight: 700; margin-right: 8px; }
+.original-price { color: #9ca3af; text-decoration: line-through; } 

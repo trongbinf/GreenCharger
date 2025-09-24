@@ -334,12 +334,12 @@
   height: 100%;
   background: white;
   border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
+  overflow: hidden; /* like product card */
   box-shadow: 0 8px 20px rgba(46, 204, 113, 0.1), 0 4px 6px rgba(46, 204, 113, 0.05), inset 0 -2px 0 rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.7);
   transition: all 0.3s ease;
   cursor: pointer;
+  padding: 0; /* remove large padding so image can cover */
 }
 
 .category-card:hover {
@@ -348,26 +348,35 @@
 }
 
 .category-image {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0; /* align with product style */
+  height: 220px; /* similar to product thumbnail */
+  overflow: hidden;
   flex-shrink: 0;
 }
 
 .category-image img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
+  border-radius: 0; /* rectangular like product */
+  display: block;
+  transition: transform 0.3s ease;
 }
+
+.category-card:hover .category-image img { transform: scale(1.05); }
 
 .category-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 1rem 1.25rem; /* add padding for content like product */
+  text-align: left;
 }
 
 .category-name {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #27ae60;
   margin-bottom: 0.5rem;

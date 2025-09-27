@@ -1,4 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 
+namespace GreenChargerAPI.Models
+{
     public class AdminChangePasswordModel
     {
         [Required]
@@ -6,3 +9,4 @@
         [DataType(DataType.Password)]
         public string NewPassword { get; set; } = string.Empty;
     }
+}

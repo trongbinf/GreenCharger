@@ -34,4 +34,8 @@ export class HeaderComponent {
     this.isMenuOpen = false;
     this.router.navigate(['/']);
   }
+
+  isAdmin(): boolean {
+    return this.currentUser?.roles?.includes('Admin') || false;
+  }
 }

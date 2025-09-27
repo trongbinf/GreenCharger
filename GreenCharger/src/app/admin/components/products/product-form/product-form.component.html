@@ -31,13 +31,13 @@
 
           <div class="form-group">
             <label for="description">Mô tả <span class="required">*</span></label>
-            <textarea 
-              id="description" 
-              formControlName="description" 
-              class="form-control" 
-              rows="3"
-              [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched"
-            ></textarea>
+            <quill-editor
+              formControlName="description"
+              [modules]="quillConfig"
+              placeholder="Nhập mô tả chi tiết sản phẩm..."
+              class="quill-editor"
+              [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched">
+            </quill-editor>
             <div *ngIf="productForm.get('description')?.invalid && productForm.get('description')?.touched" class="invalid-feedback">
               Vui lòng nhập mô tả sản phẩm
             </div>
@@ -50,30 +50,48 @@
                 type="number" 
                 id="price" 
                 formControlName="price" 
-                class="form-control"
+                class="form-control" 
+                min="0"
                 [class.is-invalid]="productForm.get('price')?.invalid && productForm.get('price')?.touched"
               >
               <div *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" class="invalid-feedback">
-                Giá phải lớn hơn hoặc bằng 0
+                Vui lòng nhập giá hợp lệ
               </div>
             </div>
 
             <div class="form-group col-md-6">
-              <label for="discountPrice">Giá khuyến mãi</label>
+              <label for="discount">Giảm giá (%)</label>
               <input 
                 type="number" 
-                id="discountPrice" 
-                formControlName="discountPrice" 
-                class="form-control"
-                [class.is-invalid]="productForm.get('discountPrice')?.invalid && productForm.get('discountPrice')?.touched"
+                id="discount" 
+                formControlName="discount" 
+                class="form-control" 
+                min="0" 
+                max="100"
+                [class.is-invalid]="productForm.get('discount')?.invalid && productForm.get('discount')?.touched"
               >
-              <div *ngIf="productForm.get('discountPrice')?.invalid && productForm.get('discountPrice')?.touched" class="invalid-feedback">
-                Giá khuyến mãi phải lớn hơn hoặc bằng 0
+              <div *ngIf="productForm.get('discount')?.invalid && productForm.get('discount')?.touched" class="invalid-feedback">
+                Giảm giá phải từ 0-100%
               </div>
             </div>
           </div>
 
           <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="stockQuantity">Số lượng <span class="required">*</span></label>
+              <input 
+                type="number" 
+                id="stockQuantity" 
+                formControlName="stockQuantity" 
+                class="form-control" 
+                min="0"
+                [class.is-invalid]="productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched"
+              >
+              <div *ngIf="productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched" class="invalid-feedback">
+                Vui lòng nhập số lượng hợp lệ
+              </div>
+            </div>
+
             <div class="form-group col-md-6">
               <label for="categoryId">Danh mục <span class="required">*</span></label>
               <select 
@@ -82,85 +100,110 @@
                 class="form-control"
                 [class.is-invalid]="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched"
               >
-                <option value="">Chọn danh mục</option>
-                <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+                <option value="0">Chọn danh mục</option>
+                <option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </option>
               </select>
               <div *ngIf="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched" class="invalid-feedback">
                 Vui lòng chọn danh mục
               </div>
             </div>
+          </div>
 
-            <div class="form-group col-md-6">
-              <label for="quantityInStock">Số lượng tồn kho <span class="required">*</span></label>
-              <input 
-                type="number" 
-                id="quantityInStock" 
-                formControlName="quantityInStock" 
-                class="form-control"
-                [class.is-invalid]="productForm.get('quantityInStock')?.invalid && productForm.get('quantityInStock')?.touched"
-              >
-              <div *ngIf="productForm.get('quantityInStock')?.invalid && productForm.get('quantityInStock')?.touched" class="invalid-feedback">
-                Số lượng tồn kho phải lớn hơn hoặc bằng 0
+          <!-- Status Checkboxes -->
+          <div class="form-group">
+            <label>Trạng thái</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input 
+                  type="checkbox" 
+                  id="isActive" 
+                  formControlName="isActive"
+                  class="form-checkbox"
+                >
+                <label for="isActive" class="checkbox-label">Hoạt động</label>
+              </div>
+              
+              <div class="checkbox-item">
+                <input 
+                  type="checkbox" 
+                  id="isNew" 
+                  formControlName="isNew"
+                  class="form-checkbox"
+                >
+                <label for="isNew" class="checkbox-label">Sản phẩm mới</label>
+              </div>
+              
+              <div class="checkbox-item">
+                <input 
+                  type="checkbox" 
+                  id="isOnSale" 
+                  formControlName="isOnSale"
+                  class="form-checkbox"
+                >
+                <label for="isOnSale" class="checkbox-label">Đang giảm giá</label>
+              </div>
+              
+              <div class="checkbox-item">
+                <input 
+                  type="checkbox" 
+                  id="isFeatured" 
+                  formControlName="isFeatured"
+                  class="form-checkbox"
+                >
+                <label for="isFeatured" class="checkbox-label">Sản phẩm nổi bật</label>
               </div>
             </div>
           </div>
 
-          <div class="form-row checkbox-group">
-            <div class="form-check col-md-6">
-              <input type="checkbox" id="isActive" formControlName="isActive" class="form-check-input">
-              <label class="form-check-label" for="isActive">Kích hoạt</label>
-            </div>
-
-            <div class="form-check col-md-6">
-              <input type="checkbox" id="isNew" formControlName="isNew" class="form-check-input">
-              <label class="form-check-label" for="isNew">Sản phẩm mới</label>
-            </div>
-
-            <div class="form-check col-md-6">
-              <input type="checkbox" id="isOnSale" formControlName="isOnSale" class="form-check-input">
-              <label class="form-check-label" for="isOnSale">Đang khuyến mãi</label>
-            </div>
-
-            <div class="form-check col-md-6">
-              <input type="checkbox" id="isFeatured" formControlName="isFeatured" class="form-check-input">
-              <label class="form-check-label" for="isFeatured">Sản phẩm nổi bật</label>
-            </div>
-          </div>
-
+          <!-- Image Upload Section -->
           <div class="form-group">
-            <label for="images">Hình ảnh sản phẩm</label>
-            <input 
-              type="file" 
-              id="images" 
-              class="form-control-file" 
-              (change)="onImagesSelected($event)"
-              multiple
-              accept="image/*"
-            >
-          </div>
-
-          <!-- Image Previews -->
-          <div class="image-preview-container" *ngIf="imagePreviewUrls.length > 0">
-            <div class="image-preview-item" *ngFor="let url of imagePreviewUrls; let i = index">
-              <img [src]="url" alt="Preview">
-              <button type="button" class="remove-image-btn" (click)="removeImage(i)">
-                <i class="fas fa-times"></i>
-              </button>
+            <label>Hình ảnh sản phẩm</label>
+            <div class="image-upload-section">
+              <div class="upload-area">
+                <input 
+                  type="file" 
+                  id="imageUpload" 
+                  multiple 
+                  accept="image/*" 
+                  (change)="onImageSelected($event)"
+                  class="file-input"
+                >
+                <label for="imageUpload" class="upload-label">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <span>Chọn hình ảnh</span>
+                </label>
+              </div>
+              
+              <div *ngIf="imagePreviewUrls.length > 0" class="image-previews">
+                <div *ngFor="let url of imagePreviewUrls; let i = index" class="image-preview">
+                  <img [src]="url" [alt]="'Preview ' + (i + 1)">
+                  <button type="button" class="remove-image" (click)="removeImage(i)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" (click)="onClose()">Hủy</button>
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="onClose()">
+              <i class="fas fa-times"></i>
+              Hủy
+            </button>
             <button 
               type="submit" 
               class="btn btn-primary" 
               [disabled]="productForm.invalid || loading"
             >
-              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-              {{ mode === 'create' ? 'Thêm sản phẩm' : 'Cập nhật' }}
+              <i class="fas fa-save" *ngIf="!loading"></i>
+              <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+              {{ loading ? 'Đang xử lý...' : (mode === 'create' ? 'Thêm sản phẩm' : 'Cập nhật sản phẩm') }}
             </button>
           </div>
         </form>
       </div>
-    </div>
   </div>
+</div>

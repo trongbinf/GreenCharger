@@ -52,7 +52,7 @@
         <div class="dropdown-menu" [class.show]="isMenuOpen">
           <div class="dropdown-item" style="cursor:default;opacity:.8">Xin chào, {{ currentUser?.firstName || currentUser?.email }}</div>
           <a routerLink="/profile" class="dropdown-item">Hồ sơ</a>
-          <a routerLink="/orders" class="dropdown-item">Đơn hàng</a>
+          <a routerLink="/orders" class="dropdown-item" *ngIf="!isAdmin()">Đơn hàng</a>
           <a routerLink="/admin" class="dropdown-item" *ngIf="currentUser?.roles?.includes('Admin')">Quản trị</a>
           <hr class="dropdown-divider">
           <button class="dropdown-item logout-btn" (click)="logout()">Đăng xuất</button>

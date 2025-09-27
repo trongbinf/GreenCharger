@@ -128,7 +128,7 @@ export class CategoryFormComponent implements OnInit {
       this.save.emit(categoryData);
     } catch (error) {
       console.error('Error saving category:', error);
-      alert('Có lỗi xảy ra khi lưu danh mục. Vui lòng thử lại.');
+      this.messageService.error('Lỗi', 'Có lỗi xảy ra khi lưu danh mục. Vui lòng thử lại.');
     } finally {
       this.isUploading = false;
     }

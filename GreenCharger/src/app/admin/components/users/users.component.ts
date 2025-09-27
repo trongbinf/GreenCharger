@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserService } from '../../../services/user.service';
+import { MessageService } from '../../../services/message.service';
 import { User, UserDto, CreateUserRequest, UpdateUserRequest } from '../../../models/user.model';
 import { UserDetailsComponent } from './user-details/user-details.component';
 import { UserFormComponent } from './user-form/user-form.component';
@@ -31,7 +33,11 @@ export class UsersComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private userService: UserService,
+    private messageService: MessageService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -49,10 +55,11 @@ export class UsersComponent implements OnInit {
         this.loading = false;
         console.log('Users loaded:', users);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.error = 'Không thể tải danh sách người dùng';
         this.loading = false;
         console.error('Error loading users:', error);
+        this.messageService.error('Lỗi', 'Không thể tải danh sách người dùng');
       }
     });
   }
@@ -64,171 +71,132 @@ export class UsersComponent implements OnInit {
       this.filteredUsers = this.users.filter(user =>
         user.firstName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         user.lastName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.phoneNumber?.toLowerCase().includes(this.searchTerm.toLowerCase())
+        user.email?.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
     this.totalItems = this.filteredUsers.length;
     this.currentPage = 1;
   }
 
-  onViewUser(user: User): void {
-    this.selectedUser = user;
-    this.showUserDetails = true;
-  }
-  
   onAddUser(): void {
-    this.selectedUser = null;
     this.formMode = 'add';
+    this.selectedUser = null;
     this.showUserForm = true;
+    console.log('Add user mode, selectedUser:', this.selectedUser);
   }
 
   onEditUser(user: User): void {
-    this.selectedUser = user;
+    console.log('onEditUser called with user:', user);
     this.formMode = 'edit';
+    this.selectedUser = { ...user }; // Create a copy to avoid reference issues
     this.showUserForm = true;
+    console.log('Edit user mode, selectedUser:', this.selectedUser);
+    console.log('showUserForm:', this.showUserForm);
+    console.log('formMode:', this.formMode);
   }
 
-  onDeleteUser(user: User): void {
-    if (confirm(`Bạn có chắc chắn muốn xóa người dùng "${user.firstName} ${user.lastName}"?`)) {
-      this.loading = true;
-      this.userService.deleteUser(user.id).subscribe({
-        next: () => {
-          this.loadUsers();
-          this.loading = false;
-        },
-        error: (error) => {
-          this.error = 'Không thể xóa người dùng';
-          this.loading = false;
-          console.error('Error deleting user:', error);
-        }
-      });
-    }
+  onViewUser(user: User): void {
+    // Navigate to user detail page
+    this.router.navigate(['/admin/users/detail', user.id]);
   }
 
-  onLockUser(user: User): void {
-    if (confirm(`Bạn có chắc chắn muốn khóa tài khoản "${user.firstName} ${user.lastName}"?`)) {
-      // Set a local loading state for this operation
-      const userIndex = this.findUserIndex(user);
-      
-      this.userService.lockUser(user.id).subscribe({
-        next: () => {
-          // Update user locally instead of reloading all users
-          if (userIndex !== -1) {
-            // Set the lockout end date to a future date (e.g., 10 years from now)
-            const lockoutEndDate = new Date();
-            lockoutEndDate.setFullYear(lockoutEndDate.getFullYear() + 10);
-            
-            // Create a new user object with updated lockout information
-            const updatedUser = { 
-              ...this.users[userIndex],
-              lockoutEnd: lockoutEndDate.toISOString(),
-              lockoutEnabled: true
-            };
-            
-            // Update both arrays to maintain consistency
-            this.users[userIndex] = updatedUser;
-            
-            // Find the user in filtered users array and update it too
-            const filteredIndex = this.filteredUsers.findIndex(u => u.id === user.id);
-            if (filteredIndex !== -1) {
-              this.filteredUsers[filteredIndex] = updatedUser;
-            }
-          }
-        },
-        error: (error) => {
-          this.error = 'Không thể khóa tài khoản';
-          console.error('Error locking user:', error);
-        }
-      });
-    }
-  }
-
-  onUnlockUser(user: User): void {
-    if (confirm(`Bạn có chắc chắn muốn mở khóa tài khoản "${user.firstName} ${user.lastName}"?`)) {
-      // Set a local loading state for this operation
-      const userIndex = this.findUserIndex(user);
-      
-      this.userService.unlockUser(user.id).subscribe({
-        next: () => {
-          // Update user locally instead of reloading all users
-          if (userIndex !== -1) {
-            // Set lockout end date to a past date instead of null
-            // This ensures the user is unlocked without changing the type
-            const pastDate = new Date();
-            pastDate.setFullYear(pastDate.getFullYear() - 1); // Set to 1 year in the past
-            
-            // Create a new user object with updated lockout information
-            const updatedUser = { 
-              ...this.users[userIndex],
-              lockoutEnd: pastDate.toISOString(),
-              lockoutEnabled: false
-            };
-            
-            // Update both arrays to maintain consistency
-            this.users[userIndex] = updatedUser;
-            
-            // Find the user in filtered users array and update it too
-            const filteredIndex = this.filteredUsers.findIndex(u => u.id === user.id);
-            if (filteredIndex !== -1) {
-              this.filteredUsers[filteredIndex] = updatedUser;
-            }
-          }
-        },
-        error: (error) => {
-          this.error = 'Không thể mở khóa tài khoản';
-          console.error('Error unlocking user:', error);
-        }
-      });
-    }
-  }
-  
-  // Helper method to find a user's index in the users array
-  findUserIndex(user: User): number {
-    return this.users.findIndex(u => u.id === user.id);
-  }
-  
-  onSaveUser(userData: CreateUserRequest | UpdateUserRequest): void {
-    this.loading = true;
+  onToggleLock(user: User): void {
+    const action = this.isUserLocked(user) ? 'mở khóa' : 'khóa';
+    const actionText = this.isUserLocked(user) ? 'Mở khóa' : 'Khóa';
     
+    this.messageService.confirm(
+      `Xác nhận ${action}`,
+      `Bạn có chắc chắn muốn ${action} tài khoản "${user.firstName} ${user.lastName}"?`,
+      actionText,
+      'Hủy'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        if (this.isUserLocked(user)) {
+          // Unlock user
+          this.userService.unlockUser(user.id).subscribe({
+            next: () => {
+              this.messageService.success('Thành công', 'Mở khóa tài khoản thành công');
+              this.loadUsers();
+            },
+            error: (error: any) => {
+              console.error('Error unlocking user:', error);
+              this.messageService.error('Lỗi', 'Không thể mở khóa tài khoản');
+            }
+          });
+        } else {
+          // Lock user
+          this.userService.lockUser(user.id).subscribe({
+            next: () => {
+              this.messageService.success('Thành công', 'Khóa tài khoản thành công');
+              this.loadUsers();
+            },
+            error: (error: any) => {
+              console.error('Error locking user:', error);
+              this.messageService.error('Lỗi', 'Không thể khóa tài khoản');
+            }
+          });
+        }
+      }
+    });
+  }
+
+  onSaveUser(userData: UserDto): void {
     if (this.formMode === 'add') {
-      // Add new user
-      this.userService.createUser(userData as CreateUserRequest).subscribe({
+      const createRequest: CreateUserRequest = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        password: 'TempPassword123!', // Default password, user should change on first login
+        confirmPassword: 'TempPassword123!',
+        emailConfirmed: true // Admin-created users are automatically confirmed
+      };
+
+      this.userService.createUser(createRequest).subscribe({
         next: () => {
-          this.showUserForm = false;
+          this.messageService.success('Thành công', 'Thêm người dùng thành công');
+          this.onCloseUserForm();
           this.loadUsers();
-          this.loading = false;
         },
-        error: (error) => {
-          this.error = 'Không thể thêm người dùng mới';
-          this.loading = false;
+        error: (error: any) => {
           console.error('Error creating user:', error);
+          this.messageService.error('Lỗi', 'Không thể tạo người dùng mới');
         }
       });
     } else if (this.formMode === 'edit' && this.selectedUser) {
-      // Update existing user
-      this.userService.updateUserProfile(this.selectedUser.id, userData as UpdateUserRequest).subscribe({
+      const updateRequest: UpdateUserRequest = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email
+      };
+
+      this.userService.updateUserProfile(this.selectedUser.id, updateRequest).subscribe({
         next: () => {
-          this.showUserForm = false;
+          this.messageService.success('Thành công', 'Cập nhật người dùng thành công');
+          this.onCloseUserForm();
           this.loadUsers();
-          this.loading = false;
         },
-        error: (error) => {
-          this.error = 'Không thể cập nhật thông tin người dùng';
-          this.loading = false;
+        error: (error: any) => {
           console.error('Error updating user:', error);
+          this.messageService.error('Lỗi', 'Không thể cập nhật người dùng');
         }
       });
     }
   }
-  
-  onCloseModal(): void {
+
+  onCloseUserDetails(): void {
     this.showUserDetails = false;
+    this.selectedUser = null;
+  }
+
+  onCloseUserForm(): void {
     this.showUserForm = false;
+    this.selectedUser = null;
   }
 
   isUserLocked(user: User): boolean {
-    return !!(user.lockoutEnd && new Date(user.lockoutEnd) > new Date());
+    if (!user.lockoutEnabled) return false;
+    if (!user.lockoutEnd) return false;
+    return new Date(user.lockoutEnd) > new Date();
   }
 
   // Pagination methods
@@ -251,5 +219,41 @@ export class UsersComponent implements OnInit {
   changeItemsPerPage(items: number): void {
     this.itemsPerPage = items;
     this.currentPage = 1;
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const totalPages = this.totalPages;
+    const current = this.currentPage;
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (current <= 4) {
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push(-1); // Ellipsis
+        pages.push(totalPages);
+      } else if (current >= totalPages - 3) {
+        pages.push(1);
+        pages.push(-1); // Ellipsis
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push(-1); // Ellipsis
+        for (let i = current - 1; i <= current + 1; i++) {
+          pages.push(i);
+        }
+        pages.push(-1); // Ellipsis
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   }
 }

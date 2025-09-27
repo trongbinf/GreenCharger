@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../../services/category.service';
+import { MessageService } from '../../../services/message.service';
 import { Category, CategoryDto } from '../../../models/category.model';
 import { CategoryDetailComponent } from './category-detail/category-detail.component';
 
@@ -44,7 +45,10 @@ export class CategoriesComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
 
-  constructor(private categoryService: CategoryService) { }
+  constructor(
+    private categoryService: CategoryService,
+    private messageService: MessageService
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -66,6 +70,7 @@ export class CategoriesComponent implements OnInit {
         this.error = 'Không thể tải danh sách danh mục';
         this.loading = false;
         console.error('Error loading categories:', error);
+        this.messageService.error('Lỗi', 'Không thể tải danh sách danh mục');
       }
     });
   }
@@ -106,19 +111,26 @@ export class CategoriesComponent implements OnInit {
   }
 
   onDeleteCategory(category: Category): void {
-    if (confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`)) {
-      this.categoryService.deleteCategory(category.id).subscribe({
-        next: () => {
-          alert('Xóa danh mục thành công');
-          this.loadCategories();
-        },
-        error: (error) => {
-          this.error = 'Không thể xóa danh mục';
-          console.error('Error deleting category:', error);
-          alert('Xóa danh mục thất bại: ' + error.message);
-        }
-      });
-    }
+    this.messageService.confirm(
+      'Xác nhận xóa',
+      `Bạn có chắc chắn muốn xóa danh mục "${category.name}"?`,
+      'Xóa',
+      'Hủy'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.categoryService.deleteCategory(category.id).subscribe({
+          next: () => {
+            this.messageService.success('Thành công', 'Xóa danh mục thành công');
+            this.loadCategories();
+          },
+          error: (error) => {
+            this.error = 'Không thể xóa danh mục';
+            console.error('Error deleting category:', error);
+            this.messageService.error('Lỗi', 'Không thể xóa danh mục');
+          }
+        });
+      }
+    });
   }
 
   onViewCategory(category: Category): void {
@@ -200,80 +212,78 @@ export class CategoriesComponent implements OnInit {
     this.categoryData.imageUrl = '';
   }
 
+  // FIXED: Use combined endpoints for better image handling
   onModalSave(): void {
     if (!this.validateCategoryForm()) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc');
-      return;
-    }
-
-    if (this.imageFile) {
-      // Tải lên ảnh mới nếu có
-      this.uploadImageAndSaveCategory();
-    } else {
-      // Lưu danh mục nếu không có ảnh mới
-      this.saveCategory();
-    }
-  }
-
-  uploadImageAndSaveCategory(): void {
-    if (!this.imageFile) {
-      this.saveCategory();
+      this.messageService.warning('Cảnh báo', 'Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
 
     this.isUploading = true;
-    this.categoryService.uploadCategoryImage(this.imageFile).subscribe({
+
+    if (this.isEditMode && this.selectedCategory) {
+      // Cập nhật danh mục hiện có
+      this.updateCategoryWithImage();
+    } else {
+      // Tạo danh mục mới
+      this.createCategoryWithImage();
+    }
+  }
+
+  // FIXED: Create category with image in one call
+  createCategoryWithImage(): void {
+    console.log('Creating new category with image');
+    
+    const payload = {
+      name: this.categoryData.name,
+      description: this.categoryData.description,
+      file: this.imageFile
+    };
+
+    this.categoryService.createCategoryWithImage(payload).subscribe({
       next: (response) => {
-        console.log('Image upload successful:', response);
-        this.categoryData.imageUrl = response.imageUrl;
-        this.saveCategory();
+        console.log('Category created successfully:', response);
+        this.messageService.success('Thành công', 'Thêm danh mục thành công');
+        this.isUploading = false;
+        this.onModalClose();
+        this.loadCategories();
       },
       error: (error) => {
-        console.error('Error uploading image:', error);
-        alert('Không thể tải lên ảnh danh mục');
+        this.error = 'Không thể tạo danh mục mới';
+        console.error('Error creating category:', error);
+        this.messageService.error('Lỗi', 'Không thể tạo danh mục mới');
         this.isUploading = false;
-        // Vẫn tiếp tục lưu danh mục
-        this.saveCategory();
       }
     });
   }
 
-  saveCategory(): void {
-    console.log('Saving category with data:', this.categoryData);
+  // FIXED: Update category with image in one call
+  updateCategoryWithImage(): void {
+    if (!this.selectedCategory) return;
     
-    if (this.isEditMode && this.selectedCategory) {
-      // Cập nhật danh mục hiện có
-      console.log('Updating category with ID:', this.selectedCategory.id);
-      this.categoryService.updateCategory(this.selectedCategory.id, this.categoryData).subscribe({
-        next: () => {
-          console.log('Category updated successfully');
-          alert('Cập nhật danh mục thành công');
-          this.onModalClose();
-          this.loadCategories();
-        },
-        error: (error) => {
-          this.error = 'Không thể cập nhật danh mục';
-          console.error('Error updating category:', error);
-          alert('Cập nhật danh mục thất bại: ' + error.message);
-        }
-      });
-    } else {
-      // Tạo danh mục mới
-      console.log('Creating new category');
-      this.categoryService.createCategory(this.categoryData).subscribe({
-        next: () => {
-          console.log('Category created successfully');
-          alert('Thêm danh mục thành công');
-          this.onModalClose();
-          this.loadCategories();
-        },
-        error: (error) => {
-          this.error = 'Không thể tạo danh mục mới';
-          console.error('Error creating category:', error);
-          alert('Thêm danh mục thất bại: ' + error.message);
-        }
-      });
-    }
+    console.log('Updating category with ID:', this.selectedCategory.id);
+    
+    const payload = {
+      name: this.categoryData.name,
+      description: this.categoryData.description,
+      file: this.imageFile
+    };
+
+    this.categoryService.updateCategoryWithImage(this.selectedCategory.id, payload).subscribe({
+      next: (response) => {
+        console.log('Category updated successfully:', response);
+        this.messageService.success('Thành công', 'Cập nhật danh mục thành công');
+        this.isUploading = false;
+        this.onModalClose();
+        this.loadCategories();
+      },
+      error: (error) => {
+        this.error = 'Không thể cập nhật danh mục';
+        console.error('Error updating category:', error);
+        this.messageService.error('Lỗi', 'Không thể cập nhật danh mục');
+        this.isUploading = false;
+      }
+    });
   }
 
   validateCategoryForm(): boolean {

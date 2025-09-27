@@ -54,4 +54,46 @@ export class CategoryService {
       headers: this.getAuthHeadersForFormData() 
     });
   }
+
+  createCategoryWithImage(payload: { name: string; description: string; file?: File | null }): Observable<Category> {
+    const formData = new FormData();
+    formData.append('name', payload.name ?? '');
+    formData.append('description', payload.description ?? '');
+    if (payload.file) formData.append('file', payload.file);
+    return this.http.post<Category>(`${this.apiUrl}/create-with-image`, formData, {
+      headers: this.getAuthHeadersForFormData()
+    });
+  }
+
+  updateCategoryWithImage(id: number, payload: { name: string; description: string; file?: File | null }): Observable<any> {
+    const formData = new FormData();
+    formData.append('name', payload.name ?? '');
+    formData.append('description', payload.description ?? '');
+    if (payload.file) formData.append('file', payload.file);
+    return this.http.put(`${this.apiUrl}/update-with-image/${id}`, formData, {
+      headers: this.getAuthHeadersForFormData()
+    });
+  }
+
+  // Test method for debugging category creation with image
+  testCreateCategoryWithImage(payload: { name: string; description: string; file?: File | null }): Observable<Category> {
+    const formData = new FormData();
+    formData.append('name', payload.name ?? '');
+    formData.append('description', payload.description ?? '');
+    if (payload.file) formData.append('file', payload.file);
+    return this.http.post<Category>(`${this.apiUrl}/test-create-with-image`, formData, {
+      headers: this.getAuthHeadersForFormData()
+    });
+  }
+
+  // Test method for debugging category update with image
+  testUpdateCategoryWithImage(id: number, payload: { name: string; description: string; file?: File | null }): Observable<any> {
+    const formData = new FormData();
+    formData.append('name', payload.name ?? '');
+    formData.append('description', payload.description ?? '');
+    if (payload.file) formData.append('file', payload.file);
+    return this.http.put(`${this.apiUrl}/test-update-with-image/${id}`, formData, {
+      headers: this.getAuthHeadersForFormData()
+    });
+  }
 }

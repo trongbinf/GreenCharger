@@ -50,10 +50,10 @@ namespace GreenChargerAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = new ApplicationUser 
-            { 
-                UserName = model.Email, 
-                Email = model.Email,          
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -77,7 +77,7 @@ namespace GreenChargerAPI.Controllers
                 // Tạo token xác nhận email (token lifespan cấu hình 5 phút trong Program.cs)
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 Console.WriteLine($"[Register] Token: {token}");
-                
+
                 var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
 
                 // Gửi email xác nhận
@@ -85,13 +85,13 @@ namespace GreenChargerAPI.Controllers
 
                 // Gán role cho tài khoản mới
                 string role = !string.IsNullOrEmpty(model.Role) ? model.Role : "User";
-                
+
                 // Đảm bảo role tồn tại
                 if (!await _roleManager.RoleExistsAsync(role))
                 {
                     await _roleManager.CreateAsync(new IdentityRole(role));
                 }
-                
+
                 // Gán role cho user
                 var roleResult = await _userManager.AddToRoleAsync(user, role);
                 if (!roleResult.Succeeded)
@@ -130,7 +130,7 @@ namespace GreenChargerAPI.Controllers
 
             // Phân loại lỗi token hết hạn/không hợp lệ (token lifespan 5 phút được cấu hình trong Program.cs)
             var errorCodes = string.Join(",", result.Errors.Select(e => e.Code));
-            var errorDesc  = string.Join("; ", result.Errors.Select(e => e.Description));
+            var errorDesc = string.Join("; ", result.Errors.Select(e => e.Description));
 
             // Identity thường trả về InvalidToken khi hết hạn/không hợp lệ
             if (result.Errors.Any(e => e.Code.Equals("InvalidToken", StringComparison.OrdinalIgnoreCase)))
@@ -160,23 +160,22 @@ namespace GreenChargerAPI.Controllers
 
             // Tạo JWT token
             var tokenJwt = await GenerateJwtToken(user);
-            
+
             // Lấy thông tin người dùng để trả về
             var roles = await _userManager.GetRolesAsync(user);
             var userInfo = new UserDto
             {
                 Id = user.Id,
+                UserName = user.UserName ?? "",
                 Email = user.Email ?? "",
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                
-                
                 EmailConfirmed = user.EmailConfirmed,
                 Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
-            
+
             // Trả về cả token và thông tin người dùng
             return Ok(new { success = true, token = tokenJwt, user = userInfo });
         }
@@ -259,19 +258,19 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpGet("users")]
-        
         public IActionResult GetUsers()
         {
             var users = _userManager.Users.ToList();
             var dtos = users.Select(u => new UserDto
             {
                 Id = u.Id,
+                UserName = u.UserName ?? "",
                 Email = u.Email ?? "",
                 FirstName = u.FirstName,
                 LastName = u.LastName,
-                
-                
                 EmailConfirmed = u.EmailConfirmed,
+                LockoutEnd = u.LockoutEnd?.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                LockoutEnabled = u.LockoutEnabled,
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt
             });
@@ -296,11 +295,10 @@ namespace GreenChargerAPI.Controllers
             var dto = new UserDto
             {
                 Id = user.Id,
+                UserName = user.UserName ?? "",
                 Email = user.Email ?? "",
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                
-                
                 EmailConfirmed = user.EmailConfirmed,
                 Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
@@ -308,9 +306,8 @@ namespace GreenChargerAPI.Controllers
             };
             return Ok(dto);
         }
-        
+
         [HttpGet("users/{id}")]
-      
         public async Task<IActionResult> GetUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -319,11 +316,10 @@ namespace GreenChargerAPI.Controllers
             var dto = new UserDto
             {
                 Id = user.Id,
+                UserName = user.UserName ?? "",
                 Email = user.Email ?? "",
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                
-                
                 EmailConfirmed = user.EmailConfirmed,
                 Roles = roles.ToList(),
                 CreatedAt = user.CreatedAt,
@@ -333,7 +329,6 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPut("users/{id}")]
-       
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto dto)
         {
             try
@@ -344,33 +339,33 @@ namespace GreenChargerAPI.Controllers
                 }
 
                 var user = await _userManager.FindByIdAsync(id);
-            var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound();
-                
+
                 Console.WriteLine($"Updating user {id}: {JsonSerializer.Serialize(dto)}");
                 Console.WriteLine($"Current phone: {user.PhoneNumber}, New phone: {dto.PhoneNumber}");
-                
+
                 // Update name
                 var names = (dto.FullName ?? "").Split(' ', 2);
                 user.FirstName = names.FirstOrDefault() ?? "";
                 user.LastName = names.Length > 1 ? names[1] : "";
-                
+
                 // Update phone number if provided
                 if (dto.PhoneNumber != null)
                 {
                     user.PhoneNumber = dto.PhoneNumber;
                     Console.WriteLine($"Setting phone number to: {dto.PhoneNumber}");
                 }
-                
+
                 user.UpdatedAt = DateTime.UtcNow;
                 var result = await _userManager.UpdateAsync(user);
-                
+
                 if (!result.Succeeded)
                 {
                     Console.WriteLine($"User update failed: {JsonSerializer.Serialize(result.Errors)}");
                     return BadRequest(new { message = "Không thể cập nhật thông tin người dùng", errors = result.Errors });
                 }
-                
+
                 return NoContent();
             }
             catch (Exception ex)
@@ -381,7 +376,6 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/lock")]
-       
         public async Task<IActionResult> LockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -394,7 +388,6 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/unlock")]
-       
         public async Task<IActionResult> UnlockUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -414,13 +407,12 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpPost("users/{id}/role")]
-     
         public async Task<IActionResult> UpdateUserRole(string id, [FromBody] JsonElement body)
         {
-            try 
+            try
             {
                 string role = "";
-                
+
                 // Try to get the Role property first (Pascal case for C#)
                 if (body.TryGetProperty("Role", out JsonElement roleElement))
                 {
@@ -431,25 +423,25 @@ namespace GreenChargerAPI.Controllers
                 {
                     role = roleElement.GetString() ?? "";
                 }
-                
+
                 if (string.IsNullOrEmpty(role))
                 {
                     return BadRequest(new { message = "Vai trò không được cung cấp hoặc không hợp lệ" });
                 }
-                
+
                 var user = await _userManager.FindByIdAsync(id);
-            var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound();
-                
+
                 // Validate that the role exists
                 var roleExists = await _roleManager.RoleExistsAsync(role);
                 if (!roleExists)
                 {
                     return BadRequest(new { message = $"Vai trò '{role}' không tồn tại" });
                 }
-                
+
                 var currentRoles = await _userManager.GetRolesAsync(user);
-                
+
                 // Remove all current roles and their claims
                 if (currentRoles.Any())
                 {
@@ -462,20 +454,20 @@ namespace GreenChargerAPI.Controllers
                         await _userManager.RemoveClaimsAsync(user, roleClaims);
                     }
                 }
-                
+
                 // Add new role
                 var result = await _userManager.AddToRoleAsync(user, role);
                 if (!result.Succeeded)
                 {
                     return BadRequest(new { message = "Không thể cập nhật vai trò", errors = result.Errors });
                 }
-                
+
                 // Add role claim to ensure it exists
                 await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, role));
-                
+
                 user.UpdatedAt = DateTime.UtcNow;
                 await _userManager.UpdateAsync(user);
-                
+
                 return Ok(new { message = "Cập nhật quyền thành công" });
             }
             catch (Exception ex)
@@ -502,9 +494,9 @@ namespace GreenChargerAPI.Controllers
                 }
 
                 var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(user);
                 if (user == null) return NotFound(new { message = "User not found" });
-                
+
                 // Update name if provided
                 if (!string.IsNullOrEmpty(model.FullName))
                 {
@@ -512,21 +504,21 @@ namespace GreenChargerAPI.Controllers
                     user.FirstName = names.FirstOrDefault() ?? "";
                     user.LastName = names.Length > 1 ? names[1] : "";
                 }
-                
+
                 // Update phone number if provided
                 if (model.PhoneNumber != null)
                 {
                     user.PhoneNumber = model.PhoneNumber;
                 }
-                
+
                 user.UpdatedAt = DateTime.UtcNow;
                 var result = await _userManager.UpdateAsync(user);
-                
+
                 if (!result.Succeeded)
                 {
                     return BadRequest(new { message = "Không thể cập nhật thông tin người dùng", errors = result.Errors });
                 }
-                
+
                 return Ok(new { message = "Cập nhật thông tin thành công" });
             }
             catch (Exception ex)
@@ -553,7 +545,7 @@ namespace GreenChargerAPI.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             var roles = await _userManager.GetRolesAsync(user);
             if (user == null) return NotFound(new { message = "User not found" });
-            
+
             // Kiểm tra mật khẩu hiện tại
             if (!(await _userManager.CheckPasswordAsync(user, model.CurrentPassword)))
             {
@@ -576,6 +568,27 @@ namespace GreenChargerAPI.Controllers
             return Ok(new { message = "Password changed successfully" });
         }
 
+
+        [HttpPost("users/{id}/change-password")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminChangePassword(string id, [FromBody] AdminChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            // Admin can change password without knowing current password
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+            
+            if (!result.Succeeded)
+                return BadRequest(new { message = "Failed to change password", errors = result.Errors });
+
+            return Ok(new { message = "Password changed successfully" });
+        }
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
@@ -586,10 +599,10 @@ namespace GreenChargerAPI.Controllers
 
             // Lấy các roles của user và thêm vào claims
             var userRoles = await _userManager.GetRolesAsync(user);
-            
+
             // Lấy các claims hiện tại của user
             var userClaims = await _userManager.GetClaimsAsync(user);
-            
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
@@ -597,13 +610,13 @@ namespace GreenChargerAPI.Controllers
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-            
+
             // Thêm claims về role từ roles
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            
+
             // Thêm các claims khác của user (bao gồm role claims nếu có)
             foreach (var claim in userClaims)
             {
@@ -686,7 +699,7 @@ namespace GreenChargerAPI.Controllers
     {
         [Required]
         public required string CurrentPassword { get; set; }
-        
+
         [Required]
         [StringLength(100, MinimumLength = 6)]
         public required string NewPassword { get; set; }

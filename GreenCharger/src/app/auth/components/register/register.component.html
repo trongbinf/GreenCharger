@@ -1,13 +1,8 @@
 <div class="register-container">
   <div class="register-card">
     <div class="register-header">
-      <div class="logo-section">
-        <img src="https://res.cloudinary.com/ddkvhnj27/image/upload/v1758400063/z7019344847597_aa447955326b74efcd30844f0ddafb97_mcbqgu.jpg" 
-             alt="GreenCharger Logo" 
-             class="auth-logo" />
-        <h2>Đăng Ký</h2>
-      </div>
-      <p>Tạo tài khoản mới để bắt đầu</p>
+      <h2>Đăng ký tài khoản</h2>
+      <p>Tạo tài khoản mới để sử dụng dịch vụ</p>
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
@@ -23,6 +18,14 @@
         />
         <div class="error-message" *ngIf="getFieldError('email')">
           {{ getFieldError('email') }}
+        </div>
+        <div class="email-status" *ngIf="getEmailStatusMessage()" [ngClass]="getEmailStatusClass()">
+          <i class="fas" [ngClass]="{
+            'fa-spinner fa-spin': isCheckingEmail,
+            'fa-times-circle': emailExists,
+            'fa-check-circle': emailStatus && !emailExists
+          }"></i>
+          {{ getEmailStatusMessage() }}
         </div>
       </div>
 
@@ -56,9 +59,9 @@
             formControlName="confirmPassword"
             class="form-control"
             [class.error]="getFieldError('confirmPassword')"
-            placeholder="Nhập lại mật khẩu "
+            placeholder="Nhập lại mật khẩu"
           />
-          <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()" aria-label="Hiện/ẩn xác nhận mật khẩu">
+          <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()" aria-label="Hiện/ẩn mật khẩu xác nhận">
             <span *ngIf="!showConfirmPassword">👁️</span>
             <span *ngIf="showConfirmPassword">🙈</span>
           </button>
@@ -68,42 +71,35 @@
         </div>
       </div>
 
-      <div class="error-message global-error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <div class="success-message" *ngIf="successMessage">
-        {{ successMessage }}
-      </div>
-
-      <button
-        type="submit"
-        class="register-btn"
-        [disabled]="isLoading"
-        [class.loading]="isLoading"
-      >
-        <span *ngIf="!isLoading">Đăng Ký</span>
-        <span *ngIf="isLoading">Đang đăng ký...</span>
+      <button 
+        type="submit" 
+        class="btn-register" 
+        [disabled]="registerForm.invalid || isLoading || emailExists">
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Đang đăng ký...' : 'Đăng ký' }}
       </button>
-
-      <div class="error-message" *ngIf="emailStatus?.exists && !emailStatus?.emailConfirmed">
-        Email đã đăng ký nhưng chưa xác nhận. 
-        <a href="javascript:void(0)" (click)="resendConfirmation()">Gửi lại email xác nhận</a>.
-      </div>
     </form>
 
     <div class="register-footer">
-      <p>
-        Đã có tài khoản?
-        <a routerLink="/login" class="login-link">Đăng nhập ngay</a>
-      </p>
+      <p>Đã có tài khoản? <a routerLink="/login">Đăng nhập ngay</a></p>
     </div>
 
-    <!-- Back to Home Button -->
-    <div class="back-to-home">
-      <a routerLink="/home" class="back-home-btn">
-        ← Quay về trang chủ
-      </a>
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <!-- Email Status Messages -->
+    <div class="email-status-message" *ngIf="emailStatus?.exists && !emailStatus?.emailConfirmed">
+      <div class="error-message">
+        Email này đã được đăng ký nhưng chưa xác thực. 
+        <a href="javascript:void(0)" (click)="resendConfirmation()">Gửi lại email xác nhận</a>
+      </div>
     </div>
   </div>
 </div>

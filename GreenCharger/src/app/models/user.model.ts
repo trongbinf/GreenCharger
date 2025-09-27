@@ -6,7 +6,6 @@ export interface User {
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  address: string;
   createdAt: string;
   updatedAt: string;
   lockoutEnd: string;
@@ -21,12 +20,12 @@ export interface UserDto {
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  address: string;
   createdAt: string;
   updatedAt: string;
   lockoutEnd: string;
   lockoutEnabled: boolean;
 }
+
 // Authentication interfaces
 export interface LoginRequest {
   email: string;
@@ -50,18 +49,17 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
+  fullName: string;
   phoneNumber?: string;
+  role?: string;
 }
 
 export interface RegisterResponse {
   success: boolean;
   message: string;
-  userId?: string;
 }
 
 export interface ForgotPasswordRequest {
@@ -85,21 +83,71 @@ export interface ResetPasswordResponse {
   message: string;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export interface CreateUserRequest {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
-  phoneNumber?: string;
-  address?: string;
-  emailConfirmed: boolean;
+  emailConfirmed?: boolean;
 }
 
 export interface UpdateUserRequest {
   firstName: string;
   lastName: string;
   email: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
   phoneNumber?: string;
-  address?: string;
+  emailConfirmed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserRole {
+  id: string;
+  name: string;
+}
+
+export interface UserStatus {
+  isActive: boolean;
+  isLocked: boolean;
+  lockoutEnd?: string;
+}
+
+export interface UserSearchFilters {
+  searchTerm?: string;
+  role?: string;
+  status?: 'active' | 'inactive' | 'locked';
+  emailConfirmed?: boolean;
+  createdFrom?: string;
+  createdTo?: string;
+}
+
+export interface UserListResponse {
+  users: User[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number;
+  lockedUsers: number;
+  unconfirmedUsers: number;
+  newUsersThisMonth: number;
 }

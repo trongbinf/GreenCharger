@@ -21,6 +21,14 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent)
       },
       {
+        path: 'users/detail/:id',
+        loadComponent: () => import('./components/users/user-detail-page/user-detail-page.component').then(m => m.UserDetailPageComponent)
+      },
+      {
+        path: 'users/edit/:id',
+        loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent)
+      },
+      {
         path: 'categories',
         loadComponent: () => import('./components/categories/categories.component').then(m => m.CategoriesComponent)
       },

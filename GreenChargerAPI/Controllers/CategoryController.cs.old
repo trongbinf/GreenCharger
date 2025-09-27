@@ -154,8 +154,6 @@ namespace GreenChargerAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCategoryWithImage(int id, [FromForm] CategoryUpdateWithImageDto dto)
         {
-            Console.WriteLine($"UpdateCategoryWithImage called - ID: {id}, Name: {dto.Name}, Description: {dto.Description}, HasFile: {dto.File != null}");
-            
             var category = await _unitOfWork.Categories.GetByIdAsync(id);
             if (category == null)
                 return NotFound("Category not found");
@@ -167,25 +165,19 @@ namespace GreenChargerAPI.Controllers
             // Handle image upload if provided
             if (dto.File != null && dto.File.Length > 0)
             {
-                Console.WriteLine($"Processing image file: {dto.File.FileName}, Size: {dto.File.Length}");
-                
                 // Delete old image if exists
                 if (!string.IsNullOrEmpty(category.ImageUrl))
                 {
-                    Console.WriteLine($"Deleting old image: {category.ImageUrl}");
                     await _cloudinaryService.DeleteFileByUrlAsync(category.ImageUrl);
                 }
 
                 // Upload new image
                 var newImageUrl = await _cloudinaryService.UploadFileAsync(dto.File);
-                Console.WriteLine($"New image uploaded: {newImageUrl}");
                 category.ImageUrl = newImageUrl;
             }
 
             _unitOfWork.Categories.Update(category);
             await _unitOfWork.CompleteAsync();
-
-            Console.WriteLine($"Category updated successfully - ID: {category.Id}, ImageUrl: {category.ImageUrl}");
 
             var resultDto = _mapper.Map<CategoryDto>(category);
             return Ok(new { message = "Category updated successfully", category = resultDto });
@@ -196,8 +188,6 @@ namespace GreenChargerAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategoryWithImage([FromForm] CategoryCreateWithImageDto dto)
         {
-            Console.WriteLine($"CreateCategoryWithImage called - Name: {dto.Name}, Description: {dto.Description}, HasFile: {dto.File != null}");
-            
             if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest("Name is required");
 
             var category = new Category
@@ -208,16 +198,12 @@ namespace GreenChargerAPI.Controllers
 
             if (dto.File != null && dto.File.Length > 0)
             {
-                Console.WriteLine($"Processing image file: {dto.File.FileName}, Size: {dto.File.Length}");
                 var imageUrl = await _cloudinaryService.UploadFileAsync(dto.File);
-                Console.WriteLine($"Image uploaded successfully: {imageUrl}");
                 category.ImageUrl = imageUrl;
             }
 
             await _unitOfWork.Categories.AddAsync(category);
             await _unitOfWork.CompleteAsync();
-
-            Console.WriteLine($"Category created successfully - ID: {category.Id}, ImageUrl: {category.ImageUrl}");
 
             var resultDto = _mapper.Map<CategoryDto>(category);
             return CreatedAtAction(nameof(GetById), new { id = category.Id }, resultDto);
@@ -332,37 +318,6 @@ namespace GreenChargerAPI.Controllers
 
             var dto = _mapper.Map<CategoryDto>(category);
             return Ok(new { message = "Category updated successfully", category = dto });
-        }
-
-        // TEST: api/category/test-create-with-image - Test endpoint for creating categories with images
-        [HttpPost("test-create-with-image")]
-        public async Task<IActionResult> TestCreateCategoryWithImage([FromForm] CategoryCreateWithImageDto dto)
-        {
-            Console.WriteLine($"TestCreateCategoryWithImage called - Name: {dto.Name}, Description: {dto.Description}, HasFile: {dto.File != null}");
-            
-            if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest("Name is required");
-
-            var category = new Category
-            {
-                Name = dto.Name,
-                Description = dto.Description
-            };
-
-            if (dto.File != null && dto.File.Length > 0)
-            {
-                Console.WriteLine($"Processing image file: {dto.File.FileName}, Size: {dto.File.Length}");
-                var imageUrl = await _cloudinaryService.UploadFileAsync(dto.File);
-                Console.WriteLine($"Image uploaded successfully: {imageUrl}");
-                category.ImageUrl = imageUrl;
-            }
-
-            await _unitOfWork.Categories.AddAsync(category);
-            var result = await _unitOfWork.CompleteAsync();
-
-            Console.WriteLine($"Category created successfully - ID: {category.Id}, ImageUrl: {category.ImageUrl}, Result: {result}");
-
-            var resultDto = _mapper.Map<CategoryDto>(category);
-            return CreatedAtAction(nameof(GetById), new { id = category.Id }, resultDto);
         }
     }
 }

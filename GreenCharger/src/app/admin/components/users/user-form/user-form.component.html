@@ -52,28 +52,6 @@
           </div>
         </div>
         
-        <div class="form-group">
-          <label for="phoneNumber">Số điện thoại</label>
-          <input 
-            type="text" 
-            id="phoneNumber" 
-            formControlName="phoneNumber" 
-            class="form-control"
-            [ngClass]="{ 'is-invalid': submitted && f['phoneNumber'].errors }" />
-          <div *ngIf="submitted && f['phoneNumber'].errors" class="invalid-feedback">
-            <div *ngIf="f['phoneNumber'].errors['pattern']">Số điện thoại không hợp lệ</div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="address">Địa chỉ</label>
-          <textarea 
-            id="address" 
-            formControlName="address" 
-            class="form-control"
-            rows="3"></textarea>
-        </div>
-        
         <ng-container *ngIf="mode === 'add'">
           <div class="form-grid">
             <div class="form-group">
@@ -104,20 +82,66 @@
               </div>
             </div>
           </div>
-          
-          <div class="form-note">
-            <i class="fas fa-info-circle"></i>
-            <span>Tài khoản sẽ được kích hoạt ngay mà không cần xác nhận email.</span>
+        </ng-container>
+
+        <ng-container *ngIf="mode === 'edit'">
+          <div class="password-section">
+            <div class="section-header">
+              <h4><i class="fas fa-key"></i> Đổi mật khẩu</h4>
+              <p class="section-description">Để trống nếu không muốn thay đổi mật khẩu</p>
+            </div>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="newPassword">Mật khẩu mới</label>
+                <div class="password-input">
+                  <input 
+                    type="password" 
+                    id="newPassword" 
+                    formControlName="newPassword" 
+                    class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['newPassword'].errors }"
+                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" />
+                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+                    <i class="fas" [ngClass]="showNewPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                </div>
+                <div *ngIf="submitted && f['newPassword'].errors" class="invalid-feedback">
+                  <div *ngIf="f['newPassword'].errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="confirmNewPassword">Xác nhận mật khẩu mới</label>
+                <div class="password-input">
+                  <input 
+                    type="password" 
+                    id="confirmNewPassword" 
+                    formControlName="confirmNewPassword" 
+                    class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && (f['confirmNewPassword'].errors || newPasswordsMismatch) }"
+                    placeholder="Nhập lại mật khẩu mới" />
+                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+                    <i class="fas" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                </div>
+                <div *ngIf="submitted && (f['confirmNewPassword'].errors || newPasswordsMismatch)" class="invalid-feedback">
+                  <div *ngIf="newPasswordsMismatch">Mật khẩu xác nhận không khớp</div>
+                </div>
+              </div>
+            </div>
           </div>
         </ng-container>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onClose()">
+            Hủy
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid">
+            {{ mode === 'add' ? 'Thêm' : 'Cập nhật' }}
+          </button>
+        </div>
       </form>
-    </div>
-    
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
-      <button type="button" class="btn btn-primary" (click)="onSubmit()">
-        {{ mode === 'add' ? 'Thêm mới' : 'Cập nhật' }}
-      </button>
     </div>
   </div>
 </div>

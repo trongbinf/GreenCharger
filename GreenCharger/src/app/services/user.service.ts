@@ -140,9 +140,13 @@ export class UserService {
     return this.http.get<User[]>(`${this.apiUrl}/users`, { headers: this.getAuthHeaders() });
   }
 
+  getUserById(userId: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/${userId}`, { headers: this.getAuthHeaders() });
+  }
+
   createUser(userData: CreateUserRequest): Observable<User> {
     userData.emailConfirmed = true;
-    return this.http.post<User>(`${this.apiUrl}/register`, userData, { headers: this.getAuthHeaders() });
+    return this.http.post<User>(`${this.apiUrl}/users`, userData, { headers: this.getAuthHeaders() });
   }
   
   updateUserProfile(userId: string, userData: UpdateUserRequest): Observable<User> {
@@ -161,3 +165,5 @@ export class UserService {
     return this.http.post<void>(`${this.apiUrl}/users/${userId}/unlock`, {}, { headers: this.getAuthHeaders() });
   }
 }
+
+  // Admin change password

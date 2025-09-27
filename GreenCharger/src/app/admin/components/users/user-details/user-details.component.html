@@ -6,76 +6,84 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="modal-body" *ngIf="user">
-      <div class="user-avatar">
-        <i class="fas fa-user"></i>
+    
+    <div class="modal-body">
+      <div class="user-info-container">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        
+        <div class="user-basic-info">
+          <h4>{{ user?.firstName }} {{ user?.lastName }}</h4>
+          <p class="user-email">{{ user?.email }}</p>
+          <div class="status-badges">
+            <span class="status-badge" [ngClass]="user?.emailConfirmed ? 'confirmed' : 'unconfirmed'">
+              {{ user?.emailConfirmed ? 'Đã xác thực' : 'Chưa xác thực' }}
+            </span>
+            <span class="status-badge" [ngClass]="isUserLocked() ? 'locked' : 'active'">
+              {{ isUserLocked() ? 'Đã khóa' : 'Hoạt động' }}
+            </span>
+          </div>
+        </div>
       </div>
       
-      <div class="user-info-section">
-        <h4>Thông tin cá nhân</h4>
-        
-        <div class="info-group">
+      <div class="user-details-section">
+        <h5>Thông tin cá nhân</h5>
+        <div class="info-grid">
           <div class="info-item">
-            <label>Họ tên:</label>
-            <p>{{ user.firstName }} {{ user.lastName }}</p>
+            <label>Họ:</label>
+            <p>{{ user?.firstName || 'Không có' }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Tên:</label>
+            <p>{{ user?.lastName || 'Không có' }}</p>
           </div>
           
           <div class="info-item">
             <label>Email:</label>
-            <p>{{ user.email }}</p>
+            <p>{{ user?.email || 'Không có' }}</p>
           </div>
           
           <div class="info-item">
             <label>Số điện thoại:</label>
-            <p>{{ user.phoneNumber || 'Không có' }}</p>
-          </div>
-          
-          <div class="info-item">
-            <label>Địa chỉ:</label>
-            <p>{{ user.address || 'Không có' }}</p>
+            <p>{{ user?.phoneNumber || 'Không có' }}</p>
           </div>
         </div>
       </div>
       
       <div class="account-info-section">
-        <h4>Thông tin tài khoản</h4>
-        
-        <div class="info-group">
-         
+        <h5>Thông tin tài khoản</h5>
+        <div class="info-grid">
           <div class="info-item">
-            <label>Trạng thái xác thực email:</label>
-            <p [class.text-success]="user.emailConfirmed" [class.text-danger]="!user.emailConfirmed">
-              {{ user.emailConfirmed ? 'Đã xác thực' : 'Chưa xác thực' }}
-            </p>
-          </div>
-          
-          <div class="info-item">
-            <label>Trạng thái tài khoản:</label>
-            <p [class.text-success]="!isUserLocked()" [class.text-danger]="isUserLocked()">
-              {{ isUserLocked() ? 'Đã khóa' : 'Hoạt động' }}
-            </p>
-          </div>
-          
-          <div class="info-item" *ngIf="isUserLocked()">
-            <label>Khóa đến:</label>
-            <p class="text-danger">{{ formatDate(user.lockoutEnd) }}</p>
+            <label>ID:</label>
+            <p class="user-id">{{ user?.id }}</p>
           </div>
           
           <div class="info-item">
             <label>Ngày tạo:</label>
-            <p>{{ formatDate(user.createdAt) }}</p>
+            <p>{{ user?.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
           </div>
           
           <div class="info-item">
             <label>Cập nhật lần cuối:</label>
-            <p>{{ formatDate(user.updatedAt) }}</p>
+            <p>{{ user?.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label>Trạng thái khóa:</label>
+            <p [ngClass]="isUserLocked() ? 'locked-text' : 'active-text'">
+              {{ isUserLocked() ? 'Đã khóa' : 'Chưa khóa' }}
+            </p>
           </div>
         </div>
       </div>
     </div>
     
     <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="onClose()">Đóng</button>
+      <button class="btn btn-secondary" (click)="onClose()">
+        Đóng
+      </button>
     </div>
   </div>
 </div>

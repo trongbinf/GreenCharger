@@ -184,3 +184,79 @@
     gap: 0;
   }
 }
+/* Password Section Styles */
+.password-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--background-color);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.section-header {
+  margin-bottom: 20px;
+}
+
+.section-header h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-header h4 i {
+  color: var(--primary-color);
+}
+
+.section-description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+  background: var(--background-color);
+}
+
+/* Form Grid for Password Fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .password-section {
+    padding: 16px;
+  }
+}

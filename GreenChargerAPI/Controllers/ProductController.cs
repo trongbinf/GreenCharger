@@ -1,18 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using GreenChargerAPI.Models;
-using GreenChargerAPI.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.IO;
-using System;
-using GreenChargerAPI.Models.DTOs;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using GreenChargerAPI.Services;
-using GreenChargerAPI.Helpers;
-using System.Linq;
 using AutoMapper;
+using GreenChargerAPI.Models;
+using GreenChargerAPI.Models.DTOs;
+using GreenChargerAPI.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GreenChargerAPI.Controllers
 {
@@ -21,265 +13,303 @@ namespace GreenChargerAPI.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly CloudinaryService _cloudinaryService;
         private readonly IMapper _mapper;
 
-        public ProductController(IUnitOfWork unitOfWork, IMapper mapper, CloudinaryService cloudinaryService)
+        public ProductController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _cloudinaryService = cloudinaryService;
             _mapper = mapper;
         }
 
         // GET: api/product
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<List<ProductDto>>> GetProducts()
         {
-            var products = await _unitOfWork.Products.GetAllAsync(
-                null,
-                q => q.Include(p => p.Category!)
-            );
-            var dtos = _mapper.Map<IEnumerable<ProductDto>>(products);
-            return Ok(dtos);
+            var products = await _unitOfWork.Products.GetAllAsync(includeProperties: q => q.Include(p => p.Category));
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
+            
+            // Map additional fields for frontend compatibility
+            foreach (var dto in productDtos)
+            {
+                dto.QuantityInStock = dto.StockQuantity;
+                dto.FinalPrice = dto.Discount > 0 ? dto.Price * (1 - dto.Discount / 100) : dto.Price;
+                dto.DiscountPrice = dto.Discount > 0 ? dto.Price - dto.FinalPrice : null;
+                dto.ImageUrls = dto.DetailImageUrls;
+                dto.IsNew = (DateTime.UtcNow - dto.CreatedAt).Days <= 30;
+                dto.IsOnSale = dto.Discount > 0;
+                dto.IsFeatured = dto.AverageRating >= 4.0;
+            }
+            
+            return Ok(productDtos);
         }
 
         // GET: api/product/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<ProductDto>> GetById(int id)
         {
-            var product = await _unitOfWork.Products.GetByIdAsync(
-                id,
-                q => q.Include(p => p.Category!)
-            );
+            var product = await _unitOfWork.Products.GetByIdAsync(id, includeProperties: q => q.Include(p => p.Category));
             if (product == null) return NotFound();
+            
             var dto = _mapper.Map<ProductDto>(product);
+            
+            // Map additional fields for frontend compatibility
+            dto.QuantityInStock = dto.StockQuantity;
+            dto.FinalPrice = dto.Discount > 0 ? dto.Price * (1 - dto.Discount / 100) : dto.Price;
+            dto.DiscountPrice = dto.Discount > 0 ? dto.Price - dto.FinalPrice : null;
+            dto.ImageUrls = dto.DetailImageUrls;
+            dto.IsNew = (DateTime.UtcNow - dto.CreatedAt).Days <= 30;
+            dto.IsOnSale = dto.Discount > 0;
+            dto.IsFeatured = dto.AverageRating >= 4.0;
+            
             return Ok(dto);
         }
 
         // POST: api/product
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] Product product)
+        public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] ProductCreateDto productDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            product.Category = await _unitOfWork.Categories.GetByIdAsync(product.CategoryId);
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                Discount = productDto.Discount,
+                StockQuantity = productDto.StockQuantity,
+                // Xử lý null values - cho phép null
+                MainImageUrl = productDto.MainImageUrl ?? "",
+                DetailImageUrls = productDto.DetailImageUrls ?? new List<string>(),
+                CategoryId = productDto.CategoryId,
+                IsActive = productDto.IsActive,
+                CreatedAt = DateTime.UtcNow,
+                OrderDetails = new List<OrderDetail>()
+            };
 
-            product.CreatedAt = DateTime.UtcNow;
             await _unitOfWork.Products.AddAsync(product);
             await _unitOfWork.CompleteAsync();
 
-            var dto = _mapper.Map<ProductDto>(product);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, dto);
-        }
-
-        // PUT: api/product/5
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
-        {
-            if (id != product.Id)
-                return BadRequest();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var existingProduct = await _unitOfWork.Products.GetByIdAsync(id);
-            if (existingProduct == null)
-                return NotFound();
-
-            // Delete old main image if URL is changing
-            if (!string.IsNullOrEmpty(existingProduct.MainImageUrl) && 
-                existingProduct.MainImageUrl != product.MainImageUrl)
-            {
-                await _cloudinaryService.DeleteFileByUrlAsync(existingProduct.MainImageUrl);
-            }
-
-            // Delete old detail images if URLs are changing
-            if (existingProduct.DetailImageUrls != null && existingProduct.DetailImageUrls.Any())
-            {
-                var newDetailUrls = product.DetailImageUrls ?? new List<string>();
-
-                // Delete images that are no longer in the new list
-                foreach (var oldUrl in existingProduct.DetailImageUrls)
-                {
-                    if (!string.IsNullOrWhiteSpace(oldUrl) && !newDetailUrls.Contains(oldUrl))
-                    {
-                        await _cloudinaryService.DeleteFileByUrlAsync(oldUrl);
-                    }
-                }
-            }
-
-            // Cập nhật từng property
-            existingProduct.Name = product.Name;
-            existingProduct.Description = product.Description;
-            existingProduct.Price = product.Price;
-            existingProduct.Discount = product.Discount;
-            existingProduct.StockQuantity = product.StockQuantity;
-            existingProduct.MainImageUrl = product.MainImageUrl;
-            existingProduct.DetailImageUrls = product.DetailImageUrls ?? new List<string>();
-            existingProduct.CategoryId = product.CategoryId;
-            existingProduct.Category = await _unitOfWork.Categories.GetByIdAsync(product.CategoryId);
-            existingProduct.IsActive = product.IsActive;
-            existingProduct.UpdatedAt = DateTime.UtcNow;
-
-            _unitOfWork.Products.Update(existingProduct);
-            await _unitOfWork.CompleteAsync();
-
-            return NoContent();
-        }
-
-        // DELETE: api/product/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var product = await _unitOfWork.Products.GetByIdAsync(id);
-            if (product == null) return NotFound();
-
-            // Delete main image if exists
-            if (!string.IsNullOrEmpty(product.MainImageUrl))
-            {
-                await _cloudinaryService.DeleteFileByUrlAsync(product.MainImageUrl);
-            }
-
-            // Delete detail images if exist
-            if (product.DetailImageUrls != null && product.DetailImageUrls.Any())
-            {
-                foreach (var imageUrl in product.DetailImageUrls)
-                {
-                    if (!string.IsNullOrWhiteSpace(imageUrl))
-                    {
-                        await _cloudinaryService.DeleteFileByUrlAsync(imageUrl);
-                    }
-                }
-            }
-
-            _unitOfWork.Products.Remove(product);
-            await _unitOfWork.CompleteAsync();
-            return NoContent();
-        }
-
-        // GET: api/product/category/5
-        [HttpGet("category/{categoryId}")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId)
-        {
-            var products = await _unitOfWork.Products.GetAllAsync(
-                p => p.CategoryId == categoryId,
-                q => q.Include(p => p.Category!)
-            );
-            var dtos = _mapper.Map<IEnumerable<ProductDto>>(products);
-            return Ok(dtos);
+            // Load product with category for response
+            var createdProduct = await _unitOfWork.Products.GetByIdAsync(product.Id, includeProperties: q => q.Include(p => p.Category));
+            var resultDto = _mapper.Map<ProductDto>(createdProduct);
+            
+            // Map additional fields for frontend compatibility
+            resultDto.QuantityInStock = resultDto.StockQuantity;
+            resultDto.FinalPrice = resultDto.Discount > 0 ? resultDto.Price * (1 - resultDto.Discount / 100) : resultDto.Price;
+            resultDto.DiscountPrice = resultDto.Discount > 0 ? resultDto.Price - resultDto.FinalPrice : null;
+            resultDto.ImageUrls = resultDto.DetailImageUrls;
+            resultDto.IsNew = (DateTime.UtcNow - resultDto.CreatedAt).Days <= 30;
+            resultDto.IsOnSale = resultDto.Discount > 0;
+            resultDto.IsFeatured = resultDto.AverageRating >= 4.0;
+            
+            return CreatedAtAction(nameof(GetById), new { id = product.Id }, resultDto);
         }
 
         // POST: api/product/upload-main-image
         [HttpPost("upload-main-image")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadMainImage(IFormFile file)
+        public async Task<ActionResult<ImageUploadResponse>> UploadMainImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 
-            var url = await _cloudinaryService.UploadFileAsync(file);
-            return Ok(new { url });
+            if (file.Length > 5 * 1024 * 1024) // 5MB limit
+                return BadRequest("File size exceeds 5MB limit");
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+                return BadRequest("Invalid file type. Only JPG, JPEG, PNG, GIF, and WebP are allowed");
+
+            try
+            {
+                var fileName = $"{Guid.NewGuid()}{fileExtension}";
+                var filePath = Path.Combine("wwwroot", "images", "products", "main", fileName);
+                
+                // Ensure directory exists
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var imageUrl = $"/images/products/main/{fileName}";
+                return Ok(new ImageUploadResponse 
+                { 
+                    ImageUrl = imageUrl,
+                    FileName = fileName,
+                    FileSize = file.Length,
+                    Message = "Main image uploaded successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error uploading file: {ex.Message}");
+            }
         }
 
         // POST: api/product/upload-detail-images
         [HttpPost("upload-detail-images")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadDetailImages(List<IFormFile> files)
+        public async Task<ActionResult<ImageUploadResponse>> UploadDetailImages(List<IFormFile> files)
         {
-            if (files == null || !files.Any())
+            if (files == null || files.Count == 0)
                 return BadRequest("No files uploaded");
 
-            var urls = new List<string>();
+            if (files.Count > 10)
+                return BadRequest("Maximum 10 detail images allowed");
+
+            var uploadedUrls = new List<string>();
+            var errors = new List<string>();
+
             foreach (var file in files)
             {
-                if (file.Length > 0)
+                if (file.Length == 0) continue;
+
+                if (file.Length > 5 * 1024 * 1024) // 5MB limit
                 {
-                    var url = await _cloudinaryService.UploadFileAsync(file);
-                    urls.Add(url);
+                    errors.Add($"File {file.FileName} exceeds 5MB limit");
+                    continue;
+                }
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    errors.Add($"File {file.FileName} has invalid type");
+                    continue;
+                }
+
+                try
+                {
+                    var fileName = $"{Guid.NewGuid()}{fileExtension}";
+                    var filePath = Path.Combine("wwwroot", "images", "products", "details", fileName);
+                    
+                    // Ensure directory exists
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                    
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var imageUrl = $"/images/products/details/{fileName}";
+                    uploadedUrls.Add(imageUrl);
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Error uploading {file.FileName}: {ex.Message}");
                 }
             }
 
-            return Ok(new { urls });
+            return Ok(new ImageUploadResponse 
+            { 
+                ImageUrls = uploadedUrls,
+                Message = $"Uploaded {uploadedUrls.Count} images successfully",
+                Errors = errors
+            });
         }
 
-        // PATCH: api/product/5/status
-        [HttpPatch("{id}/status")]
+        // PATCH: api/product/{id}/images - Cập nhật ảnh cho sản phẩm
+        [HttpPatch("{id}/images")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] bool status)
+        public async Task<ActionResult<ProductDto>> UpdateProductImages(int id, [FromBody] ProductImageUploadDto imageDto)
         {
-            var product = await _unitOfWork.Products.GetByIdAsync(id);
-            if (product == null)
-                return NotFound();
+            var product = await _unitOfWork.Products.GetByIdAsync(id, includeProperties: q => q.Include(p => p.Category));
+            if (product == null) return NotFound();
 
-            product.IsActive = status;
+            // Cập nhật ảnh chính
+            if (!string.IsNullOrEmpty(imageDto.MainImageUrl))
+            {
+                product.MainImageUrl = imageDto.MainImageUrl;
+            }
+
+            // Cập nhật ảnh phụ
+            if (imageDto.DetailImageUrls != null)
+            {
+                product.DetailImageUrls = imageDto.DetailImageUrls;
+            }
+
+            product.UpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.CompleteAsync();
+
+            var resultDto = _mapper.Map<ProductDto>(product);
+            
+            // Map additional fields for frontend compatibility
+            resultDto.QuantityInStock = resultDto.StockQuantity;
+            resultDto.FinalPrice = resultDto.Discount > 0 ? resultDto.Price * (1 - resultDto.Discount / 100) : resultDto.Price;
+            resultDto.DiscountPrice = resultDto.Discount > 0 ? resultDto.Price - resultDto.FinalPrice : null;
+            resultDto.ImageUrls = resultDto.DetailImageUrls;
+            resultDto.IsNew = (DateTime.UtcNow - resultDto.CreatedAt).Days <= 30;
+            resultDto.IsOnSale = resultDto.Discount > 0;
+            resultDto.IsFeatured = resultDto.AverageRating >= 4.0;
+            
+            return Ok(resultDto);
+        }
+
+        // PUT: api/product/{id}
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, [FromBody] ProductUpdateDto productDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var product = await _unitOfWork.Products.GetByIdAsync(id, includeProperties: q => q.Include(p => p.Category));
+            if (product == null) return NotFound();
+
+            product.Name = productDto.Name;
+            product.Description = productDto.Description;
+            product.Price = productDto.Price;
+            product.Discount = productDto.Discount ?? 0;
+            product.StockQuantity = productDto.StockQuantity;
+            product.MainImageUrl = productDto.MainImageUrl ?? "";
+            product.DetailImageUrls = productDto.DetailImageUrls ?? new List<string>();
+            product.CategoryId = productDto.CategoryId;
+            product.IsActive = productDto.IsActive;
             product.UpdatedAt = DateTime.UtcNow;
 
-            _unitOfWork.Products.Update(product);
+            await _unitOfWork.CompleteAsync();
+
+            var resultDto = _mapper.Map<ProductDto>(product);
+            
+            // Map additional fields for frontend compatibility
+            resultDto.QuantityInStock = resultDto.StockQuantity;
+            resultDto.FinalPrice = resultDto.Discount > 0 ? resultDto.Price * (1 - resultDto.Discount / 100) : resultDto.Price;
+            resultDto.DiscountPrice = resultDto.Discount > 0 ? resultDto.Price - resultDto.FinalPrice : null;
+            resultDto.ImageUrls = resultDto.DetailImageUrls;
+            resultDto.IsNew = (DateTime.UtcNow - resultDto.CreatedAt).Days <= 30;
+            resultDto.IsOnSale = resultDto.Discount > 0;
+            resultDto.IsFeatured = resultDto.AverageRating >= 4.0;
+            
+            return Ok(resultDto);
+        }
+
+        // DELETE: api/product/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
+            if (product == null) return NotFound();
+
+            _unitOfWork.Products.Remove(product);
             await _unitOfWork.CompleteAsync();
 
             return NoContent();
         }
+    }
 
-        // GET: api/product/search?q=query
-        [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string q)
-        {
-            if (string.IsNullOrWhiteSpace(q))
-                return Ok(Array.Empty<ProductDto>());
-
-            var allProducts = await _unitOfWork.Products.GetAllAsync(
-                null,
-                query => query.Include(p => p.Category!)
-            );
-
-            var searchResults = allProducts
-                .Where(p => 
-                    // Check normalized Vietnamese names and descriptions
-                    p.Name.ContainsIgnoreDiacritics(q) ||
-                    (p.Description != null && p.Description.ContainsIgnoreDiacritics(q)) ||
-                    (p.Category != null && p.Category.Name.ContainsIgnoreDiacritics(q)) ||
-                    // Also check original strings
-                    p.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                    (p.Description != null && p.Description.Contains(q, StringComparison.OrdinalIgnoreCase)) ||
-                    (p.Category != null && p.Category.Name.Contains(q, StringComparison.OrdinalIgnoreCase))
-                )
-                .ToList();
-
-            var dtos = _mapper.Map<IEnumerable<ProductDto>>(searchResults);
-            return Ok(dtos);
-        }
-
-        // POST: api/product/{id}/upload-image
-        [HttpPost("{id}/upload-image")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadProductImage(int id, IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded");
-
-            var product = await _unitOfWork.Products.GetByIdAsync(id);
-            if (product == null)
-                return NotFound();
-
-            // Delete old image if exists
-            if (!string.IsNullOrEmpty(product.MainImageUrl))
-            {
-                await _cloudinaryService.DeleteFileByUrlAsync(product.MainImageUrl);
-            }
-
-            var url = await _cloudinaryService.UploadFileAsync(file);
-            
-            product.MainImageUrl = url;
-            product.UpdatedAt = DateTime.UtcNow;
-            
-            _unitOfWork.Products.Update(product);
-            await _unitOfWork.CompleteAsync();
-
-            return Ok(new { url });
-        }
+    public class ImageUploadResponse
+    {
+        public string? ImageUrl { get; set; }
+        public List<string>? ImageUrls { get; set; }
+        public string? FileName { get; set; }
+        public long? FileSize { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public List<string>? Errors { get; set; }
     }
 }

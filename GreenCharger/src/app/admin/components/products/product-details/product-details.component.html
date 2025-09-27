@@ -79,7 +79,8 @@
             
             <div class="detail-description">
               <h4>Mô tả sản phẩm</h4>
-              <p>{{ product.description }}</p>
+              <!-- Sử dụng innerHTML để render HTML -->
+              <div class="description-content" [innerHTML]="getSafeHtml(product.description)"></div>
             </div>
             
             <div class="detail-row">

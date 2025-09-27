@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { Product, ProductDto } from '../../../models/product.model';
@@ -29,50 +30,52 @@ export class ProductsComponent implements OnInit {
   searchTerm: string = '';
   selectedCategory: number | string = '';
   selectedStatus: string = '';
+  sortBy: string = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+  showForm = false;
+  showDetails = false;
+  showFormModal = false;
+  showDetailsModal = false;
+  selectedProduct: Product | null = null;
+  isEditing = false;
+  formMode: 'create' | 'edit' = 'create';
   loading = false;
-  error: string | null = null;
-
-  // Pagination
+  error: string = '';
   currentPage = 1;
   itemsPerPage = 10;
   totalItems = 0;
 
-  // Modals
-  showFormModal = false;
-  showDetailsModal = false;
-  selectedProduct: Product | null = null;
-  formMode: 'create' | 'edit' = 'create';
-
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private message: NzMessageService
-  ) { }
+    private message: NzMessageService,
+    private sanitizer: DomSanitizer
+  ) {}
 
   ngOnInit(): void {
-  // Hiển thị mặc định tất cả filter
-  this.selectedCategory = '';
-  this.selectedStatus = '';
-  this.loadProducts();
-  this.loadCategories();
+    this.loadProducts();
+    this.loadCategories();
+  }
+
+  // Sanitize HTML content
+  getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   loadProducts(): void {
     this.loading = true;
-    this.error = null;
-    
+    this.error = '';
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
-        this.filteredProducts = products;
+        this.filteredProducts = [...products];
         this.totalItems = products.length;
         this.loading = false;
-        console.log('Products loaded:', products);
       },
       error: (error) => {
-        this.error = 'Không thể tải danh sách sản phẩm';
-        this.loading = false;
         console.error('Error loading products:', error);
+        this.error = 'Lỗi khi tải danh sách sản phẩm';
+        this.loading = false;
       }
     });
   }
@@ -84,44 +87,52 @@ export class ProductsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading categories:', error);
+        this.message.error('Lỗi khi tải danh mục');
       }
     });
   }
 
   onSearch(): void {
-    this.applyFilters();
+    this.filterProducts();
   }
 
   onCategoryChange(): void {
-    this.applyFilters();
+    this.filterProducts();
   }
 
   onStatusChange(): void {
-    this.applyFilters();
+    this.filterProducts();
   }
 
-  applyFilters(): void {
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedCategory = '';
+    this.selectedStatus = '';
+    this.filterProducts();
+  }
+
+  filterProducts(): void {
     let filtered = [...this.products];
 
-    // Search filter
+    // Filter by search term
     if (this.searchTerm.trim()) {
-      filtered = filtered.filter(product =>
-        product.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        product.categoryName?.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-
-    // Category filter
-    if (this.selectedCategory !== '' && this.selectedCategory !== null) {
-      filtered = filtered.filter(product => product.categoryId === this.selectedCategory);
-    }
-
-    // Status filter
-    if (this.selectedStatus !== '' && this.selectedStatus !== null) {
+      const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(product => 
-        this.selectedStatus === 'active' ? product.isActive : !product.isActive
+        product.name.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term) ||
+        product.categoryName.toLowerCase().includes(term)
       );
+    }
+
+    // Filter by category
+    if (this.selectedCategory && this.selectedCategory !== '') {
+      filtered = filtered.filter(product => product.categoryId === Number(this.selectedCategory));
+    }
+
+    // Filter by status
+    if (this.selectedStatus && this.selectedStatus !== '') {
+      const isActive = this.selectedStatus === 'active';
+      filtered = filtered.filter(product => product.isActive === isActive);
     }
 
     this.filteredProducts = filtered;
@@ -129,132 +140,189 @@ export class ProductsComponent implements OnInit {
     this.currentPage = 1;
   }
 
+  onSort(column: string): void {
+    if (this.sortBy === column) {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortOrder = 'asc';
+    }
+
+    this.filteredProducts.sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (column) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'price':
+          aValue = a.price;
+          bValue = b.price;
+          break;
+        case 'category':
+          aValue = a.categoryName.toLowerCase();
+          bValue = b.categoryName.toLowerCase();
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return this.sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
   onAddProduct(): void {
-    this.selectedProduct = {} as Product;
+    this.selectedProduct = null;
+    this.isEditing = false;
     this.formMode = 'create';
+    this.showForm = true;
     this.showFormModal = true;
   }
 
   onEditProduct(product: Product): void {
     this.selectedProduct = product;
+    this.isEditing = true;
     this.formMode = 'edit';
+    this.showForm = true;
     this.showFormModal = true;
+  }
+
+  onViewProduct(product: Product): void {
+    this.selectedProduct = product;
+    this.showDetails = true;
+    this.showDetailsModal = true;
   }
 
   onDeleteProduct(product: Product): void {
     if (confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?`)) {
       this.productService.deleteProduct(product.id).subscribe({
         next: () => {
+          this.message.success('Xóa sản phẩm thành công');
           this.loadProducts();
         },
         error: (error) => {
-          this.error = 'Không thể xóa sản phẩm';
           console.error('Error deleting product:', error);
+          this.message.error('Lỗi khi xóa sản phẩm');
         }
       });
     }
   }
 
-  onViewProduct(product: Product): void {
-    this.selectedProduct = product;
-    this.showDetailsModal = true;
-  }
-
-  onCopyProduct(product: Product): void {
-    // Create a copy without ID to add as new
-    const productCopy: Product = {
-      ...product,
-      id: 0, // Set to 0 as this will be a new product
-      name: `${product.name} (Sao chép)`
-    };
-    
-    this.selectedProduct = productCopy;
-    this.formMode = 'create';
-    this.showFormModal = true;
-  }
-
   onToggleStatus(product: Product): void {
-    this.productService.updateProductStatus(product.id, !product.isActive).subscribe({
+    const newStatus = !product.isActive;
+    this.productService.updateProductStatus(product.id, newStatus).subscribe({
       next: () => {
-        this.loadProducts();
+        product.isActive = newStatus;
+        this.message.success(`Sản phẩm đã ${newStatus ? 'kích hoạt' : 'vô hiệu hóa'}`);
       },
       error: (error) => {
-        this.error = 'Không thể cập nhật trạng thái sản phẩm';
         console.error('Error updating product status:', error);
+        this.message.error('Lỗi khi cập nhật trạng thái sản phẩm');
       }
     });
   }
 
-  clearFilters(): void {
-    this.searchTerm = '';
-  this.selectedCategory = '';
-  this.selectedStatus = '';
-    this.applyFilters();
+  onCloseForm(): void {
+    this.showForm = false;
+    this.showFormModal = false;
+    this.selectedProduct = null;
+    this.isEditing = false;
+  }
+
+  onSaveProduct(product: any): void {
+    this.showForm = false;
+    this.showFormModal = false;
+    this.selectedProduct = null;
+    this.isEditing = false;
+    this.loadProducts();
+  }
+
+  onCloseDetails(): void {
+    this.showDetails = false;
+    this.showDetailsModal = false;
+    this.selectedProduct = null;
+  }
+
+  getStatusClass(isActive: boolean): string {
+    return isActive ? 'status-active' : 'status-inactive';
+  }
+
+  getStatusText(isActive: boolean): string {
+    return isActive ? 'Hoạt động' : 'Không hoạt động';
+  }
+
+  getStatusIcon(isActive: boolean): string {
+    return isActive ? 'fa-check-circle' : 'fa-times-circle';
+  }
+
+  getStatusColor(isActive: boolean): string {
+    return isActive ? '#28a745' : '#dc3545';
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   }
 
-  // Pagination methods
-  get totalPages(): number {
+  getTotalPages(): number {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
 
-  get paginatedProducts(): Product[] {
+  getPageNumbers(): number[] {
+    const totalPages = this.getTotalPages();
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+  }
+
+  onPageSizeChange(size: number): void {
+    this.itemsPerPage = size;
+    this.currentPage = 1;
+  }
+
+  changeItemsPerPage(size: number): void {
+    this.itemsPerPage = size;
+    this.currentPage = 1;
+  }
+
+  getPaginatedProducts(): Product[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredProducts.slice(startIndex, endIndex);
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
+  get paginatedProducts(): Product[] {
+    return this.getPaginatedProducts();
   }
 
-  changeItemsPerPage(items: number): void {
-    this.itemsPerPage = items;
-    this.currentPage = 1;
-  }
-
-  onCloseForm(): void {
-    this.showFormModal = false;
-  }
-
-  onCloseDetails(): void {
-    this.showDetailsModal = false;
-  }
-
-  onSaveProduct(product: ProductDto): void {
-    if (this.formMode === 'create') {
-      this.productService.createProduct(product).subscribe({
-        next: (newProduct: Product) => {
-          this.products.unshift(newProduct);
-          this.showFormModal = false;
-          this.message.success('Thêm sản phẩm thành công!');
-          this.loadProducts(); // Reload to get the correct product list
-        },
-        error: (error: any) => {
-          console.error('Error adding product:', error);
-          this.message.error('Lỗi khi thêm sản phẩm. Vui lòng thử lại!');
-        }
-      });
-    } else {
-      this.productService.updateProduct(product.id, product).subscribe({
-        next: () => {
-          this.showFormModal = false;
-          this.message.success('Cập nhật sản phẩm thành công!');
-          this.loadProducts(); // Reload to get the updated product data
-        },
-        error: (error: any) => {
-          console.error('Error updating product:', error);
-          this.message.error('Lỗi khi cập nhật sản phẩm. Vui lòng thử lại!');
-        }
-      });
-    }
+  get totalPages(): number {
+    return this.getTotalPages();
   }
 }

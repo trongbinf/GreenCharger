@@ -12,9 +12,6 @@ namespace GreenChargerAPI.Interfaces
         IGenericRepository<Cart> Carts { get; }
         IGenericRepository<Address> Addresses { get; }
         IGenericRepository<Review> Reviews { get; }
-        IGenericRepository<Wishlist> Wishlists { get; }
-        IGenericRepository<Coupon> Coupons { get; }
-        IGenericRepository<CouponUsage> CouponUsages { get; }
         IGenericRepository<ReviewHelpful> ReviewHelpfuls { get; }
         Task<int> CompleteAsync();
     }

@@ -31,7 +31,6 @@ namespace GreenChargerAPI.Models
         // Foreign Keys for new models
         public string? UserId { get; set; }
         public int? AddressId { get; set; }
-        public int? CouponId { get; set; }
         
         // Navigation Properties
         [ForeignKey("UserId")]
@@ -39,9 +38,6 @@ namespace GreenChargerAPI.Models
         
         [ForeignKey("AddressId")]
         public virtual Address? Address { get; set; }
-        
-        [ForeignKey("CouponId")]
-        public virtual Coupon? Coupon { get; set; }
         
         public required ICollection<OrderDetail> OrderDetails { get; set; }
     }
@@ -54,4 +50,4 @@ namespace GreenChargerAPI.Models
         Delivered,
         Cancelled
     }
-} 
+}

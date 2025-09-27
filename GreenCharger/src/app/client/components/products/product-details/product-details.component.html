@@ -1,70 +1,72 @@
 <app-header></app-header>
 
 <div class="container" *ngIf="!isLoading && !error && product as p">
-  <nz-breadcrumb class="pd-breadcrumb">
-    <nz-breadcrumb-item><a routerLink="/">Home</a></nz-breadcrumb-item>
-    <nz-breadcrumb-item><a routerLink="/products">Sản phẩm</a></nz-breadcrumb-item>
+  <nz-breadcrumb>
+    <nz-breadcrumb-item>
+      <a [routerLink]="['/']">Trang chủ</a>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>
+      <a [routerLink]="['/products']">Sản phẩm</a>
+    </nz-breadcrumb-item>
     <nz-breadcrumb-item>{{ p.name }}</nz-breadcrumb-item>
   </nz-breadcrumb>
 
-  <div nz-row [nzGutter]="24" class="pd-row">
-    <!-- Left: Image -->
-    <div nz-col [nzXs]="24" [nzMd]="12">
-      <nz-card class="pd-card" [nzBordered]="false">
-        <div class="pd-image-wrap">
-          <img class="pd-image" [src]="p.mainImageUrl || 'https://via.placeholder.com/800x600?text=Product'" [alt]="p.name" />
-        </div>
+  <div nz-row [nzGutter]="24" class="pd-main">
+    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12">
+      <nz-card [nzBordered]="false" class="pd-image-card">
+        <img [src]="p.mainImageUrl || 'https://via.placeholder.com/600x600?text=Product'" [alt]="p.name" class="pd-main-image" />
       </nz-card>
     </div>
 
-    <!-- Right: Info -->
-    <div nz-col [nzXs]="24" [nzMd]="12">
-      <nz-card class="pd-card" [nzBordered]="false">
+    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12">
+      <nz-card [nzBordered]="false" class="pd-info-card">
         <h1 class="pd-title">{{ p.name }}</h1>
-
-        <div class="pd-meta">
-          <nz-tag nzColor="green" *ngIf="p.isActive; else outStock">Còn hàng</nz-tag>
-          <ng-template #outStock><nz-tag nzColor="default">Hết hàng</nz-tag></ng-template>
-        </div>
-
+        
         <div class="pd-price">
-          <span class="pd-price-current">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-          <span class="pd-price-original" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-          <nz-tag *ngIf="p.discount>0" nzColor="magenta" class="pd-discount">-{{ p.discount }}%</nz-tag>
+          <span class="pd-current">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+          <span class="pd-original" *ngIf="p.discount > 0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
         </div>
 
-        <div class="pd-qty">
-          <span>Số lượng:</span>
-          <nz-input-number [(ngModel)]="quantity" [nzMin]="1" [nzMax]="p.quantityInStock || 99"></nz-input-number>
+        <div class="pd-badges">
+          <nz-tag *ngIf="p.isNew" nzColor="blue">Mới</nz-tag>
+          <nz-tag *ngIf="p.isOnSale" nzColor="red">Giảm giá</nz-tag>
+          <nz-tag *ngIf="p.isFeatured" nzColor="green">Nổi bật</nz-tag>
+        </div>
+
+        <div class="pd-quantity">
+          <label>Số lượng:</label>
+          <nz-input-number [(ngModel)]="quantity" [nzMin]="1" [nzMax]="p.quantityInStock"></nz-input-number>
         </div>
 
         <div class="pd-actions">
-          <button nz-button nzType="primary" nzSize="large"><i class="fa fa-cart-plus" style="margin-right:6px"></i>Thêm vào giỏ</button>
-          <button nz-button nzType="default" nzSize="large">Mua ngay</button>
+          <button nz-button nzType="primary" nzSize="large" (click)="addToCart()">
+            <i nz-icon nzType="shopping-cart"></i>
+            Thêm vào giỏ hàng
+          </button>
         </div>
-      </nz-card>
-
-      <nz-card class="pd-card" nzTitle="Mô tả" [nzBordered]="false">
-        <p class="pd-description">{{ p.description || 'Chưa có mô tả cho sản phẩm này.' }}</p>
       </nz-card>
     </div>
   </div>
 
-  <!-- Related products (compact, ng-zorro UI) -->
+  <div class="pd-details">
+    <nz-card class="pd-card" nzTitle="Mô tả" [nzBordered]="false">
+      <p class="pd-description" [innerHTML]="getSafeHtml(p.description || 'Chưa có mô tả cho sản phẩm này.')"></p>
+    </nz-card>
+  </div>
+
+  <!-- Related products -->
   <nz-card nzTitle="Sản phẩm khác của GREEN CHARGER" class="pd-card" [nzBordered]="false" *ngIf="relatedProducts.length">
     <div nz-row [nzGutter]="16">
       <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let rp of relatedProducts">
         <a [routerLink]="['/product', rp.id]">
-          <nz-card nzHoverable [nzBordered]="true" class="pd-related-card" [nzCover]="coverTpl">
+          <nz-card nzHoverable [nzBordered]="true" class="pd-related-card">
             <nz-card-meta [nzTitle]="rp.name"></nz-card-meta>
             <div class="pd-related-price">
               <span class="pd-related-current">{{ (rp.finalPrice || rp.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-              <span class="pd-related-original" *ngIf="rp.discount>0">{{ rp.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+              <span class="pd-related-original" *ngIf="rp.discount > 0">{{ rp.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
             </div>
-          </nz-card>
-          <ng-template #coverTpl>
             <img [src]="rp.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="rp.name" class="pd-related-image" />
-          </ng-template>
+          </nz-card>
         </a>
       </div>
     </div>
@@ -74,4 +76,4 @@
 <div *ngIf="isLoading" class="pd-loading">Đang tải...</div>
 <div *ngIf="error" class="pd-error">{{ error }}</div>
 
-<app-footer></app-footer> 
+<app-footer></app-footer>

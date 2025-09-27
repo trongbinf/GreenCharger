@@ -17,9 +17,6 @@ namespace GreenChargerAPI.Repositories
         private readonly IGenericRepository<Cart> _carts;
         private readonly IGenericRepository<Address> _addresses;
         private readonly IGenericRepository<Review> _reviews;
-        private readonly IGenericRepository<Wishlist> _wishlists;
-        private readonly IGenericRepository<Coupon> _coupons;
-        private readonly IGenericRepository<CouponUsage> _couponUsages;
         private readonly IGenericRepository<ReviewHelpful> _reviewHelpfuls;
 
         public UnitOfWork(ApplicationDbContext context)
@@ -33,9 +30,6 @@ namespace GreenChargerAPI.Repositories
             _carts = new GenericRepository<Cart>(context);
             _addresses = new GenericRepository<Address>(context);
             _reviews = new GenericRepository<Review>(context);
-            _wishlists = new GenericRepository<Wishlist>(context);
-            _coupons = new GenericRepository<Coupon>(context);
-            _couponUsages = new GenericRepository<CouponUsage>(context);
             _reviewHelpfuls = new GenericRepository<ReviewHelpful>(context);
         }
 
@@ -47,9 +41,6 @@ namespace GreenChargerAPI.Repositories
         public IGenericRepository<Cart> Carts => _carts;
         public IGenericRepository<Address> Addresses => _addresses;
         public IGenericRepository<Review> Reviews => _reviews;
-        public IGenericRepository<Wishlist> Wishlists => _wishlists;
-        public IGenericRepository<Coupon> Coupons => _coupons;
-        public IGenericRepository<CouponUsage> CouponUsages => _couponUsages;
         public IGenericRepository<ReviewHelpful> ReviewHelpfuls => _reviewHelpfuls;
         public async Task<int> CompleteAsync()
         {

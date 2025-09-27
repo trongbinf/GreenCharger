@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GreenChargerAPI.Models.DTOs
 {
     public class ProductDto
@@ -6,14 +8,20 @@ namespace GreenChargerAPI.Models.DTOs
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public decimal? Discount { get; set; }
-        public decimal FinalPrice => Discount.HasValue ? Price * (1 - Discount.Value / 100) : Price;
+        public decimal Discount { get; set; }
+        public decimal? DiscountPrice { get; set; }
+        public decimal FinalPrice { get; set; }
         public int StockQuantity { get; set; }
+        public int QuantityInStock { get; set; }
         public string? MainImageUrl { get; set; }
         public List<string>? DetailImageUrls { get; set; }
+        public List<string>? ImageUrls { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public bool IsNew { get; set; }
+        public bool IsOnSale { get; set; }
+        public bool IsFeatured { get; set; }
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -22,14 +30,30 @@ namespace GreenChargerAPI.Models.DTOs
 
     public class ProductCreateDto
     {
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; } = string.Empty;
+        
+        [Required]
         public string Description { get; set; } = string.Empty;
+        
+        [Required]
         public decimal Price { get; set; }
-        public decimal? Discount { get; set; }
+        
+        public decimal Discount { get; set; } = 0;
+        
         public int StockQuantity { get; set; }
+        
+        // Ảnh chính - có thể null
+        [StringLength(200)]
         public string? MainImageUrl { get; set; }
+        
+        // Ảnh phụ - có thể null
         public List<string>? DetailImageUrls { get; set; }
+        
+        [Required]
         public int CategoryId { get; set; }
+        
         public bool IsActive { get; set; } = true;
     }
 
@@ -66,5 +90,13 @@ namespace GreenChargerAPI.Models.DTOs
         public int Page { get; set; }
         public int PageSize { get; set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+    }
+
+    // DTO riêng cho upload ảnh
+    public class ProductImageUploadDto
+    {
+        public int ProductId { get; set; }
+        public string? MainImageUrl { get; set; }
+        public List<string>? DetailImageUrls { get; set; }
     }
 }

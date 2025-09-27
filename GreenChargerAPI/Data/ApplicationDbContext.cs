@@ -19,9 +19,6 @@ namespace GreenChargerAPI.Data
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<Wishlist> Wishlists { get; set; }
-        public DbSet<Coupon> Coupons { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,11 +65,6 @@ namespace GreenChargerAPI.Data
                       .WithMany()
                       .HasForeignKey(o => o.AddressId)
                       .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(o => o.Coupon)
-                      .WithMany(c => c.Orders)
-                      .HasForeignKey(o => o.CouponId)
-                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Address relationships
@@ -113,67 +105,6 @@ namespace GreenChargerAPI.Data
                       .WithMany(r => r.ReviewHelpfuls)
                       .HasForeignKey(rh => rh.ReviewId)
                       .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            // CouponUsage relationships - avoid cascade conflicts
-            modelBuilder.Entity<CouponUsage>(entity =>
-            {
-                entity.HasOne(cu => cu.User)
-                      .WithMany()
-                      .HasForeignKey(cu => cu.UserId)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(cu => cu.Coupon)
-                      .WithMany(c => c.CouponUsages)
-                      .HasForeignKey(cu => cu.CouponId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(cu => cu.Order)
-                      .WithMany()
-                      .HasForeignKey(cu => cu.OrderId)
-                      .OnDelete(DeleteBehavior.NoAction);
-            });
-
-            // Wishlist relationships
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany()
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.Product)
-                .WithMany()
-                .HasForeignKey(w => w.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Coupon configuration
-            modelBuilder.Entity<Coupon>()
-                .Property(c => c.Value)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Coupon>()
-                .Property(c => c.MaxDiscountAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Coupon>()
-                .Property(c => c.MinOrderAmount)
-                .HasColumnType("decimal(18,2)");
-
-            // Coupon relationships
-            modelBuilder.Entity<Coupon>(entity =>
-            {
-                entity.HasOne(c => c.Category)
-                      .WithMany()
-                      .HasForeignKey(c => c.CategoryId)
-                      .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(c => c.Product)
-                      .WithMany()
-                      .HasForeignKey(c => c.ProductId)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasIndex(c => c.Code).IsUnique();
             });
 
             // Product price configuration

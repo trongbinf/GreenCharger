@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Product } from '../../../../models/product.model';
 
 @Component({
@@ -14,6 +15,8 @@ export class ProductDetailsComponent {
   @Input() isVisible = false;
   @Output() close = new EventEmitter<void>();
   
+  constructor(private sanitizer: DomSanitizer) {}
+  
   onClose(): void {
     this.close.emit();
   }
@@ -21,5 +24,10 @@ export class ProductDetailsComponent {
   // Format currency
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  }
+  
+  // Sanitize HTML content
+  getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

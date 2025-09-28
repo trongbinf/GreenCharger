@@ -1,0 +1,201 @@
+<div class="profile-main">
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Profile Content -->
+  <div class="profile-content">
+    <div class="container">
+      <div class="profile-wrapper">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <div class="avatar-circle">
+              <span class="avatar-text">{{ (currentUser?.firstName?.[0] || currentUser?.email?.[0] || 'U').toUpperCase() }}</span>
+            </div>
+          </div>
+          <div class="profile-info">
+            <h1 class="profile-name">{{ currentUser?.firstName || '' }} {{ currentUser?.lastName || '' }}</h1>
+            <p class="profile-email">{{ currentUser?.email }}</p>
+            <div class="profile-badges">
+              <span class="badge" *ngIf="currentUser?.roles?.includes('Admin')">Admin</span>
+              <span class="badge user-badge">Thành viên</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Tabs -->
+        <div class="profile-tabs">
+          <div class="tab-content">
+            <!-- Personal Information Tab -->
+            <div class="tab-panel active">
+              <div class="panel-header">
+                <h2 class="panel-title">Thông tin cá nhân</h2>
+                <p class="panel-description">Cập nhật thông tin cá nhân của bạn</p>
+              </div>
+
+              <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="profile-form">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="firstName" class="form-label">Họ *</label>
+                    <input 
+                      type="text" 
+                      id="firstName" 
+                      formControlName="firstName" 
+                      class="form-input"
+                      [class.error]="getFieldError(profileForm, 'firstName')"
+                      placeholder="Nhập họ của bạn"
+                    />
+                    <div class="error-message" *ngIf="getFieldError(profileForm, 'firstName')">
+                      {{ getFieldError(profileForm, 'firstName') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="lastName" class="form-label">Tên *</label>
+                    <input 
+                      type="text" 
+                      id="lastName" 
+                      formControlName="lastName" 
+                      class="form-input"
+                      [class.error]="getFieldError(profileForm, 'lastName')"
+                      placeholder="Nhập tên của bạn"
+                    />
+                    <div class="error-message" *ngIf="getFieldError(profileForm, 'lastName')">
+                      {{ getFieldError(profileForm, 'lastName') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="email" class="form-label">Email *</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      formControlName="email" 
+                      class="form-input"
+                      [class.error]="getFieldError(profileForm, 'email')"
+                      placeholder="Nhập email của bạn"
+                    />
+                    <div class="error-message" *ngIf="getFieldError(profileForm, 'email')">
+                      {{ getFieldError(profileForm, 'email') }}
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                    <input 
+                      type="tel" 
+                      id="phoneNumber" 
+                      formControlName="phoneNumber" 
+                      class="form-input"
+                      [class.error]="getFieldError(profileForm, 'phoneNumber')"
+                      placeholder="Nhập số điện thoại"
+                    />
+                    <div class="error-message" *ngIf="getFieldError(profileForm, 'phoneNumber')">
+                      {{ getFieldError(profileForm, 'phoneNumber') }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                    <span *ngIf="isLoading" class="loading-spinner"></span>
+                    {{ isLoading ? 'Đang cập nhật...' : 'Cập nhật thông tin' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Change Password Tab -->
+            <div class="tab-panel">
+              <div class="panel-header">
+                <h2 class="panel-title">Đổi mật khẩu</h2>
+                <p class="panel-description">Thay đổi mật khẩu để bảo mật tài khoản của bạn</p>
+              </div>
+
+              <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()" class="password-form">
+                <div class="form-group">
+                  <label for="currentPassword" class="form-label">Mật khẩu hiện tại *</label>
+                  <div class="password-input-group">
+                    <input 
+                      [type]="showPassword ? 'text' : 'password'" 
+                      id="currentPassword" 
+                      formControlName="currentPassword" 
+                      class="form-input"
+                      [class.error]="getFieldError(passwordForm, 'currentPassword')"
+                      placeholder="Nhập mật khẩu hiện tại"
+                    />
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('current')">
+                      <i class="eye-icon">{{ showPassword ? '��️' : '👁️‍🗨️' }}</i>
+                    </button>
+                  </div>
+                  <div class="error-message" *ngIf="getFieldError(passwordForm, 'currentPassword')">
+                    {{ getFieldError(passwordForm, 'currentPassword') }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="newPassword" class="form-label">Mật khẩu mới *</label>
+                  <div class="password-input-group">
+                    <input 
+                      [type]="showNewPassword ? 'text' : 'password'" 
+                      id="newPassword" 
+                      formControlName="newPassword" 
+                      class="form-input"
+                      [class.error]="getFieldError(passwordForm, 'newPassword')"
+                      placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
+                    />
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
+                      <i class="eye-icon">{{ showNewPassword ? '👁️' : '👁️‍🗨️' }}</i>
+                    </button>
+                  </div>
+                  <div class="error-message" *ngIf="getFieldError(passwordForm, 'newPassword')">
+                    {{ getFieldError(passwordForm, 'newPassword') }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới *</label>
+                  <div class="password-input-group">
+                    <input 
+                      [type]="showConfirmPassword ? 'text' : 'password'" 
+                      id="confirmPassword" 
+                      formControlName="confirmPassword" 
+                      class="form-input"
+                      [class.error]="getFieldError(passwordForm, 'confirmPassword')"
+                      placeholder="Nhập lại mật khẩu mới"
+                    />
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
+                      <i class="eye-icon">{{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}</i>
+                    </button>
+                  </div>
+                  <div class="error-message" *ngIf="getFieldError(passwordForm, 'confirmPassword')">
+                    {{ getFieldError(passwordForm, 'confirmPassword') }}
+                  </div>
+                </div>
+
+                <div class="password-requirements">
+                  <h4>Yêu cầu mật khẩu:</h4>
+                  <ul>
+                    <li>Ít nhất 6 ký tự</li>
+                    <li>Không được trùng với mật khẩu hiện tại</li>
+                    <li>Nên bao gồm chữ hoa, chữ thường và số</li>
+                  </ul>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" [disabled]="isPasswordLoading">
+                    <span *ngIf="isPasswordLoading" class="loading-spinner"></span>
+                    {{ isPasswordLoading ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>

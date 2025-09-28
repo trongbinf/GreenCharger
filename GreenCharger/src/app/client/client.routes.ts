@@ -5,6 +5,8 @@ import { ProductDetailsComponent } from './components/products/product-details/p
 import { SearchComponent } from './components/search/search.component';
 import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { AuthGuard } from '../guards/auth.guard';
 
 export const clientRoutes: Routes = [
   {
@@ -34,5 +36,10 @@ export const clientRoutes: Routes = [
   {
     path: 'search',
     component: SearchComponent
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
   }
 ];

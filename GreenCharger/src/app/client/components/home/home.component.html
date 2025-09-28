@@ -11,7 +11,9 @@
         </div>
       </div>
     </div>
+    <div class="slider-dots">
       <div class="slider-dot" *ngFor="let slide of slides; let i = index" [class.active]="currentSlide === i" (click)="goToSlide(i)"></div>
+    </div>
   </section>
 
   <!-- Categories Section -->
@@ -63,7 +65,7 @@
           </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-description">{{ product.description }}</p>
+            <div class="product-description" [innerHTML]="product.description"></div>
             <div class="product-price">
               <span class="current-price">{{ formatPrice(product.finalPrice) }}</span>
               <span class="original-price" *ngIf="product.discount > 0">{{ formatPrice(product.price) }}</span>
@@ -121,8 +123,6 @@
       </div>
     </div>
   </section>
-
- 
 
   <!-- Footer -->
   <app-footer></app-footer>

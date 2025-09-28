@@ -57,6 +57,7 @@ export class TokenService {
 
     return [];
   }
+}
 
   getToken(): string | null {
     return localStorage.getItem('token');

@@ -182,4 +182,23 @@ export class UserService {
       headers: this.getAuthHeaders()
     });
   }
+
+
+  // Change Password Methods
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    const changePasswordData = {
+      currentPassword,
+      newPassword
+    };
+    
+    return this.http.post(`${this.apiUrl}/change-password`, changePasswordData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  updateProfile(profileData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/profile`, profileData, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }

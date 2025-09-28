@@ -15,22 +15,21 @@
         <div *ngIf="product" class="product-details">
           <div class="product-images">
             <div class="main-image">
-              <!-- Use imageUrls if available, otherwise fall back to mainImageUrl -->
-              <img *ngIf="product.imageUrls && product.imageUrls.length > 0" [src]="product.imageUrls[0]" [alt]="product.name" class="product-image">
-              <img *ngIf="(!product.imageUrls || product.imageUrls.length === 0) && product.mainImageUrl" [src]="product.mainImageUrl" [alt]="product.name" class="product-image">
-              <div *ngIf="(!product.imageUrls || product.imageUrls.length === 0) && !product.mainImageUrl" class="no-image">
+              <!-- Main image display -->
+              <img *ngIf="product.mainImageUrl" [src]="product.mainImageUrl" [alt]="product.name" class="product-image">
+              <div *ngIf="!product.mainImageUrl" class="no-image">
                 <i class="fas fa-image"></i>
-                <p>No image available</p>
+                <p>Chưa có ảnh</p>
               </div>
             </div>
-            <div class="thumbnail-images" *ngIf="product.imageUrls && product.imageUrls.length > 1">
-              <div class="thumbnail" *ngFor="let url of product.imageUrls.slice(1)">
-                <img [src]="url" [alt]="product.name">
-              </div>
-            </div>
-            <div class="thumbnail-images" *ngIf="product.detailImageUrls && product.detailImageUrls.length > 0">
-              <div class="thumbnail" *ngFor="let url of product.detailImageUrls">
-                <img [src]="url" [alt]="product.name">
+            
+            <!-- Detail images display -->
+            <div class="detail-images" *ngIf="product.detailImageUrls && product.detailImageUrls.length > 0">
+              <h6>Ảnh chi tiết:</h6>
+              <div class="detail-images-grid">
+                <div class="detail-image-item" *ngFor="let url of product.detailImageUrls">
+                  <img [src]="url" [alt]="product.name" class="detail-image">
+                </div>
               </div>
             </div>
           </div>
@@ -51,52 +50,52 @@
               </span>
             </div>
             
-            <div class="detail-row">
-              <span class="detail-label">Danh mục:</span>
-              <span class="detail-value">{{ product.categoryName }}</span>
+            <div class="detail-row" *ngIf="product.discount && product.discount > 0">
+              <span class="detail-label">Giảm giá:</span>
+              <span class="detail-value discount">{{ product.discount }}%</span>
             </div>
             
             <div class="detail-row">
-              <span class="detail-label">Số lượng tồn kho:</span>
-              <span class="detail-value">{{ product.quantityInStock }}</span>
+              <span class="detail-label">Số lượng:</span>
+              <span class="detail-value stock" [class.low-stock]="product.stockQuantity < 10">
+                {{ product.stockQuantity }}
+              </span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Danh mục:</span>
+              <span class="detail-value category">{{ product.categoryName }}</span>
             </div>
             
             <div class="detail-row">
               <span class="detail-label">Trạng thái:</span>
-              <span class="detail-value status">
-                <span class="status-badge" [class.badge-success]="product.isActive" [class.badge-danger]="!product.isActive">
-                  <i class="fas" [ngClass]="product.isActive ? 'fa-check-circle' : 'fa-times-circle'"></i>
-                  {{ product.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
-                </span>
+              <span class="detail-value status" [class.active]="product.isActive" [class.inactive]="!product.isActive">
+                {{ product.isActive ? 'Hoạt động' : 'Ngừng hoạt động' }}
               </span>
             </div>
             
-            <div class="flags">
-              <span class="flag" *ngIf="product.isNew">Mới</span>
-              <span class="flag sale" *ngIf="product.isOnSale">Giảm giá</span>
-              <span class="flag featured" *ngIf="product.isFeatured">Nổi bật</span>
-            </div>
-            
-            <div class="detail-description">
-              <h4>Mô tả sản phẩm</h4>
-              <!-- Sử dụng innerHTML để render HTML -->
-              <div class="description-content" [innerHTML]="getSafeHtml(product.description)"></div>
-            </div>
-            
             <div class="detail-row">
-              <span class="detail-label">Ngày tạo:</span>
-              <span class="detail-value">{{ product.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              <span class="detail-label">Đánh giá:</span>
+              <span class="detail-value rating">
+                <i class="fas fa-star"></i>
+                {{ product.averageRating ? product.averageRating.toFixed(1) : '0.0' }}
+                ({{ product.reviewCount || 0 }} đánh giá)
+              </span>
             </div>
             
-            <div class="detail-row" *ngIf="product.updatedAt">
-              <span class="detail-label">Cập nhật lần cuối:</span>
-              <span class="detail-value">{{ product.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            <div class="detail-row description-row">
+              <span class="detail-label">Mô tả:</span>
+              <div class="detail-value description" [innerHTML]="product.description"></div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onClose()">Đóng</button>
+        <button type="button" class="btn btn-secondary" (click)="onClose()">
+          <i class="fas fa-times"></i>
+          Đóng
+        </button>
       </div>
-    </div>
   </div>
+</div>

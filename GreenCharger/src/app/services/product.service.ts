@@ -51,10 +51,19 @@ export class ProductService {
     return this.http.put<void>(`${this.apiUrl}/${id}/status`, { isActive }, { headers: this.getAuthHeaders() });
   }
 
-  uploadProductImage(file: File): Observable<{ imageUrl: string }> {
+    uploadProductImage(file: File): Observable<{ imageUrl: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload-image`, formData, { 
+    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/upload-main-image`, formData, { 
+      headers: this.getAuthHeadersForFormData() 
+    });
+  }
+  uploadDetailImages(files: File[]): Observable<{ imageUrls: string[] }> {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append("files", file);
+    });
+    return this.http.post<{ imageUrls: string[] }>(`${this.apiUrl}/upload-detail-images`, formData, { 
       headers: this.getAuthHeadersForFormData() 
     });
   }

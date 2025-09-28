@@ -142,7 +142,7 @@
 .checkbox-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
+  gap: 16px;
   margin-top: 8px;
 }
 
@@ -173,7 +173,7 @@
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
   padding: 20px 24px;
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
@@ -372,7 +372,7 @@
 .detail-images-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -381,7 +381,7 @@
   width: 100px;
   height: 100px;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .detail-image-item img {

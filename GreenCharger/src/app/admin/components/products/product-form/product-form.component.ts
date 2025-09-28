@@ -172,7 +172,7 @@ export class ProductFormComponent implements OnInit {
     }
   }
 
-  async uploadImages(): Promise<{mainImageUrl: string, detailImageUrls: string[]}> {
+    async uploadImages(): Promise<{mainImageUrl: string, detailImageUrls: string[]}> {
     this.uploadingImages = true;
     const result = { mainImageUrl: '', detailImageUrls: [] as string[] };
 
@@ -185,11 +185,9 @@ export class ProductFormComponent implements OnInit {
 
       // Upload detail images if selected
       if (this.selectedDetailImages.length > 0) {
-        for (const file of this.selectedDetailImages) {
-          const detailImageResponse = await this.productService.uploadProductImage(file).toPromise();
-          if (detailImageResponse?.imageUrl) {
-            result.detailImageUrls.push(detailImageResponse.imageUrl);
-          }
+        const detailImagesResponse = await this.productService.uploadDetailImages(this.selectedDetailImages).toPromise();
+        if (detailImagesResponse?.imageUrls) {
+          result.detailImageUrls = detailImagesResponse.imageUrls;
         }
       }
     } catch (error) {

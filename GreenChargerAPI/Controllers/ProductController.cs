@@ -2,6 +2,7 @@ using AutoMapper;
 using GreenChargerAPI.Models;
 using GreenChargerAPI.Models.DTOs;
 using GreenChargerAPI.Interfaces;
+using GreenChargerAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,13 @@ namespace GreenChargerAPI.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public ProductController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductController(IUnitOfWork unitOfWork, IMapper mapper, CloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cloudinaryService = cloudinaryService;
         }
 
         // GET: api/product
@@ -79,7 +82,6 @@ namespace GreenChargerAPI.Controllers
                 Price = productDto.Price,
                 Discount = productDto.Discount,
                 StockQuantity = productDto.StockQuantity,
-                // Xử lý null values - cho phép null
                 MainImageUrl = productDto.MainImageUrl ?? "",
                 DetailImageUrls = productDto.DetailImageUrls ?? new List<string>(),
                 CategoryId = productDto.CategoryId,
@@ -125,22 +127,11 @@ namespace GreenChargerAPI.Controllers
 
             try
             {
-                var fileName = $"{Guid.NewGuid()}{fileExtension}";
-                var filePath = Path.Combine("wwwroot", "images", "products", "main", fileName);
-                
-                // Ensure directory exists
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                var imageUrl = $"/images/products/main/{fileName}";
+                var imageUrl = await _cloudinaryService.UploadFileAsync(file);
                 return Ok(new ImageUploadResponse 
                 { 
                     ImageUrl = imageUrl,
-                    FileName = fileName,
+                    FileName = file.FileName,
                     FileSize = file.Length,
                     Message = "Main image uploaded successfully"
                 });
@@ -162,92 +153,34 @@ namespace GreenChargerAPI.Controllers
             if (files.Count > 10)
                 return BadRequest("Maximum 10 detail images allowed");
 
-            var uploadedUrls = new List<string>();
-            var errors = new List<string>();
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var imageUrls = new List<string>();
 
-            foreach (var file in files)
+            try
             {
-                if (file.Length == 0) continue;
-
-                if (file.Length > 5 * 1024 * 1024) // 5MB limit
+                foreach (var file in files)
                 {
-                    errors.Add($"File {file.FileName} exceeds 5MB limit");
-                    continue;
+                    if (file.Length > 5 * 1024 * 1024) // 5MB limit per file
+                        return BadRequest($"File {file.FileName} exceeds 5MB limit");
+
+                    var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                    if (!allowedExtensions.Contains(fileExtension))
+                        return BadRequest($"Invalid file type for {file.FileName}. Only JPG, JPEG, PNG, GIF, and WebP are allowed");
+
+                    var imageUrl = await _cloudinaryService.UploadFileAsync(file);
+                    imageUrls.Add(imageUrl);
                 }
 
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                if (!allowedExtensions.Contains(fileExtension))
-                {
-                    errors.Add($"File {file.FileName} has invalid type");
-                    continue;
-                }
-
-                try
-                {
-                    var fileName = $"{Guid.NewGuid()}{fileExtension}";
-                    var filePath = Path.Combine("wwwroot", "images", "products", "details", fileName);
-                    
-                    // Ensure directory exists
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                    
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    var imageUrl = $"/images/products/details/{fileName}";
-                    uploadedUrls.Add(imageUrl);
-                }
-                catch (Exception ex)
-                {
-                    errors.Add($"Error uploading {file.FileName}: {ex.Message}");
-                }
+                return Ok(new ImageUploadResponse 
+                { 
+                    ImageUrls = imageUrls,
+                    Message = $"{imageUrls.Count} detail images uploaded successfully"
+                });
             }
-
-            return Ok(new ImageUploadResponse 
-            { 
-                ImageUrls = uploadedUrls,
-                Message = $"Uploaded {uploadedUrls.Count} images successfully",
-                Errors = errors
-            });
-        }
-
-        // PATCH: api/product/{id}/images - Cập nhật ảnh cho sản phẩm
-        [HttpPatch("{id}/images")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ProductDto>> UpdateProductImages(int id, [FromBody] ProductImageUploadDto imageDto)
-        {
-            var product = await _unitOfWork.Products.GetByIdAsync(id, includeProperties: q => q.Include(p => p.Category));
-            if (product == null) return NotFound();
-
-            // Cập nhật ảnh chính
-            if (!string.IsNullOrEmpty(imageDto.MainImageUrl))
+            catch (Exception ex)
             {
-                product.MainImageUrl = imageDto.MainImageUrl;
+                return StatusCode(500, $"Error uploading files: {ex.Message}");
             }
-
-            // Cập nhật ảnh phụ
-            if (imageDto.DetailImageUrls != null)
-            {
-                product.DetailImageUrls = imageDto.DetailImageUrls;
-            }
-
-            product.UpdatedAt = DateTime.UtcNow;
-            await _unitOfWork.CompleteAsync();
-
-            var resultDto = _mapper.Map<ProductDto>(product);
-            
-            // Map additional fields for frontend compatibility
-            resultDto.QuantityInStock = resultDto.StockQuantity;
-            resultDto.FinalPrice = resultDto.Discount > 0 ? resultDto.Price * (1 - resultDto.Discount / 100) : resultDto.Price;
-            resultDto.DiscountPrice = resultDto.Discount > 0 ? resultDto.Price - resultDto.FinalPrice : null;
-            resultDto.ImageUrls = resultDto.DetailImageUrls;
-            resultDto.IsNew = (DateTime.UtcNow - resultDto.CreatedAt).Days <= 30;
-            resultDto.IsOnSale = resultDto.Discount > 0;
-            resultDto.IsFeatured = resultDto.AverageRating >= 4.0;
-            
-            return Ok(resultDto);
         }
 
         // PUT: api/product/{id}
@@ -261,6 +194,10 @@ namespace GreenChargerAPI.Controllers
             var product = await _unitOfWork.Products.GetByIdAsync(id, includeProperties: q => q.Include(p => p.Category));
             if (product == null) return NotFound();
 
+            // Store old image URLs for deletion
+            var oldMainImageUrl = product.MainImageUrl;
+            var oldDetailImageUrls = new List<string>(product.DetailImageUrls);
+
             product.Name = productDto.Name;
             product.Description = productDto.Description;
             product.Price = productDto.Price;
@@ -273,6 +210,30 @@ namespace GreenChargerAPI.Controllers
             product.UpdatedAt = DateTime.UtcNow;
 
             await _unitOfWork.CompleteAsync();
+
+            // Delete old images from Cloudinary if they changed
+            try
+            {
+                // Delete old main image if it changed and is from Cloudinary
+                if (!string.IsNullOrEmpty(oldMainImageUrl) && oldMainImageUrl != product.MainImageUrl && oldMainImageUrl.Contains("cloudinary.com"))
+                {
+                    await _cloudinaryService.DeleteFileByUrlAsync(oldMainImageUrl);
+                }
+
+                // Delete old detail images that are no longer in the new list
+                foreach (var oldDetailUrl in oldDetailImageUrls)
+                {
+                    if (!string.IsNullOrEmpty(oldDetailUrl) && !product.DetailImageUrls.Contains(oldDetailUrl) && oldDetailUrl.Contains("cloudinary.com"))
+                    {
+                        await _cloudinaryService.DeleteFileByUrlAsync(oldDetailUrl);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't fail the update
+                Console.WriteLine($"Warning: Could not delete old images: {ex.Message}");
+            }
 
             var resultDto = _mapper.Map<ProductDto>(product);
             
@@ -295,6 +256,28 @@ namespace GreenChargerAPI.Controllers
         {
             var product = await _unitOfWork.Products.GetByIdAsync(id);
             if (product == null) return NotFound();
+
+            // Delete images from Cloudinary before deleting product
+            try
+            {
+                if (!string.IsNullOrEmpty(product.MainImageUrl) && product.MainImageUrl.Contains("cloudinary.com"))
+                {
+                    await _cloudinaryService.DeleteFileByUrlAsync(product.MainImageUrl);
+                }
+
+                foreach (var detailUrl in product.DetailImageUrls)
+                {
+                    if (!string.IsNullOrEmpty(detailUrl) && detailUrl.Contains("cloudinary.com"))
+                    {
+                        await _cloudinaryService.DeleteFileByUrlAsync(detailUrl);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't fail the deletion
+                Console.WriteLine($"Warning: Could not delete images: {ex.Message}");
+            }
 
             _unitOfWork.Products.Remove(product);
             await _unitOfWork.CompleteAsync();

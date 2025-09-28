@@ -235,11 +235,18 @@
   transform: scaleY(1);
 }
 
+/* Fixed check icon alignment */
 .check-icon {
   font-size: 1.5rem;
   color: #2ecc71;
   flex-shrink: 0;
-  margin-top: 4px;
+  margin-top: 2px; /* Slightly adjust to align with first line of text */
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
 }
 
 .mission-item p {
@@ -248,6 +255,7 @@
   margin: 0;
   line-height: 1.7;
   font-weight: 500;
+  flex: 1;
 }
 
 /* Conclusion Section */
@@ -444,21 +452,6 @@
   animation-delay: 0.4s;
   animation-fill-mode: both;
 }
-
-
-/* Container utility */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 16px;
-  }
-}
-
 
 /* Container utility */
 .container {

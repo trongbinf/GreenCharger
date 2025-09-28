@@ -1,79 +1,224 @@
 <app-header></app-header>
 
-<div class="container" *ngIf="!isLoading && !error && product as p">
-  <nz-breadcrumb>
-    <nz-breadcrumb-item>
-      <a [routerLink]="['/']">Trang chủ</a>
-    </nz-breadcrumb-item>
-    <nz-breadcrumb-item>
-      <a [routerLink]="['/products']">Sản phẩm</a>
-    </nz-breadcrumb-item>
-    <nz-breadcrumb-item>{{ p.name }}</nz-breadcrumb-item>
-  </nz-breadcrumb>
-
-  <div nz-row [nzGutter]="24" class="pd-main">
-    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12">
-      <nz-card [nzBordered]="false" class="pd-image-card">
-        <img [src]="p.mainImageUrl || 'https://via.placeholder.com/600x600?text=Product'" [alt]="p.name" class="pd-main-image" />
-      </nz-card>
+<div class="product-details-container" *ngIf="!isLoading && !error && product as p">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-section">
+    <div class="container">
+      <nz-breadcrumb>
+        <nz-breadcrumb-item>
+          <a [routerLink]="['/']">Trang chủ</a>
+        </nz-breadcrumb-item>
+        <nz-breadcrumb-item>
+          <a [routerLink]="['/products']">Sản phẩm</a>
+        </nz-breadcrumb-item>
+        <nz-breadcrumb-item>{{ p.name }}</nz-breadcrumb-item>
+      </nz-breadcrumb>
     </div>
+  </div>
 
-    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="12" [nzLg]="12">
-      <nz-card [nzBordered]="false" class="pd-info-card">
-        <h1 class="pd-title">{{ p.name }}</h1>
-        
-        <div class="pd-price">
-          <span class="pd-current">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-          <span class="pd-original" *ngIf="p.discount > 0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+  <!-- Main Product Section -->
+  <div class="main-product-section">
+    <div class="container">
+      <div class="product-layout">
+        <!-- Product Images -->
+        <div class="product-images">
+          <div class="main-image-container">
+            <img 
+              [src]="selectedImage || p.mainImageUrl || 'https://via.placeholder.com/600x600?text=Product'" 
+              [alt]="p.name" 
+              class="main-image" 
+            />
+            <div class="image-badges">
+              <span class="badge new" *ngIf="p.isNew">Mới</span>
+              <span class="badge sale" *ngIf="p.isOnSale">Giảm {{ p.discount }}%</span>
+            </div>
+          </div>
+          
+          <!-- Thumbnail Images -->
+          <div class="thumbnail-gallery" *ngIf="getAllImages(p).length > 1">
+            <div 
+              class="thumbnail-item" 
+              *ngFor="let image of getAllImages(p); let i = index"
+              [class.active]="selectedImage === image"
+              (click)="selectImage(image)"
+            >
+              <img [src]="image" [alt]="p.name + ' - Ảnh ' + (i + 1)" />
+            </div>
+          </div>
         </div>
 
-        <div class="pd-badges">
-          <nz-tag *ngIf="p.isNew" nzColor="blue">Mới</nz-tag>
-          <nz-tag *ngIf="p.isOnSale" nzColor="red">Giảm giá</nz-tag>
-          <nz-tag *ngIf="p.isFeatured" nzColor="green">Nổi bật</nz-tag>
-        </div>
+        <!-- Product Info -->
+        <div class="product-info">
+          <div class="product-header">
+            <h1 class="product-title">{{ p.name }}</h1>
+            <div class="product-rating" *ngIf="p.averageRating > 0">
+              <div class="stars">
+                <span 
+                  *ngFor="let star of getStars(p.averageRating)"
+                  class="star"
+                  [class.filled]="star === 1">★</span>
+              </div>
+              <span class="rating-text">({{ p.reviewCount }} đánh giá)</span>
+            </div>
+          </div>
 
-        <div class="pd-quantity">
-          <label>Số lượng:</label>
-          <nz-input-number [(ngModel)]="quantity" [nzMin]="1" [nzMax]="p.quantityInStock"></nz-input-number>
-        </div>
+          <div class="product-price">
+            <span class="current-price">{{ formatCurrency(p.finalPrice || p.price) }}</span>
+            <span class="original-price" *ngIf="p.discount > 0">{{ formatCurrency(p.price) }}</span>
+            <span class="discount-badge" *ngIf="p.discount > 0">Tiết kiệm {{ formatCurrency(p.price - (p.finalPrice || p.price)) }}</span>
+          </div>
 
-        <div class="pd-actions">
-          <button nz-button nzType="primary" nzSize="large" (click)="addToCart()">
-            <i nz-icon nzType="shopping-cart"></i>
-            Thêm vào giỏ hàng
+          <div class="product-meta">
+            <div class="meta-item">
+              <span class="meta-label">Danh mục:</span>
+              <span class="meta-value">{{ p.categoryName }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Tình trạng:</span>
+              <span class="meta-value" [class.in-stock]="p.quantityInStock > 0" [class.out-of-stock]="p.quantityInStock <= 0">
+                {{ p.quantityInStock > 0 ? 'Còn hàng' : 'Hết hàng' }}
+              </span>
+            </div>
+            <div class="meta-item" *ngIf="p.quantityInStock > 0">
+              <span class="meta-label">Số lượng còn:</span>
+              <span class="meta-value">{{ p.quantityInStock }} sản phẩm</span>
+            </div>
+          </div>
+
+          <div class="product-actions">
+            <div class="quantity-selector">
+              <label>Số lượng:</label>
+              <div class="quantity-controls">
+                <button type="button" (click)="decreaseQuantity()" [disabled]="quantity <= 1">-</button>
+                <input type="number" [(ngModel)]="quantity" [min]="1" [max]="p.quantityInStock" readonly>
+                <button type="button" (click)="increaseQuantity()" [disabled]="quantity >= p.quantityInStock">+</button>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button 
+                class="btn btn-primary add-to-cart" 
+                (click)="addToCart()"
+                [disabled]="p.quantityInStock <= 0"
+              >
+                <i class="icon-cart"></i>
+                {{ p.quantityInStock > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}
+              </button>
+              <button class="btn btn-contact" (click)="contactDirectly()">
+                <i class="icon-phone"></i>
+                Liên hệ trực tiếp
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Description -->
+  <div class="product-description-section">
+    <div class="container">
+      <div class="description-tabs">
+        <div class="tab-header">
+          <button 
+            class="tab-button" 
+            [class.active]="activeTab === 'description'"
+            (click)="setActiveTab('description')"
+          >
+            Mô tả sản phẩm
+          </button>
+          <button 
+            class="tab-button" 
+            [class.active]="activeTab === 'specifications'"
+            (click)="setActiveTab('specifications')"
+          >
+            Thông số kỹ thuật
           </button>
         </div>
-      </nz-card>
+        
+        <div class="tab-content">
+          <div class="tab-panel" *ngIf="activeTab === 'description'">
+            <div class="description-content" [innerHTML]="getSafeHtml(p.description || 'Chưa có mô tả cho sản phẩm này.')"></div>
+          </div>
+          
+          <div class="tab-panel" *ngIf="activeTab === 'specifications'">
+            <div class="specifications-content">
+              <div class="spec-item">
+                <span class="spec-label">Tên sản phẩm:</span>
+                <span class="spec-value">{{ p.name }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Danh mục:</span>
+                <span class="spec-value">{{ p.categoryName }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Giá gốc:</span>
+                <span class="spec-value">{{ formatCurrency(p.price) }}</span>
+              </div>
+              <div class="spec-item" *ngIf="p.discount > 0">
+                <span class="spec-label">Giảm giá:</span>
+                <span class="spec-value">{{ p.discount }}%</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Giá bán:</span>
+                <span class="spec-value">{{ formatCurrency(p.finalPrice || p.price) }}</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Tình trạng:</span>
+                <span class="spec-value">{{ p.isActive ? 'Đang bán' : 'Ngừng bán' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="pd-details">
-    <nz-card class="pd-card" nzTitle="Mô tả" [nzBordered]="false">
-      <p class="pd-description" [innerHTML]="getSafeHtml(p.description || 'Chưa có mô tả cho sản phẩm này.')"></p>
-    </nz-card>
-  </div>
-
-  <!-- Related products -->
-  <nz-card nzTitle="Sản phẩm khác của GREEN CHARGER" class="pd-card" [nzBordered]="false" *ngIf="relatedProducts.length">
-    <div nz-row [nzGutter]="16">
-      <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="6" *ngFor="let rp of relatedProducts">
-        <a [routerLink]="['/product', rp.id]">
-          <nz-card nzHoverable [nzBordered]="true" class="pd-related-card">
-            <nz-card-meta [nzTitle]="rp.name"></nz-card-meta>
-            <div class="pd-related-price">
-              <span class="pd-related-current">{{ (rp.finalPrice || rp.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
-              <span class="pd-related-original" *ngIf="rp.discount > 0">{{ rp.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
+  <!-- Related Products - Fixed Navigation -->
+  <div class="related-products-section" *ngIf="relatedProducts.length">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Sản phẩm khác của GREEN CHARGER</h2>
+      </div>
+      
+      <div class="related-products-grid">
+        <a 
+          [routerLink]="['/product', rp.id]" 
+          class="related-product-card" 
+          *ngFor="let rp of relatedProducts"
+          (click)="onRelatedProductClick(rp.id)"
+        >
+          <div class="product-image">
+            <img [src]="rp.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="rp.name" />
+            <!-- Corner Badge - Only show if there's a discount -->
+            <div class="product-badges" *ngIf="rp.discount > 0">
+              <span class="badge sale">Giảm {{ rp.discount }}%</span>
             </div>
-            <img [src]="rp.mainImageUrl || 'https://via.placeholder.com/300x300?text=Product'" [alt]="rp.name" class="pd-related-image" />
-          </nz-card>
+          </div>
+          <div class="product-content">
+            <h3 class="product-name">{{ rp.name }}</h3>
+            <div class="product-price">
+              <span class="current-price">{{ formatCurrency(rp.finalPrice || rp.price) }}</span>
+              <span class="original-price" *ngIf="rp.discount > 0">{{ formatCurrency(rp.price) }}</span>
+            </div>
+          </div>
         </a>
       </div>
     </div>
-  </nz-card>
+  </div>
 </div>
 
-<div *ngIf="isLoading" class="pd-loading">Đang tải...</div>
-<div *ngIf="error" class="pd-error">{{ error }}</div>
+<!-- Loading and Error States -->
+<div class="loading-container" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p>Đang tải sản phẩm...</p>
+</div>
+
+<div class="error-container" *ngIf="error">
+  <div class="error-icon">⚠️</div>
+  <h3>Không thể tải sản phẩm</h3>
+  <p>{{ error }}</p>
+  <button class="btn btn-primary" (click)="goBack()">Quay lại</button>
+</div>
 
 <app-footer></app-footer>

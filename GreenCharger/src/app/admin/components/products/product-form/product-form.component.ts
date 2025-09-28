@@ -5,13 +5,14 @@ import { QuillModule } from 'ngx-quill';
 import { Product, ProductDto } from '../../../../models/product.model';
 import { Category } from '../../../../models/category.model';
 import { CategoryService } from '../../../../services/category.service';
+import { ProductService } from '../../../../services/product.service';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, QuillModule],
   templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.css', './product-form.component.modal.css']
+  styleUrls: ['./product-form.component.css']
 })
 export class ProductFormComponent implements OnInit {
   @Input() product: Product | null = null;
@@ -24,8 +25,6 @@ export class ProductFormComponent implements OnInit {
   categories: Category[] = [];
   loading = false;
   error: string | null = null;
-  selectedImages: File[] = [];
-  imagePreviewUrls: string[] = [];
 
   // Quill editor configuration
   quillConfig = {
@@ -49,7 +48,8 @@ export class ProductFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
@@ -88,7 +88,7 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  private loadProductData(): void {
+    private loadProductData(): void {
     if (this.product) {
       this.productForm.patchValue({
         name: this.product.name,
@@ -102,56 +102,182 @@ export class ProductFormComponent implements OnInit {
         isOnSale: this.product.isOnSale,
         isFeatured: this.product.isFeatured
       });
+
+      // Set existing images
+      this.existingMainImage = this.product.mainImageUrl || null;
+      this.existingDetailImages = this.product.detailImageUrls || [];
     }
   }
 
-  onImageSelected(event: any): void {
+
+  // Image upload properties
+  selectedMainImage: File | null = null;
+  selectedDetailImages: File[] = [];
+  mainImagePreview: string | null = null;
+  detailImagePreviews: string[] = [];
+  // Existing image properties
+  existingMainImage: string | null = null;
+  existingDetailImages: string[] = [];
+  uploadingImages = false;
+
+  // Image upload methods
+  onMainImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedMainImage = file;
+      this.previewMainImage(file);
+    }
+  }
+
+  onDetailImagesSelected(event: any): void {
     const files = Array.from(event.target.files) as File[];
-    this.selectedImages = [...this.selectedImages, ...files];
-    this.updateImagePreviews();
+    this.selectedDetailImages = [...this.selectedDetailImages, ...files];
+    this.previewDetailImages();
   }
 
-  removeImage(index: number): void {
-    this.selectedImages.splice(index, 1);
-    this.updateImagePreviews();
+  private previewMainImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.mainImagePreview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
-  private updateImagePreviews(): void {
-    this.imagePreviewUrls = [];
-    this.selectedImages.forEach(file => {
+  private previewDetailImages(): void {
+    this.detailImagePreviews = [];
+    this.selectedDetailImages.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.imagePreviewUrls.push(e.target?.result as string);
+        this.detailImagePreviews.push(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     });
   }
 
-  onSubmit(): void {
+    removeMainImage(): void {
+    this.selectedMainImage = null;
+    this.mainImagePreview = null;
+    this.existingMainImage = null;
+  }
+
+    removeDetailImage(index: number): void {
+    if (index < this.existingDetailImages.length) {
+      // Remove from existing images
+      this.existingDetailImages.splice(index, 1);
+    } else {
+      // Remove from new previews
+      const previewIndex = index - this.existingDetailImages.length;
+      this.selectedDetailImages.splice(previewIndex, 1);
+      this.detailImagePreviews.splice(previewIndex, 1);
+    }
+  }
+
+  async uploadImages(): Promise<{mainImageUrl: string, detailImageUrls: string[]}> {
+    this.uploadingImages = true;
+    const result = { mainImageUrl: '', detailImageUrls: [] as string[] };
+
+    try {
+      // Upload main image if selected
+      if (this.selectedMainImage) {
+        const mainImageResponse = await this.productService.uploadProductImage(this.selectedMainImage).toPromise();
+        result.mainImageUrl = mainImageResponse?.imageUrl || '';
+      }
+
+      // Upload detail images if selected
+      if (this.selectedDetailImages.length > 0) {
+        for (const file of this.selectedDetailImages) {
+          const detailImageResponse = await this.productService.uploadProductImage(file).toPromise();
+          if (detailImageResponse?.imageUrl) {
+            result.detailImageUrls.push(detailImageResponse.imageUrl);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      throw error;
+    } finally {
+      this.uploadingImages = false;
+    }
+
+    return result;
+  }
+
+  
+  
+  
+  // Getter methods for null safety
+  get hasDetailImages(): boolean {
+    return this.detailImagePreviews.length > 0 || 
+           this.existingDetailImages.length > 0 ||
+           (this.product?.detailImageUrls ? this.product.detailImageUrls.length > 0 : false);
+  }
+
+  get showDetailUploadContent(): boolean {
+    return this.detailImagePreviews.length === 0 && 
+           this.existingDetailImages.length === 0 &&
+           (!this.product?.detailImageUrls || this.product.detailImageUrls.length === 0);
+  }
+
+  get showDetailImagesGrid(): boolean {
+    return this.detailImagePreviews.length > 0 || 
+           this.existingDetailImages.length > 0 ||
+           (this.product?.detailImageUrls ? this.product.detailImageUrls.length > 0 : false);
+  }
+
+  get detailImageUrls(): string[] {
+    return this.product?.detailImageUrls || [];
+  }
+
+  get allDetailImages(): string[] {
+    return [...this.existingDetailImages, ...this.detailImagePreviews];
+  }
+
+    async onSubmit(): Promise<void> {
     if (this.productForm.valid) {
       this.loading = true;
       this.error = null;
 
-      const formData = this.productForm.value;
+      try {
+        const formData = this.productForm.value;
+        let mainImageUrl = this.existingMainImage || '';
+        let detailImageUrls = [...this.existingDetailImages];
 
-      // Create ProductDto for emission
-      const productDto: ProductDto = {
-        id: this.product?.id || 0,
-        name: formData.name || '',
-        description: formData.description || '',
-        price: Number(formData.price) || 0,
-        discount: Number(formData.discount) || 0,
-        stockQuantity: Number(formData.stockQuantity) || 0,
-        quantityInStock: Number(formData.stockQuantity) || 0, // Ensure this is present
-        categoryId: Number(formData.categoryId) || 0,
-        isActive: formData.isActive !== undefined ? formData.isActive : true,
-        isNew: formData.isNew !== undefined ? formData.isNew : false,
-        isOnSale: formData.isOnSale !== undefined ? formData.isOnSale : false,
-        isFeatured: formData.isFeatured !== undefined ? formData.isFeatured : false
-      };
+        // Upload new images if any are selected
+        if (this.selectedMainImage || this.selectedDetailImages.length > 0) {
+          const uploadResult = await this.uploadImages();
+          if (uploadResult.mainImageUrl) {
+            mainImageUrl = uploadResult.mainImageUrl;
+          }
+          if (uploadResult.detailImageUrls.length > 0) {
+            detailImageUrls = [...detailImageUrls, ...uploadResult.detailImageUrls];
+          }
+        }
 
-      this.save.emit(productDto);
-      this.loading = false;
+        // Create ProductDto
+        const productDto: ProductDto = {
+          id: this.product?.id || 0,
+          name: formData.name || '',
+          description: formData.description || '',
+          price: Number(formData.price) || 0,
+          discount: Number(formData.discount) || 0,
+          stockQuantity: Number(formData.stockQuantity) || 0,
+          quantityInStock: Number(formData.stockQuantity) || 0,
+          mainImageUrl: mainImageUrl,
+          detailImageUrls: detailImageUrls,
+          categoryId: Number(formData.categoryId) || 0,
+          isActive: formData.isActive !== undefined ? formData.isActive : true,
+          isNew: formData.isNew !== undefined ? formData.isNew : false,
+          isOnSale: formData.isOnSale !== undefined ? formData.isOnSale : false,
+          isFeatured: formData.isFeatured !== undefined ? formData.isFeatured : false
+        };
+
+        this.save.emit(productDto);
+        this.loading = false;
+      } catch (error) {
+        console.error('Error uploading images:', error);
+        this.error = 'Lỗi khi tải ảnh lên';
+        this.loading = false;
+      }
     } else {
       this.markFormGroupTouched();
     }

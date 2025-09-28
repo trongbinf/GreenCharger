@@ -345,3 +345,24 @@ input:checked + .toggle-slider:before {
 .error-message i {
   font-size: 16px;
 }
+/* Modal closing animation */
+.modal-overlay.modal-closing {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.modal-overlay.modal-closing .modal-content {
+  transform: scale(0.9);
+  transition: transform 0.3s ease-out;
+}
+
+/* Modal opening animation */
+.modal-overlay {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+.modal-overlay .modal-content {
+  transform: scale(1);
+  transition: transform 0.3s ease-in;
+}

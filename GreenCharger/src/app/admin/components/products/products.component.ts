@@ -237,11 +237,49 @@ export class ProductsComponent implements OnInit {
     this.isEditing = false;
   }
 
-  onSaveProduct(product: any): void {
+  onSaveProduct(product: ProductDto): void {
+    this.loading = true;
+    this.error = '';
+    
+    if (this.formMode === 'create') {
+      this.productService.createProduct(product).subscribe({
+        next: (createdProduct) => {
+          this.message.success('Thêm sản phẩm thành công');
+          this.closeModalAndReload();
+        },
+        error: (error) => {
+          console.error('Error creating product:', error);
+          this.error = 'Lỗi khi thêm sản phẩm';
+          this.message.error('Lỗi khi thêm sản phẩm');
+          this.loading = false;
+        }
+      });
+    } else {
+      this.productService.updateProduct(product.id, product).subscribe({
+        next: (updatedProduct) => {
+          this.message.success('Cập nhật sản phẩm thành công');
+          this.closeModalAndReload();
+        },
+        error: (error) => {
+          console.error('Error updating product:', error);
+          this.error = 'Lỗi khi cập nhật sản phẩm';
+          this.message.error('Lỗi khi cập nhật sản phẩm');
+          this.loading = false;
+        }
+      });
+    }
+  }
+
+  private closeModalAndReload(): void {
+    // Close modal
     this.showForm = false;
     this.showFormModal = false;
     this.selectedProduct = null;
     this.isEditing = false;
+    this.loading = false;
+    this.error = '';
+    
+    // Reload products
     this.loadProducts();
   }
 

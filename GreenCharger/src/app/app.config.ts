@@ -1,4 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection, LOCALE_ID } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes),
     provideHttpClient(),
+    provideAnimationsAsync(),
     { provide: LOCALE_ID, useValue: 'vi' },
     importProvidersFrom(QuillModule.forRoot())
   ]

@@ -35,12 +35,12 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  createProduct(product: ProductDto): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product, { headers: this.getAuthHeaders() });
+  createProduct(product: ProductDto): Observable<ProductDto> {
+    return this.http.post<ProductDto>(this.apiUrl, product, { headers: this.getAuthHeaders() });
   }
 
-  updateProduct(id: number, product: ProductDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, product, { headers: this.getAuthHeaders() });
+  updateProduct(id: number, product: ProductDto): Observable<ProductDto> {
+    return this.http.put<ProductDto>(`${this.apiUrl}/${id}`, product, { headers: this.getAuthHeaders() });
   }
 
   deleteProduct(id: number): Observable<void> {

@@ -23,39 +23,16 @@ export class HomeComponent implements OnInit {
   isLoadingProducts = false;
   productsError = '';
 
-  testimonials = [
+  currentSlide = 0;
+  slides = [
+   
     {
       id: 1,
-      name: 'Nguyễn Văn A',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face&auto=format',
-      rating: 5,
-      comment: 'Sạc rất nhanh và chất lượng tốt. Tôi rất hài lòng với sản phẩm này!'
+      image: 'https://res.cloudinary.com/dafzz2c9j/image/upload/v1759077671/z7060360293839_cff022530c1b6a7c34ec883e2e54bac7_leu07g.jpg'
     },
     {
       id: 2,
-      name: 'Trần Thị B',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face&auto=format',
-      rating: 5,
-      comment: 'Giao hàng nhanh, sản phẩm đúng như mô tả. Sẽ mua tiếp!'
-    },
-    {
-      id: 3,
-      name: 'Lê Văn C',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face&auto=format',
-      rating: 4,
-      comment: 'Giá cả hợp lý, chất lượng ổn. Khuyến nghị cho mọi người.'
-    }
-  ];
-
-  currentSlide = 0;
-  slides = [
-    {
-      id: 1,
-      title: 'Sạc Điện Tử Chất Lượng Cao',
-      subtitle: 'Khám phá bộ sưu tập sạc điện tử hiện đại và tiết kiệm năng lượng',
-      image: 'https://res.cloudinary.com/ddkvhnj27/image/upload/v1758463523/A%CC%89nh_ma%CC%80n_hi%CC%80nh_2025-09-21_lu%CC%81c_21.04.48_rl32fx.png',
-      buttonText: 'Mua ngay',
-      buttonLink: '/products'
+      image: 'https://res.cloudinary.com/dafzz2c9j/image/upload/v1759077671/1_dppzqu.jpg'
     }
   ];
 
@@ -374,7 +351,7 @@ export class HomeComponent implements OnInit {
   startSlider(): void {
     setInterval(() => {
       this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-    }, 5000);
+    }, 3000);
   }
 
   goToSlide(index: number): void {

@@ -1,0 +1,423 @@
+/* Contact Component - Professional Styling */
+.contact-main {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fffe 0%, #f0f8f7 50%, #e8f5f3 100%);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+/* Contact Hero Section */
+.contact-hero {
+  position: relative;
+  padding: 140px 0 100px;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 50%, #229954 100%);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.contact-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.1;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  margin-bottom: 24px;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  opacity: 0.95;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Contact Content Section */
+.contact-content {
+  padding: 100px 0;
+  position: relative;
+}
+
+.contact-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.contact-info {
+  background: white;
+  padding: 80px 60px;
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(46, 204, 113, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: #1a252f;
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border-radius: 2px;
+}
+
+.section-description {
+  font-size: 1.125rem;
+  color: #4a5568;
+  text-align: center;
+  max-width: 700px;
+  margin: 24px auto 60px;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* Social Links Grid - 4 columns in 1 row */
+.social-links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+
+.social-item {
+  position: relative;
+}
+
+.social-link {
+  display: block;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  text-align: center;
+}
+
+.social-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: #2ecc71;
+}
+
+.social-link:hover::before {
+  transform: scaleX(1);
+}
+
+.social-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2rem;
+  color: white;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.social-link:hover .social-icon {
+  transform: scale(1.05);
+}
+
+.social-icon.facebook { 
+  background: linear-gradient(135deg, #1877f2, #166fe5); 
+}
+.social-icon.tiktok { 
+  background: linear-gradient(135deg, #000000, #222222); 
+}
+.social-icon.email { 
+  background: linear-gradient(135deg, #ea4335, #d93025); 
+}
+.social-icon.zalo { 
+  background: linear-gradient(135deg, #008fe6, #007acc); 
+}
+
+.social-info {
+  text-align: center;
+}
+
+.social-info h3 {
+  font-size: 1.25rem;
+  color: #1a252f;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.social-info p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.social-handle {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: 'Monaco', 'Menlo', monospace;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  word-break: break-all;
+}
+
+.social-link:hover .social-handle {
+  background: #2ecc71;
+  color: white;
+  border-color: #27ae60;
+}
+
+/* Contact Form Section */
+.contact-form-section {
+  margin-top: 80px;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f8fffe, #f0f8f7);
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.form-title {
+  font-size: 2rem;
+  color: #1a252f;
+  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.form-description {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.form-placeholder {
+  background: white;
+  padding: 60px 40px;
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
+  transition: all 0.3s ease;
+}
+
+.form-placeholder:hover {
+  border-color: #2ecc71;
+  background: #f8fffe;
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.form-placeholder p {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Social Logo Styling - Fixed to show logos properly */
+.social-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  /* Removed filter to show logos in their original colors */
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .social-links {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-hero {
+    padding: 120px 0 80px;
+  }
+  
+  .contact-content {
+    padding: 80px 0;
+  }
+  
+  .contact-info {
+    padding: 40px 32px;
+    border-radius: 20px;
+  }
+  
+  .social-links {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .social-link {
+    padding: 32px 24px;
+  }
+  
+  .contact-form-section {
+    padding: 40px 24px;
+    margin-top: 60px;
+  }
+  
+  .form-placeholder {
+    padding: 40px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-hero {
+    padding: 100px 0 60px;
+  }
+  
+  .contact-info {
+    padding: 32px 24px;
+    border-radius: 16px;
+  }
+  
+  .social-link {
+    padding: 28px 20px;
+  }
+  
+  .social-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+  
+  .contact-form-section {
+    padding: 32px 20px;
+  }
+  
+  .form-placeholder {
+    padding: 32px 20px;
+  }
+}
+
+/* Focus and Accessibility */
+.social-link:focus {
+  outline: 3px solid #2ecc71;
+  outline-offset: 2px;
+}
+
+.social-link:focus-visible {
+  outline: 3px solid #2ecc71;
+  outline-offset: 2px;
+}
+
+/* Animation for page load */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contact-info {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.social-item {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.social-item:nth-child(1) { animation-delay: 0.1s; }
+.social-item:nth-child(2) { animation-delay: 0.2s; }
+.social-item:nth-child(3) { animation-delay: 0.3s; }
+.social-item:nth-child(4) { animation-delay: 0.4s; }
+
+/* Container utility */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}

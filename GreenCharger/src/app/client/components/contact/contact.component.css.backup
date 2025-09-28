@@ -1,0 +1,237 @@
+.contact-main {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+}
+
+/* Contact Hero Section */
+.contact-hero {
+  padding: 120px 0 80px;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+/* Contact Content Section */
+.contact-content {
+  padding: 80px 0;
+}
+
+.contact-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.contact-info {
+  background: white;
+  padding: 60px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border-radius: 2px;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+  max-width: 700px;
+  margin: 20px auto 40px;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.social-card {
+  background: #f9f9f9;
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #eee;
+}
+
+.social-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.social-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.social-icon.facebook { background: linear-gradient(135deg, #1877f2, #166fe5); }
+.social-icon.tiktok { background: linear-gradient(135deg, #000000, #222222); }
+.social-icon.email { background: linear-gradient(135deg, #ea4335, #d93025); }
+.social-icon.zalo { background: linear-gradient(135deg, #008fe6, #007acc); }
+
+.social-card h3 {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.social-card p {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 15px;
+  word-break: break-all; /* Ensure long emails/handles wrap */
+}
+
+.social-card a {
+  display: inline-block;
+  background: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.social-card a:hover {
+  background: #27ae60;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .contact-info {
+    padding: 40px;
+  }
+  .social-links {
+    gap: 20px;
+  }
+  .social-card {
+    width: 200px;
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+  .contact-info {
+    padding: 30px;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .section-description {
+    font-size: 1rem;
+  }
+  .social-links {
+    flex-direction: column;
+    align-items: center;
+  }
+  .social-card {
+    width: 80%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  .contact-info {
+    padding: 20px;
+  }
+  .section-title {
+    font-size: 1.8rem;
+  }
+  .social-card {
+    width: 90%;
+  }
+}
+
+/* Social Logo Styling */
+.social-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.social-icon .social-logo {
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive adjustments for social logos */
+@media (max-width: 768px) {
+  .social-logo {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .social-logo {
+    width: 20px;
+    height: 20px;
+  }
+}

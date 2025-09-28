@@ -1,0 +1,149 @@
+.about-main {
+  background: linear-gradient(135deg, #e0ffe0 0%, #c0f0c0 100%);
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+}
+
+.hero-section {
+  position: relative;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  padding: 20px;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.hero-title {
+  font-size: 3em;
+  margin-top: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.problem-section,
+.mission-section,
+.conclusion-section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5em;
+  color: #27ae60;
+  margin-bottom: 20px;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border-radius: 2px;
+}
+
+.section-description {
+  font-size: 1.1em;
+  max-width: 800px;
+  margin: 20px auto;
+  color: #555;
+}
+
+.mission-section {
+  background: linear-gradient(135deg, #f0fff0, #e0ffe0);
+  border-top: 1px solid #d0e0d0;
+  border-bottom: 1px solid #d0e0d0;
+}
+
+.mission-subtitle {
+  font-size: 1.8em;
+  color: #2ecc71;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.mission-list {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.mission-list li {
+  background: #fff;
+  margin-bottom: 15px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 1.1em;
+  color: #333;
+  border-left: 5px solid #2ecc71;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mission-list li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.conclusion-section {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  padding: 80px 20px;
+}
+
+.conclusion-section .section-description {
+  color: white;
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2em;
+  }
+
+  .section-title {
+    font-size: 2em;
+  }
+
+  .section-description {
+    font-size: 1em;
+  }
+
+  .mission-subtitle {
+    font-size: 1.5em;
+  }
+
+  .mission-list li {
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.5em;
+  }
+
+  .section-title {
+    font-size: 1.5em;
+  }
+}

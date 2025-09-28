@@ -4,6 +4,7 @@ import { RegisterComponent } from './auth/components/register/register.component
 import { ForgotPasswordComponent } from './auth/components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './auth/components/reset-password/reset-password.component';
 import { ConfirmEmailComponent } from './auth/components/confirm-email/confirm-email.component';
+import { GuestAuthGuard } from './guards/guest-auth.guard';
 
 export const routes: Routes = [
   {
@@ -12,11 +13,13 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [GuestAuthGuard]
   },
   {
     path: 'register',
-    component: RegisterComponent
+    component: RegisterComponent,
+    canActivate: [GuestAuthGuard]
   },
   {
     path: 'forgot-password',

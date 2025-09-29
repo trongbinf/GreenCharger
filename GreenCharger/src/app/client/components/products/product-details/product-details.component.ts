@@ -149,16 +149,24 @@ export class ProductDetailsComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-  // Handle related product click
-  onRelatedProductClick(productId: number): void {
-    console.log('Related product clicked:', productId);
-    // The routerLink will handle the navigation
-  }
-
-  // Navigate to product details
-  navigateToProduct(productId: number): void {
-    console.log('Navigating to product:', productId);
-    this.router.navigate(['/product', productId]);
+  // Navigate to related product
+  navigateToRelatedProduct(productId: number): void {
+    console.log('Navigating to related product:', productId);
+    console.log('Current route:', this.router.url);
+    
+    this.router.navigate(['/product', productId]).then(success => {
+      if (success) {
+        console.log('Navigation successful');
+        // Force reload to ensure new product data loads
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
+      } else {
+        console.log('Navigation failed');
+      }
+    }).catch(error => {
+      console.error('Navigation error:', error);
+    });
   }
 
   // Contact directly via Messenger

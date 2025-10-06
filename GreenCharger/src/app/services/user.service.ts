@@ -140,6 +140,15 @@ export class UserService {
     return this.http.get<User[]>(`${this.apiUrl}/users`, { headers: this.getAuthHeaders() });
   }
 
+  // Roles management
+  getRoles(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/roles`, { headers: this.getAuthHeaders() });
+  }
+
+  updateUserRole(userId: string, role: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/users/${userId}/role`, { role }, { headers: this.getAuthHeaders() });
+  }
+
   getUserById(userId: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/users/${userId}`, { headers: this.getAuthHeaders() });
   }

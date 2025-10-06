@@ -43,7 +43,6 @@
           <th>STT</th>
           <th>Họ tên</th>
           <th>Email</th>
-          <th>Xác thực Email</th>
           <th>Trạng thái</th>
           <th>Ngày tạo</th>
           <th>Thao tác</th>
@@ -51,7 +50,7 @@
       </thead>
       <tbody>
         <tr *ngIf="paginatedUsers.length === 0">
-          <td colspan="7" class="text-center">
+          <td colspan="6" class="text-center">
             <div class="empty-state">
               <i class="fas fa-inbox"></i>
               <p>Chưa có dữ liệu</p>
@@ -71,12 +70,6 @@
               <i class="fas fa-envelope"></i>
               {{ user.email }}
             </div>
-          </td>
-          <td>
-            <span class="email-status-badge" [class.badge-success]="user.emailConfirmed" [class.badge-warning]="!user.emailConfirmed">
-              <i class="fas" [ngClass]="user.emailConfirmed ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
-              {{ user.emailConfirmed ? 'Đã xác thực' : 'Chưa xác thực' }}
-            </span>
           </td>
           <td>
             <span class="status-badge" [class.badge-success]="!isUserLocked(user)" [class.badge-danger]="isUserLocked(user)">
@@ -164,6 +157,9 @@
   [user]="selectedUser" 
   [mode]="formMode"
   [isVisible]="showUserForm"
+  [roles]="roles"
+  [selectedRole]="selectedRoleForForm"
   (close)="onCloseUserForm()"
-  (save)="onSaveUser($event)">
+  (save)="onSaveUser($event)"
+  (roleChange)="selectedRoleForForm = $event">
 </app-user-form>

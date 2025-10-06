@@ -7,11 +7,16 @@ import { AboutComponent } from './components/about/about.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { AuthGuard } from '../guards/auth.guard';
+import { SliderComponent } from './components/slider/slider.component';
 
 export const clientRoutes: Routes = [
   {
     path: '',
     component: HomeComponent
+  },
+  {
+    path: 'slider',
+    component: SliderComponent
   },
   {
     path: 'home',

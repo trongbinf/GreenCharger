@@ -21,12 +21,14 @@ export class UsersComponent implements OnInit {
   searchTerm: string = '';
   loading = false;
   error: string | null = null;
+  roles: string[] = [];
   
   // Modals
   showUserDetails = false;
   showUserForm = false;
   formMode: 'add' | 'edit' = 'add';
   selectedUser: User | null = null;
+  selectedRoleForForm: string | null = null;
 
   // Pagination
   currentPage = 1;
@@ -41,6 +43,10 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.userService.getRoles().subscribe({
+      next: roles => { this.roles = roles; },
+      error: () => {}
+    });
   }
 
   loadUsers(): void {
@@ -81,6 +87,7 @@ export class UsersComponent implements OnInit {
   onAddUser(): void {
     this.formMode = 'add';
     this.selectedUser = null;
+    this.selectedRoleForForm = this.roles.includes('User') ? 'User' : (this.roles[0] || null);
     this.showUserForm = true;
     console.log('Add user mode, selectedUser:', this.selectedUser);
   }
@@ -89,6 +96,8 @@ export class UsersComponent implements OnInit {
     console.log('onEditUser called with user:', user);
     this.formMode = 'edit';
     this.selectedUser = { ...user }; // Create a copy to avoid reference issues
+    // Assume first role or default to 'User' when editing (backend returns roles in DTO)
+    this.selectedRoleForForm = (user as any).roles?.[0] || (this.roles.includes('User') ? 'User' : (this.roles[0] || null));
     this.showUserForm = true;
     console.log('Edit user mode, selectedUser:', this.selectedUser);
     console.log('showUserForm:', this.showUserForm);
@@ -152,10 +161,24 @@ export class UsersComponent implements OnInit {
       };
 
       this.userService.createUser(createRequest).subscribe({
-        next: () => {
+        next: (created) => {
           this.messageService.success('Thành công', 'Thêm người dùng thành công');
-          this.onCloseUserForm();
-          this.loadUsers();
+          // Set role after creation if selected
+          if (created && created.id && this.selectedRoleForForm) {
+            this.userService.updateUserRole(created.id, this.selectedRoleForForm).subscribe({
+              next: () => {
+                this.onCloseUserForm();
+                this.loadUsers();
+              },
+              error: () => {
+                this.onCloseUserForm();
+                this.loadUsers();
+              }
+            });
+          } else {
+            this.onCloseUserForm();
+            this.loadUsers();
+          }
         },
         error: (error: any) => {
           console.error('Error creating user:', error);
@@ -172,8 +195,16 @@ export class UsersComponent implements OnInit {
       this.userService.updateUserProfile(this.selectedUser.id, updateRequest).subscribe({
         next: () => {
           this.messageService.success('Thành công', 'Cập nhật người dùng thành công');
-          this.onCloseUserForm();
-          this.loadUsers();
+          // Update role if changed
+          if (this.selectedRoleForForm) {
+            this.userService.updateUserRole(this.selectedUser!.id, this.selectedRoleForForm).subscribe({
+              next: () => { this.onCloseUserForm(); this.loadUsers(); },
+              error: () => { this.onCloseUserForm(); this.loadUsers(); }
+            });
+          } else {
+            this.onCloseUserForm();
+            this.loadUsers();
+          }
         },
         error: (error: any) => {
           console.error('Error updating user:', error);

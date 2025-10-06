@@ -5,9 +5,9 @@
   <!-- Hero Section - Image Only Slider -->
   <section class="hero-section">
     <div class="hero-slider">
-      <div class="slide" *ngFor="let slide of slides; let i = index" [class.active]="currentSlide === i">
+      <div class="slide" *ngFor="let slide of slides; let i = index" [class.active]="currentSlide === i" (click)="navigateFromSlide(slide)" style="cursor: pointer;">
         <div class="slide-image">
-          <img [src]="slide.image" [alt]="slide.id">
+          <img [src]="slide.imageUrl" [alt]="slide.title || ('Slide ' + slide.id)">
         </div>
       </div>
     </div>

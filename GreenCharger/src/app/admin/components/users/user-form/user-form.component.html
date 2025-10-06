@@ -51,6 +51,14 @@
             <div *ngIf="f['email'].errors['email']">Email không đúng định dạng</div>
           </div>
         </div>
+
+        <!-- Role selector for both add and edit -->
+        <div class="form-group">
+          <label for="role">Vai trò</label>
+          <select id="role" class="form-control" formControlName="role" (change)="roleChange.emit($any($event.target).value)">
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
         
         <ng-container *ngIf="mode === 'add'">
           <div class="form-grid">
@@ -84,54 +92,7 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="mode === 'edit'">
-          <div class="password-section">
-            <div class="section-header">
-              <h4><i class="fas fa-key"></i> Đổi mật khẩu</h4>
-              <p class="section-description">Để trống nếu không muốn thay đổi mật khẩu</p>
-            </div>
-            
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="newPassword">Mật khẩu mới</label>
-                <div class="password-input">
-                  <input 
-                    type="password" 
-                    id="newPassword" 
-                    formControlName="newPassword" 
-                    class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['newPassword'].errors }"
-                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" />
-                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility('new')">
-                    <i class="fas" [ngClass]="showNewPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                  </button>
-                </div>
-                <div *ngIf="submitted && f['newPassword'].errors" class="invalid-feedback">
-                  <div *ngIf="f['newPassword'].errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="confirmNewPassword">Xác nhận mật khẩu mới</label>
-                <div class="password-input">
-                  <input 
-                    type="password" 
-                    id="confirmNewPassword" 
-                    formControlName="confirmNewPassword" 
-                    class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && (f['confirmNewPassword'].errors || newPasswordsMismatch) }"
-                    placeholder="Nhập lại mật khẩu mới" />
-                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility('confirm')">
-                    <i class="fas" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                  </button>
-                </div>
-                <div *ngIf="submitted && (f['confirmNewPassword'].errors || newPasswordsMismatch)" class="invalid-feedback">
-                  <div *ngIf="newPasswordsMismatch">Mật khẩu xác nhận không khớp</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ng-container>
+        <!-- Remove password change section in edit mode as requested -->
         
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="onClose()">

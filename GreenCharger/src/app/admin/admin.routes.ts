@@ -43,6 +43,10 @@ export const adminRoutes: Routes = [
       {
         path: 'slider',
         loadComponent: () => import('./components/slider/slider.component').then(m => m.SliderComponent)
+      },
+      {
+        path: 'slider/:id',
+        loadComponent: () => import('./components/slider/slider-detail/slider-detail.component').then(m => m.SliderDetailComponent)
       }
     ]
   }

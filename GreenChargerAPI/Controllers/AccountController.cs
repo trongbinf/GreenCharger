@@ -54,6 +54,7 @@ namespace GreenChargerAPI.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
+                EmailConfirmed = true, // Auto confirm email on registration
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -74,14 +75,7 @@ namespace GreenChargerAPI.Controllers
 
             if (result.Succeeded)
             {
-                // Tạo token xác nhận email (token lifespan cấu hình 5 phút trong Program.cs)
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                Console.WriteLine($"[Register] Token: {token}");
-
-                var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
-
-                // Gửi email xác nhận
-                await _emailService.SendRegistrationEmailAsync(user.Email ?? "", confirmLink);
+                // Email is auto-confirmed; skip sending confirmation email
 
                 // Gán role cho tài khoản mới
                 string role = !string.IsNullOrEmpty(model.Role) ? model.Role : "User";
@@ -102,7 +96,7 @@ namespace GreenChargerAPI.Controllers
                 // Thêm role claim thủ công để đảm bảo
                 await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, role));
 
-                return Ok(new { message = "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản." });
+                return Ok(new { message = "Đăng ký thành công." });
             }
             else
             {
@@ -151,8 +145,7 @@ namespace GreenChargerAPI.Controllers
             if (user == null)
                 return Unauthorized(new { message = "Thông tin đăng nhập không hợp lệ" });
 
-            if (!await _userManager.IsEmailConfirmedAsync(user))
-                return Unauthorized(new { message = "Vui lòng xác nhận email trước khi đăng nhập" });
+            // Email confirmation not required
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
@@ -243,18 +236,19 @@ namespace GreenChargerAPI.Controllers
         [HttpPost("resend-confirmation")]
         public async Task<IActionResult> ResendConfirmation([FromBody] ForgotPasswordModel model)
         {
+            // Email verification has been disabled; nothing to resend
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 return BadRequest(new { message = "Email chưa được đăng ký." });
 
-            if (user.EmailConfirmed)
-                return BadRequest(new { message = "Email đã được xác nhận trước đó." });
+            // Ensure user is marked confirmed for legacy accounts
+            if (!user.EmailConfirmed)
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+            }
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmLink = $"http://localhost:4200/confirm-email?email={System.Web.HttpUtility.UrlEncode(user.Email)}&token={System.Web.HttpUtility.UrlEncode(token)}";
-            await _emailService.SendRegistrationEmailAsync(user.Email ?? "", confirmLink);
-
-            return Ok(new { message = "Đã gửi lại email xác nhận. Vui lòng kiểm tra hộp thư." });
+            return Ok(new { message = "Xác nhận email không còn bắt buộc. Tài khoản đã được kích hoạt." });
         }
 
         [HttpGet("users")]

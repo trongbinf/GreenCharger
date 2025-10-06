@@ -129,7 +129,7 @@ export class RegisterComponent implements OnInit {
       this.userService.register(payload).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.successMessage = response.message || 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.';
+          this.successMessage = response.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.';
           this.msg.success('Thành công', this.successMessage);
           
           // Redirect to login page after successful registration
@@ -213,19 +213,7 @@ export class RegisterComponent implements OnInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  resendConfirmation(): void {
-    const email = this.registerForm.get('email')?.value;
-    if (email) {
-      this.userService.resendConfirmation(email).subscribe({
-        next: (response) => {
-          this.msg.success('Thành công', response.message || 'Đã gửi lại email xác nhận');
-        },
-        error: (error) => {
-          this.msg.error('Lỗi', 'Không thể gửi lại email xác nhận');
-        }
-      });
-    }
-  }
+  // Email confirmation is disabled server-side; no resend needed
 
   getEmailStatusMessage(): string {
     if (this.isCheckingEmail) {

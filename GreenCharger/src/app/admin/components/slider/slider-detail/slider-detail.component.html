@@ -1,0 +1,36 @@
+<div class="page-container">
+  <div class="page-header">
+    <h2>Chi tiết slider</h2>
+    <a routerLink="/admin/slider" class="btn">Quay lại</a>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Tìm kiếm theo tên, mô tả..." disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div *ngIf="isLoading">Đang tải...</div>
+    <div *ngIf="error">{{ error }}</div>
+    <div *ngIf="!isLoading && slider">
+      <h3>{{ slider.title }}</h3>
+      <p>{{ slider.description }}</p>
+      <div class="slider-image"><img [src]="slider.imageUrl" [alt]="slider.title"></div>
+      <p><strong>Liên kết:</strong> {{ slider.linkUrl || '—' }}</p>
+      <p><strong>Thứ tự:</strong> {{ slider.displayOrder }}</p>
+      <p><strong>Thời gian:</strong> {{ slider.startDate }} → {{ slider.endDate }}</p>
+      <p>
+        <strong>Trạng thái:</strong>
+        <span class="status-badge" [class.status-active]="slider.isActive" [class.status-inactive]="!slider.isActive">
+          {{ slider.isActive ? 'Hoạt động' : 'Ngừng hoạt động' }}
+        </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+

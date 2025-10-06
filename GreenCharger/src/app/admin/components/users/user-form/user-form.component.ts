@@ -14,8 +14,11 @@ export class UserFormComponent implements OnInit, OnChanges {
   @Input() user: User | null = null;
   @Input() isVisible = false;
   @Input() mode: 'add' | 'edit' = 'add';
+  @Input() roles: string[] = [];
+  @Input() selectedRole: string | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<UserDto>();
+  @Output() roleChange = new EventEmitter<string>();
 
   userForm!: FormGroup;
   submitted = false;
@@ -44,6 +47,13 @@ export class UserFormComponent implements OnInit, OnChanges {
     if (isVisibleChanged || userChanged || modeChanged) {
       this.initializeForm();
       this.formTitle = this.mode === 'add' ? 'Thêm người dùng mới' : 'Cập nhật thông tin người dùng';
+      // Emit current role value so parent always knows selected role
+      setTimeout(() => {
+        const roleValue = this.userForm.get('role')?.value;
+        if (roleValue) {
+          this.roleChange.emit(roleValue);
+        }
+      }, 0);
       
       // If we have user data and we're in edit mode, patch the form
       if (this.mode === 'edit' && this.user) {
@@ -66,7 +76,8 @@ export class UserFormComponent implements OnInit, OnChanges {
     const formConfig: any = {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      role: [this.selectedRole || 'User']
     };
     
     // Add password fields only for adding new users
@@ -75,11 +86,7 @@ export class UserFormComponent implements OnInit, OnChanges {
       formConfig.confirmPassword = ['', [Validators.required]];
     }
     
-    // Add new password fields for edit mode
-    if (this.mode === 'edit') {
-      formConfig.newPassword = ['', [Validators.minLength(6)]];
-      formConfig.confirmNewPassword = ['', []];
-    }
+    // Remove password change fields in edit mode per requirement
     
     this.userForm = this.fb.group(formConfig);
     console.log('Form initialized:', this.userForm.value);
@@ -129,7 +136,12 @@ export class UserFormComponent implements OnInit, OnChanges {
       lockoutEnd: this.user?.lockoutEnd || '',
       lockoutEnabled: this.user?.lockoutEnabled || false
     };
-    
+    // Ensure we emit the role value on submit as well
+    const submittedRole = this.userForm.get('role')?.value;
+    if (submittedRole) {
+      this.roleChange.emit(submittedRole);
+    }
+
     this.save.emit(userData);
   }
   

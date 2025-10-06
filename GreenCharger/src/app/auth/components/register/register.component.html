@@ -94,12 +94,6 @@
       {{ successMessage }}
     </div>
 
-    <!-- Email Status Messages -->
-    <div class="email-status-message" *ngIf="emailStatus?.exists && !emailStatus?.emailConfirmed">
-      <div class="error-message">
-        Email này đã được đăng ký nhưng chưa xác thực. 
-        <a href="javascript:void(0)" (click)="resendConfirmation()">Gửi lại email xác nhận</a>
-      </div>
-    </div>
+    <!-- Email confirmation disabled: no extra prompts -->
   </div>
 </div>

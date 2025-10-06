@@ -1,13 +1,30 @@
 <div class="page-container">
   <div class="page-header">
     <h2>Quản lý slider</h2>
-    <button class="btn btn-primary">
+    <button class="btn btn-primary" (click)="toggleCreate()">
       <i class="anticon anticon-plus"></i>
       Thêm slider mới
     </button>
   </div>
 
+  <div class="filters-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm kiếm theo tiêu đề, mô tả..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+      </div>
+    </div>
+  </div>
+
   <div class="table-container">
+    <div class="loading" *ngIf="isLoading">Đang tải slider...</div>
+    <div class="error" *ngIf="error">{{ error }}</div>
     <table class="data-table">
       <thead>
         <tr>
@@ -19,12 +36,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let slider of sliders; let i = index">
+        <tr *ngFor="let slider of filteredSliders; let i = index">
           <td>{{ i + 1 }}</td>
           <td>{{ slider.title }}</td>
           <td>
             <div class="slider-image">
-              <img [src]="slider.image" [alt]="slider.title" />
+              <img [src]="slider.imageUrl" [alt]="slider.title || ('Slide ' + slider.id)" />
             </div>
           </td>
           <td>
@@ -34,19 +51,83 @@
           </td>
           <td>
             <div class="action-buttons">
-              <button class="btn-action btn-view" title="Xem chi tiết">
-                <i class="anticon anticon-eye"></i>
+              <button class="btn-action btn-view" (click)="onView(slider)" title="Xem chi tiết" type="button">
+                <i class="fas fa-eye"></i>
               </button>
-              <button class="btn-action btn-edit" title="Sửa">
-                <i class="anticon anticon-edit"></i>
+              <button class="btn-action btn-edit" (click)="onEdit(slider)" title="Sửa">
+                <i class="fas fa-edit"></i>
               </button>
-              <button class="btn-action btn-delete" title="Xóa">
-                <i class="anticon anticon-delete"></i>
+              <button class="btn-action btn-delete" (click)="onDelete(slider)" title="Xóa">
+                <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Slider Form Modal -->
+<app-slider-form 
+  *ngIf="showCreate" 
+  [isVisible]="showCreate" 
+  [slider]="selected" 
+  [mode]="selected ? 'edit' : 'create'"
+  (close)="toggleCreate()"
+  (save)="selected ? onUpdate($event) : submitCreate($event)">
+</app-slider-form>
+
+<!-- View Modal -->
+<div class="modal" *ngIf="showView">
+  <div class="modal-backdrop" (click)="closeView()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Chi tiết slider</h3>
+      <button class="close-btn" (click)="closeView()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Tiêu đề</label>
+        <div>{{ viewing?.title }}</div>
+      </div>
+      <div class="form-row">
+        <label>Mô tả</label>
+        <div>{{ viewing?.description }}</div>
+      </div>
+      <div class="form-row col-right">
+        <label>Hình ảnh</label>
+        <div class="preview" *ngIf="viewing?.imageUrl">
+          <img [src]="viewing?.imageUrl" alt="slider" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Liên kết</label>
+        <div>{{ viewing?.linkUrl || '—' }}</div>
+      </div>
+      <div class="form-row">
+        <label>Thứ tự</label>
+        <div>{{ viewing?.displayOrder }}</div>
+      </div>
+      <div class="form-row col-right">
+        <label>Ngày bắt đầu</label>
+        <div>{{ viewing?.startDate }}</div>
+      </div>
+      <div class="form-row col-right">
+        <label>Ngày kết thúc</label>
+        <div>{{ viewing?.endDate }}</div>
+      </div>
+      <div class="form-row">
+        <label>Trạng thái</label>
+        <div>
+          <span class="badge" [class.badge-success]="viewing?.isActive" [class.badge-danger]="!viewing?.isActive">
+            {{ viewing?.isActive ? 'Hoạt động' : 'Ngừng hoạt động' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" (click)="closeView()">Đóng</button>
+    </div>
   </div>
 </div>

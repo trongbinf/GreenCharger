@@ -1,0 +1,56 @@
+<div class="modal" *ngIf="isVisible">
+  <div class="modal-backdrop" (click)="onClose()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>{{ mode === 'create' ? 'Thêm slider' : 'Sửa slider' }}</h3>
+      <button class="close-btn" (click)="onClose()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="form-row">
+        <label>Tiêu đề</label>
+        <input type="text" [(ngModel)]="form.title" placeholder="Nhập tiêu đề" />
+      </div>
+      <div class="form-row">
+        <label>Mô tả</label>
+        <textarea [(ngModel)]="form.description" placeholder="Mô tả"></textarea>
+      </div>
+      <div class="form-row">
+        <label>Hình ảnh</label>
+        <div class="upload-row">
+          <input type="file" (change)="onFileSelected($event)" [disabled]="uploading" />
+          <span *ngIf="uploading">Đang tải ảnh... {{ uploadProgress }}%</span>
+        </div>
+        <div class="preview" *ngIf="form.imageUrl">
+          <img [src]="form.imageUrl" alt="preview" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Liên kết khi click</label>
+        <input type="text" [(ngModel)]="form.linkUrl" placeholder="/product/123 hoặc https://..." />
+      </div>
+      <div class="form-row">
+        <label>Thứ tự hiển thị</label>
+        <input type="number" [(ngModel)]="form.displayOrder" />
+      </div>
+      <div class="form-row col-right">
+        <label>Ngày bắt đầu</label>
+        <input type="date" [(ngModel)]="form.startDate" />
+      </div>
+      <div class="form-row col-right">
+        <label>Ngày kết thúc</label>
+        <input type="date" [(ngModel)]="form.endDate" />
+      </div>
+      <div class="form-row">
+        <label>Trạng thái</label>
+        <input type="checkbox" [(ngModel)]="form.isActive" /> Hoạt động
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="onSubmit()">Lưu</button>
+      <button class="btn" (click)="onClose()">Hủy</button>
+    </div>
+  </div>
+  </div>
+
+

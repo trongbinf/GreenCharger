@@ -7,6 +7,7 @@ import { CategoryService } from '../../../services/category.service';
 import { Product, ProductDto } from '../../../models/product.model';
 import { Category } from '../../../models/category.model';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { MessageService } from '../../../services/message.service';
 import { ProductFormComponent } from './product-form/product-form.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
 
@@ -49,7 +50,8 @@ export class ProductsComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private message: NzMessageService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private msg: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -202,18 +204,19 @@ export class ProductsComponent implements OnInit {
   }
 
   onDeleteProduct(product: Product): void {
-    if (confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?`)) {
+    this.msg.confirm('Xóa sản phẩm?', `Bạn có chắc chắn muốn xóa "${product.name}"?`).then(result => {
+      if (!result.isConfirmed) return;
       this.productService.deleteProduct(product.id).subscribe({
         next: () => {
-          this.message.success('Xóa sản phẩm thành công');
+          this.msg.success('Đã xóa', 'Sản phẩm đã được xóa');
           this.loadProducts();
         },
         error: (error) => {
           console.error('Error deleting product:', error);
-          this.message.error('Lỗi khi xóa sản phẩm');
+          this.msg.error('Lỗi', 'Không thể xóa sản phẩm');
         }
       });
-    }
+    });
   }
 
   onToggleStatus(product: Product): void {

@@ -1,0 +1,24 @@
+<app-header></app-header>
+
+<section class="slider-page">
+  <div class="container">
+    <h2 class="section-title">Slider</h2>
+
+    <div class="loading" *ngIf="isLoading">Đang tải slider...</div>
+    <div class="error" *ngIf="error">{{ error }}</div>
+
+    <div class="slider-grid" *ngIf="!isLoading && !error">
+      <div class="slider-card" *ngFor="let s of sliders" (click)="onCardClick(s)" style="cursor: pointer;">
+        <img [src]="s.imageUrl" [alt]="s.title || ('Slide ' + s.id)" />
+        <div class="slider-info">
+          <h3>{{ s.title || ('Slide ' + s.id) }}</h3>
+          <p *ngIf="s.description">{{ s.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>
+
+

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HeaderComponent, FooterComponent } from '../../../core';
 import { CategoryService } from '../../../services/category.service';
 import { ProductService } from '../../../services/product.service';
 import { Category } from '../../../models/category.model';
 import { Product } from '../../../models/product.model';
+import { Slider } from '../../../models/slider.model';
+import { SliderService } from '../../../services/slider.service';
 
 @Component({
   selector: 'app-home',
@@ -24,27 +26,41 @@ export class HomeComponent implements OnInit {
   productsError = '';
 
   currentSlide = 0;
-  slides = [
-   
-    {
-      id: 1,
-      image: 'https://res.cloudinary.com/dafzz2c9j/image/upload/v1759077671/z7060360293839_cff022530c1b6a7c34ec883e2e54bac7_leu07g.jpg'
-    },
-    {
-      id: 2,
-      image: 'https://res.cloudinary.com/dafzz2c9j/image/upload/v1759077671/1_dppzqu.jpg'
-    }
-  ];
+  slides: Slider[] = [];
+  isLoadingSliders = false;
+  slidersError = '';
 
   constructor(
     private categoryService: CategoryService,
-    private productService: ProductService
+    private productService: ProductService,
+    private sliderService: SliderService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.startSlider();
+    this.loadSliders();
     this.loadCategories();
     this.loadFeaturedProducts();
+  }
+
+  loadSliders(): void {
+    this.isLoadingSliders = true;
+    this.slidersError = '';
+    this.sliderService.getActiveSliders().subscribe({
+      next: (sliders) => {
+        // Ensure they are sorted by displayOrder if present
+        this.slides = [...sliders].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+        this.isLoadingSliders = false;
+        if (this.slides.length > 0) {
+          this.startSlider();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading sliders:', error);
+        this.slidersError = 'Không thể tải slider';
+        this.isLoadingSliders = false;
+      }
+    });
   }
 
   loadCategories(): void {
@@ -350,8 +366,22 @@ export class HomeComponent implements OnInit {
 
   startSlider(): void {
     setInterval(() => {
-      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+      if (this.slides.length > 0) {
+        this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+      }
     }, 3000);
+  }
+
+  navigateFromSlide(slide: Slider): void {
+    if (!slide) return;
+    const url = (slide.linkUrl || '').trim();
+    if (!url) return;
+    // If absolute URL, go external; otherwise route internally
+    if (/^https?:\/\//i.test(url)) {
+      window.location.href = url;
+    } else {
+      this.router.navigateByUrl(url);
+    }
   }
 
   goToSlide(index: number): void {

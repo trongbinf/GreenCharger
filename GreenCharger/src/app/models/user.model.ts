@@ -10,6 +10,7 @@ export interface User {
   updatedAt: string;
   lockoutEnd: string;
   lockoutEnabled: boolean;
+  roles?: string[];
 }
 
 export interface UserDto {
@@ -24,6 +25,7 @@ export interface UserDto {
   updatedAt: string;
   lockoutEnd: string;
   lockoutEnabled: boolean;
+  roles?: string[];
 }
 
 // Authentication interfaces

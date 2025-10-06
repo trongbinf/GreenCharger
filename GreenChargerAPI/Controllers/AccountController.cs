@@ -252,22 +252,30 @@ namespace GreenChargerAPI.Controllers
         }
 
         [HttpGet("users")]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
             var users = _userManager.Users.ToList();
-            var dtos = users.Select(u => new UserDto
+            var dtos = new List<UserDto>();
+
+            foreach (var u in users)
             {
-                Id = u.Id,
-                UserName = u.UserName ?? "",
-                Email = u.Email ?? "",
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                EmailConfirmed = u.EmailConfirmed,
-                LockoutEnd = u.LockoutEnd?.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                LockoutEnabled = u.LockoutEnabled,
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt
-            });
+                var roles = await _userManager.GetRolesAsync(u);
+                dtos.Add(new UserDto
+                {
+                    Id = u.Id,
+                    UserName = u.UserName ?? "",
+                    Email = u.Email ?? "",
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    EmailConfirmed = u.EmailConfirmed,
+                    Roles = roles.ToList(),
+                    LockoutEnd = u.LockoutEnd?.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    LockoutEnabled = u.LockoutEnabled,
+                    CreatedAt = u.CreatedAt,
+                    UpdatedAt = u.UpdatedAt
+                });
+            }
+
             return Ok(dtos);
         }
 

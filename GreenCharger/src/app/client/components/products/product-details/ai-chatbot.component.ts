@@ -223,6 +223,7 @@ interface ChatMessage {
       flex: 1;
       padding: 24px;
       overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -309,6 +310,9 @@ interface ChatMessage {
       font-size: 14px;
       line-height: 1.5;
       position: relative;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap; /* preserve newlines from model */
     }
 
     .user-message .message-text {

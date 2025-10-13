@@ -27,7 +27,10 @@ export interface ProductInfo {
   providedIn: 'root'
 })
 export class GeminiService {
-  private readonly apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent';
+  // Use v1 with current supported model names; fallback if 404
+  private readonly baseUrl = 'https://generativelanguage.googleapis.com/v1/models';
+  private readonly primaryModel = 'gemini-1.5-flash-latest';
+  private readonly fallbackModel = 'gemini-1.5-pro-latest';
   private readonly apiKey = environment.geminiApiKey;
 
   constructor(private http: HttpClient) {}
@@ -75,21 +78,33 @@ export class GeminiService {
       }
     };
 
-    return this.http.post<GeminiResponse>(`${this.apiUrl}?key=${this.apiKey}`, requestBody, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
-    }).pipe(
-      map(response => {
-        if (response && response.candidates && response.candidates[0] && response.candidates[0].content) {
-          return response.candidates[0].content.parts[0].text;
-        } else {
-          throw new Error('Invalid response format');
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    const primaryUrl = `${this.baseUrl}/${this.primaryModel}:generateContent?key=${this.apiKey}`;
+    const fallbackUrl = `${this.baseUrl}/${this.fallbackModel}:generateContent?key=${this.apiKey}`;
+
+    const parseText = (response: GeminiResponse): string => {
+      if (response && response.candidates && response.candidates[0] && response.candidates[0].content) {
+        return response.candidates[0].content.parts[0].text;
+      }
+      throw new Error('Invalid response format');
+    };
+
+    return this.http.post<GeminiResponse>(primaryUrl, requestBody, { headers }).pipe(
+      map(parseText),
+      catchError(primaryError => {
+        // If model not found (404), try fallback model
+        if (primaryError && (primaryError.status === 404 || primaryError.statusText === 'NOT_FOUND')) {
+          return this.http.post<GeminiResponse>(fallbackUrl, requestBody, { headers }).pipe(
+            map(parseText),
+            catchError(fallbackError => {
+              console.error('Gemini API Fallback Error:', fallbackError);
+              return throwError(() => fallbackError);
+            })
+          );
         }
-      }),
-      catchError(error => {
-        console.error('Gemini API Error:', error);
-        return throwError(() => error);
+        console.error('Gemini API Error:', primaryError);
+        return throwError(() => primaryError);
       })
     );
   }

@@ -12,6 +12,7 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent, FooterComponent } from '../../../../core';
+import { AiChatbotComponent } from './ai-chatbot.component';
 
 @Component({
   selector: 'app-product-details',
@@ -27,7 +28,8 @@ import { HeaderComponent, FooterComponent } from '../../../../core';
     NzInputNumberModule,
     NzTagModule,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    AiChatbotComponent
   ],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']

@@ -4,7 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../../services/product.service';
 import { Product } from '../../../../models/product.model';
 import { HeaderComponent, FooterComponent } from '../../../../core';
-import { VisitorTrackingService } from '../../../../services/visitor-tracking.service';
+import { VisitorTrackingApiService } from '../../../../services/visitor-tracking-api.service';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -67,7 +67,7 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private visitorTrackingService: VisitorTrackingService,
+    private visitorTrackingApiService: VisitorTrackingApiService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -140,15 +140,15 @@ export class ProductListComponent implements OnInit {
   }
 
   viewDetails(p: Product): void {
-    this.visitorTrackingService.trackProductClick(p.id, p.name);
+    this.visitorTrackingApiService.trackProductClick(p.id, p.name);
     this.router.navigate(['/product', p.id]);
   }
 
   trackProductClick(p: Product): void {
-    this.visitorTrackingService.trackProductClick(p.id, p.name);
+    this.visitorTrackingApiService.trackProductClick(p.id, p.name);
   }
 
   getProductClickCount(productId: number): number {
-    return this.visitorTrackingService.getProductClickCount(productId);
+    return this.visitorTrackingApiService.getProductClickCount(productId);
   }
 } 

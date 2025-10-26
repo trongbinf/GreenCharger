@@ -19,6 +19,10 @@ namespace GreenChargerAPI.Data
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<VisitorStats> VisitorStats { get; set; }
+        public DbSet<ProductClick> ProductClicks { get; set; }
+        public DbSet<VisitorSession> VisitorSessions { get; set; }
+        public DbSet<WeeklyVisitorHistory> WeeklyVisitorHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,6 +128,22 @@ namespace GreenChargerAPI.Data
             modelBuilder.Entity<OrderDetail>()
                 .Property(od => od.Subtotal)
                 .HasColumnType("decimal(18,2)");
+
+            // Visitor tracking relationships
+            modelBuilder.Entity<ProductClick>()
+                .HasOne(pc => pc.Product)
+                .WithMany()
+                .HasForeignKey(pc => pc.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes for better performance
+            modelBuilder.Entity<VisitorSession>()
+                .HasIndex(vs => vs.SessionId)
+                .IsUnique();
+
+            modelBuilder.Entity<ProductClick>()
+                .HasIndex(pc => pc.ProductId)
+                .IsUnique();
         }
     }
 }

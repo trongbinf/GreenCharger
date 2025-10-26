@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { VisitorTrackingApiService, VisitorStats as ApiVisitorStats } from './visitor-tracking-api.service';
 
 export interface VisitorStats {
   totalVisitors: number;
@@ -15,7 +17,7 @@ export class VisitorTrackingService {
   private readonly STATS_KEY = 'green_charger_stats';
   private readonly VISIT_DATE_KEY = 'green_charger_last_visit';
 
-  constructor() {
+  constructor(private apiService: VisitorTrackingApiService) {
     this.initializeVisitor();
   }
 
@@ -48,22 +50,15 @@ export class VisitorTrackingService {
 
 
   public trackProductClick(productId: number, productName: string): void {
-    const stats = this.getStats();
-    stats.productClicks++;
+    // Use API service to track product click
+    this.apiService.trackProductClick(productId, productName);
     
-    // Track individual product clicks
-    if (!stats.productClickCounts) {
-      stats.productClickCounts = {};
-    }
-    stats.productClickCounts[productId] = (stats.productClickCounts[productId] || 0) + 1;
-    
-    this.saveStats(stats);
-
     // Log product click for analytics
     console.log(`Product clicked: ${productName} (ID: ${productId})`);
   }
 
   public getStats(): VisitorStats {
+    // Return cached stats from localStorage as fallback
     const stored = localStorage.getItem(this.STATS_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
@@ -83,6 +78,13 @@ export class VisitorTrackingService {
     };
   }
 
+  public getStatsObservable(): Observable<VisitorStats> {
+    return this.apiService.getVisitorStats().pipe(
+      // Map API response to our interface
+      // Note: We'll need to handle the mapping in the components
+    );
+  }
+
   private saveStats(stats: VisitorStats): void {
     localStorage.setItem(this.STATS_KEY, JSON.stringify(stats));
   }
@@ -99,7 +101,7 @@ export class VisitorTrackingService {
   }
 
   public getProductClickCount(productId: number): number {
-    const stats = this.getStats();
-    return stats.productClickCounts[productId] || 0;
+    // Use API service to get real-time data
+    return this.apiService.getProductClickCount(productId);
   }
 }

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UserService } from '../../../services/user.service';
 import { ProductService } from '../../../services/product.service';
-import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
+import { VisitorTrackingApiService } from '../../../services/visitor-tracking-api.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -15,34 +17,45 @@ import { environment } from '../../../../environments/environment';
 })
 export class DashboardComponent implements OnInit {
   stats = { totalUsers: 0, totalProducts: 0, totalOrders: 0, totalRevenue: 0 };
-  visitorStats = { totalVisitors: 0, totalUsers: 0, productClicks: 0, lastVisit: new Date() };
+  visitorStats$: Observable<{
+    totalVisitors: number;
+    totalUsers: number;
+    productClicks: number;
+    weeklyVisitors: number;
+    lastVisit: Date;
+  }>;
   recentOrders: { id: number; customer: string; amount: number; status: string }[] = [];
 
   constructor(
     private users: UserService,
     private products: ProductService,
-    private visitorTracking: VisitorTrackingService,
+    private visitorTrackingApiService: VisitorTrackingApiService,
     private http: HttpClient
-  ) { }
+  ) {
+    // Combine visitor stats and user count
+    this.visitorStats$ = combineLatest([
+      this.visitorTrackingApiService.getVisitorStats(),
+      this.users.getUsers()
+    ]).pipe(
+      map(([visitorStats, users]) => ({
+        totalVisitors: visitorStats.totalVisitors,
+        totalUsers: users.length,
+        productClicks: visitorStats.totalProductClicks,
+        weeklyVisitors: visitorStats.weeklyVisitors,
+        lastVisit: new Date(visitorStats.lastUpdated)
+      }))
+    );
+  }
 
   ngOnInit(): void {
     this.loadStats();
   }
 
   private loadStats(): void {
-    // Load visitor stats
-    const visitorData = this.visitorTracking.getStats();
-    this.visitorStats = {
-      totalVisitors: visitorData.totalVisitors,
-      totalUsers: 0, // Will be updated from API
-      productClicks: visitorData.productClicks,
-      lastVisit: visitorData.lastVisit
-    };
-
+    // Load user stats
     this.users.getUsers().subscribe({
       next: list => {
         this.stats.totalUsers = list.length;
-        this.visitorStats.totalUsers = list.length; // Update visitor stats with actual user count
       },
       error: () => {}
     });

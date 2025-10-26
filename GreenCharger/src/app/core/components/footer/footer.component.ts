@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { VisitorTrackingApiService } from '../../../services/visitor-tracking-api.service';
 import { UserService } from '../../../services/user.service';
 
 @Component({
@@ -13,25 +15,30 @@ import { UserService } from '../../../services/user.service';
 })
 export class FooterComponent implements OnInit {
   currentYear = new Date().getFullYear();
-  visitorStats = { totalVisitors: 0, totalUsers: 0 };
+  visitorStats$: Observable<{
+    totalVisitors: number;
+    totalUsers: number;
+    weeklyVisitors: number;
+  }>;
 
   constructor(
-    private visitorTracking: VisitorTrackingService,
+    private visitorTrackingApiService: VisitorTrackingApiService,
     private userService: UserService
-  ) {}
+  ) {
+    // Combine visitor stats and user count
+    this.visitorStats$ = combineLatest([
+      this.visitorTrackingApiService.getVisitorStats(),
+      this.userService.getUsers()
+    ]    ).pipe(
+      map(([visitorStats, users]) => ({
+        totalVisitors: visitorStats.totalVisitors,
+        totalUsers: users.length,
+        weeklyVisitors: visitorStats.weeklyVisitors
+      }))
+    );
+  }
 
   ngOnInit(): void {
-    const visitorData = this.visitorTracking.getStats();
-    this.visitorStats.totalVisitors = visitorData.totalVisitors;
-    
-    // Fetch actual user count from API
-    this.userService.getUsers().subscribe({
-      next: users => {
-        this.visitorStats.totalUsers = users.length;
-      },
-      error: () => {
-        this.visitorStats.totalUsers = 0;
-      }
-    });
+    // Data is automatically loaded through the observable
   }
 }

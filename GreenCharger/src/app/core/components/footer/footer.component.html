@@ -85,11 +85,15 @@
         <div class="visitor-stats">
           <span class="visitor-count">
             <i class="fas fa-users"></i>
-            {{ visitorStats.totalVisitors }} lượt truy cập
+            {{ (visitorStats$ | async)?.totalVisitors || 0 }} lượt truy cập
+          </span>
+          <span class="visitor-count">
+            <i class="fas fa-calendar-week"></i>
+            {{ (visitorStats$ | async)?.weeklyVisitors || 0 }} lượt tuần này
           </span>
           <span class="visitor-count">
             <i class="fas fa-user-plus"></i>
-            {{ visitorStats.totalUsers }} khách hàng đăng ký
+            {{ (visitorStats$ | async)?.totalUsers || 0 }} khách hàng đăng ký
           </span>
         </div>
         <div class="footer-bottom-links">

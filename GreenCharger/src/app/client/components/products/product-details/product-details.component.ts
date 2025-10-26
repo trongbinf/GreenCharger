@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../../../services/product.service';
-import { VisitorTrackingService } from '../../../../services/visitor-tracking.service';
+import { VisitorTrackingApiService } from '../../../../services/visitor-tracking-api.service';
 import { Product } from '../../../../models/product.model';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -52,7 +52,7 @@ export class ProductDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private visitorTrackingService: VisitorTrackingService,
+    private visitorTrackingApiService: VisitorTrackingApiService,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -226,6 +226,6 @@ export class ProductDetailsComponent implements OnInit {
 
   // Get product click count
   getProductClickCount(productId: number): number {
-    return this.visitorTrackingService.getProductClickCount(productId);
+    return this.visitorTrackingApiService.getProductClickCount(productId);
   }
 }

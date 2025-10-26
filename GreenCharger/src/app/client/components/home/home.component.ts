@@ -8,7 +8,7 @@ import { Category } from '../../../models/category.model';
 import { Product } from '../../../models/product.model';
 import { Slider } from '../../../models/slider.model';
 import { SliderService } from '../../../services/slider.service';
-import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
+import { VisitorTrackingApiService } from '../../../services/visitor-tracking-api.service';
 
 @Component({
   selector: 'app-home',
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private sliderService: SliderService,
-    private visitorTrackingService: VisitorTrackingService,
+    private visitorTrackingApiService: VisitorTrackingApiService,
     private router: Router
   ) {}
 
@@ -424,10 +424,10 @@ export class HomeComponent implements OnInit {
   }
 
   trackProductClick(product: Product): void {
-    this.visitorTrackingService.trackProductClick(product.id, product.name);
+    this.visitorTrackingApiService.trackProductClick(product.id, product.name);
   }
 
   getProductClickCount(productId: number): number {
-    return this.visitorTrackingService.getProductClickCount(productId);
+    return this.visitorTrackingApiService.getProductClickCount(productId);
   }
 }

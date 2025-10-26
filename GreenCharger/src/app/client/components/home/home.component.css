@@ -256,6 +256,27 @@
   color: #666;
 }
 
+/* Product Stats */
+.product-stats {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.click-count {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #666;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.click-count i {
+  color: #2ecc71;
+  font-size: 0.875rem;
+}
+
 .product-price {
   display: flex;
   align-items: center;

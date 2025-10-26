@@ -42,6 +42,27 @@
   text-decoration: line-through;
 }
 
+/* Product Stats */
+.product-stats {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.click-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.click-count i {
+  color: #2ecc71;
+  font-size: 12px;
+}
+
 .pagination {
   margin-top: 16px;
   text-align: center;

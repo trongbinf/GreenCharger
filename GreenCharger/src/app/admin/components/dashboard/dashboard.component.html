@@ -47,6 +47,52 @@
     </div>
   </div>
 
+  <!-- Visitor Stats Section -->
+  <div class="visitor-stats-section">
+    <h3>Thống kê truy cập website</h3>
+    <div class="visitor-stats-grid">
+      <div class="visitor-stat-card">
+        <div class="visitor-stat-icon">
+          <i class="fas fa-eye"></i>
+        </div>
+        <div class="visitor-stat-content">
+          <div class="visitor-stat-number">{{ visitorStats.totalVisitors }}</div>
+          <div class="visitor-stat-label">Tổng lượt truy cập</div>
+        </div>
+      </div>
+
+      <div class="visitor-stat-card">
+        <div class="visitor-stat-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="visitor-stat-content">
+          <div class="visitor-stat-number">{{ visitorStats.totalUsers }}</div>
+          <div class="visitor-stat-label">Tổng khách hàng đăng ký</div>
+        </div>
+      </div>
+
+      <div class="visitor-stat-card">
+        <div class="visitor-stat-icon">
+          <i class="fas fa-mouse-pointer"></i>
+        </div>
+        <div class="visitor-stat-content">
+          <div class="visitor-stat-number">{{ visitorStats.productClicks }}</div>
+          <div class="visitor-stat-label">Lượt xem sản phẩm</div>
+        </div>
+      </div>
+
+      <div class="visitor-stat-card">
+        <div class="visitor-stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="visitor-stat-content">
+          <div class="visitor-stat-number">{{ visitorStats.lastVisit | date:'dd/MM/yyyy HH:mm' }}</div>
+          <div class="visitor-stat-label">Lần truy cập cuối</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Charts Section -->
   <div class="charts-section">
     <div class="chart-card">

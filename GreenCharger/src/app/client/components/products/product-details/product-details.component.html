@@ -83,6 +83,13 @@
               <span class="meta-label">Số lượng còn:</span>
               <span class="meta-value">{{ p.quantityInStock }} sản phẩm</span>
             </div>
+            <div class="meta-item">
+              <span class="meta-label">Lượt xem:</span>
+              <span class="meta-value click-count">
+                <i class="fas fa-eye"></i>
+                {{ getProductClickCount(p.id) }} lượt
+              </span>
+            </div>
           </div>
 
           <div class="product-actions">

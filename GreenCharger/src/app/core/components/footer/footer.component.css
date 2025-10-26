@@ -224,6 +224,27 @@
   font-size: 14px;
 }
 
+/* Visitor Stats */
+.visitor-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.visitor-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.visitor-count i {
+  color: #2ecc71;
+  font-size: 14px;
+}
+
 .footer-bottom-links {
   display: flex;
   gap: 20px;

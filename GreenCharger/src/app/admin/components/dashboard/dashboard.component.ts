@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../services/user.service';
 import { ProductService } from '../../../services/product.service';
+import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -14,11 +15,13 @@ import { environment } from '../../../../environments/environment';
 })
 export class DashboardComponent implements OnInit {
   stats = { totalUsers: 0, totalProducts: 0, totalOrders: 0, totalRevenue: 0 };
+  visitorStats = { totalVisitors: 0, totalUsers: 0, productClicks: 0, lastVisit: new Date() };
   recentOrders: { id: number; customer: string; amount: number; status: string }[] = [];
 
   constructor(
     private users: UserService,
     private products: ProductService,
+    private visitorTracking: VisitorTrackingService,
     private http: HttpClient
   ) { }
 
@@ -27,8 +30,20 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadStats(): void {
+    // Load visitor stats
+    const visitorData = this.visitorTracking.getStats();
+    this.visitorStats = {
+      totalVisitors: visitorData.totalVisitors,
+      totalUsers: 0, // Will be updated from API
+      productClicks: visitorData.productClicks,
+      lastVisit: visitorData.lastVisit
+    };
+
     this.users.getUsers().subscribe({
-      next: list => this.stats.totalUsers = list.length,
+      next: list => {
+        this.stats.totalUsers = list.length;
+        this.visitorStats.totalUsers = list.length; // Update visitor stats with actual user count
+      },
       error: () => {}
     });
 

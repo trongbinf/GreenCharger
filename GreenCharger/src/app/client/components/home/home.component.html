@@ -58,7 +58,7 @@
       </div>
       
       <div class="products-grid" *ngIf="!isLoadingProducts && !productsError">
-        <a class="product-card" *ngFor="let product of featuredProducts" [routerLink]="['/product', product.id]">
+        <a class="product-card" *ngFor="let product of featuredProducts" [routerLink]="['/product', product.id]" (click)="trackProductClick(product)">
           <div class="product-image">
             <img [src]="getProductImageUrl(product)" [alt]="product.name">
             <div class="product-badge">{{ getProductBadge(product) }}</div>
@@ -78,6 +78,12 @@
                   [class.filled]="star === 1">★</span>
               </div>
               <span class="rating-text">({{ product.reviewCount }})</span>
+            </div>
+            <div class="product-stats">
+              <span class="click-count">
+                <i class="fas fa-eye"></i>
+                {{ getProductClickCount(product.id) }} lượt xem
+              </span>
             </div>
            
           </div>

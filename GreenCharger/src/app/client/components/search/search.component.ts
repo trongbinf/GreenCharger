@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { HeaderComponent, FooterComponent } from '../../../core';
 import { ProductService } from '../../../services/product.service';
+import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
 import { Product } from '../../../models/product.model';
 
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
@@ -58,7 +59,8 @@ export class SearchComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private visitorTrackingService: VisitorTrackingService
   ) {}
 
   ngOnInit(): void {
@@ -118,5 +120,13 @@ export class SearchComponent implements OnInit {
     if (this.sortBy === 'priceDesc') out.sort((a, b) => (b.finalPrice ?? b.price) - (a.finalPrice ?? a.price));
 
     this.results = out;
+  }
+
+  trackProductClick(product: Product): void {
+    this.visitorTrackingService.trackProductClick(product.id, product.name);
+  }
+
+  getProductClickCount(productId: number): number {
+    return this.visitorTrackingService.getProductClickCount(productId);
   }
 } 

@@ -8,6 +8,7 @@ import { Category } from '../../../models/category.model';
 import { Product } from '../../../models/product.model';
 import { Slider } from '../../../models/slider.model';
 import { SliderService } from '../../../services/slider.service';
+import { VisitorTrackingService } from '../../../services/visitor-tracking.service';
 
 @Component({
   selector: 'app-home',
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private sliderService: SliderService,
+    private visitorTrackingService: VisitorTrackingService,
     private router: Router
   ) {}
 
@@ -419,5 +421,13 @@ export class HomeComponent implements OnInit {
       return 'Mới';
     }
     return 'Nổi bật';
+  }
+
+  trackProductClick(product: Product): void {
+    this.visitorTrackingService.trackProductClick(product.id, product.name);
+  }
+
+  getProductClickCount(productId: number): number {
+    return this.visitorTrackingService.getProductClickCount(productId);
   }
 }

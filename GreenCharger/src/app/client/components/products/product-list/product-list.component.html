@@ -42,13 +42,19 @@
 
       <div nz-row [nzGutter]="16" *ngIf="!isLoading && !error">
         <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="12" [nzLg]="8" *ngFor="let p of pagedProducts">
-          <a [routerLink]="['/product', p.id]">
+          <a [routerLink]="['/product', p.id]" (click)="trackProductClick(p)">
             <nz-card nzHoverable [nzBordered]="true" [nzCover]="coverTpl" style="margin-bottom:12px">
               <nz-card-meta [nzTitle]="p.name"></nz-card-meta>
               <div style="display:flex; align-items:center; gap:8px; margin-top:8px">
                 <span class="current-price">{{ (p.finalPrice || p.price) | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
                 <span class="original-price" *ngIf="p.discount>0">{{ p.price | currency:'VND':'symbol':'1.0-0':'vi' }}</span>
                 <nz-tag nzColor="magenta" *ngIf="p.isOnSale && p.discount>0">-{{ p.discount }}%</nz-tag>
+              </div>
+              <div class="product-stats">
+                <span class="click-count">
+                  <i class="fas fa-eye"></i>
+                  {{ getProductClickCount(p.id) }} lượt xem
+                </span>
               </div>
             </nz-card>
             <ng-template #coverTpl>
